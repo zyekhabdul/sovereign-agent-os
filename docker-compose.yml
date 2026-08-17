@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  agent-os:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sovereign-agent-sandbox
+    hostname: sovereign-box
+    restart: unless-stopped
+    volumes:
+      - ~/Projects:/home/fuckadmin/Projects
+      - ~/Documents/Obsidian Vault:/home/fuckadmin/Documents/Obsidian Vault
+      - ~/.ssh:/home/fuckadmin/.ssh:ro
+    environment:
+      - TZ=Asia/Jakarta
+    stdin_open: true
+    tty: true

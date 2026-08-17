@@ -1,69 +1,93 @@
-# AI AGENT STANDARDS & UNIVERSAL DEVELOPER BOOTSTRAP KIT
-
-Centralized governance, binding rules, master PRD templates, project standards, and automated Tri-Forge multi-push deployment tooling for AI coding agents (Antigravity CLI `agy`, OpenCode, Codex, Claude Code).
+# SOVEREIGN AGENT OS (`sovereign-agent-os`)
+> **The Sovereign Multi-Agent & Developer Runtime Environment**  
+> *Universal Bootstrap, Cross-Agent Parity (AGY, Claude Code, OpenCode, Codex), 11 Core Components, Tri-Forge Mirroring, & Encrypted Secret Vault.*
 
 ---
 
-## 1. Directory Structure
+## ARSITEKTUR REPOSITORI
 
 ```
-ai-agent-standards/
-├── AI_BOOTSTRAP_GUIDE.md      # Autonomous setup instruction for AI Agents
-├── GLOBAL_RULES.md            # 11 Core Components & Universal Execution Guidelines
-├── PRD-MASTER-TEMPLATE.md     # Mandatory PRD Template for all projects
-├── rules/                     # Modular binding rule specifications
-│   ├── ai-proposal-protocol.md # RFC standard for AI-initiated suggestions
-│   ├── git-push-restriction.md # Strict permission control for remote pushes
-│   ├── mcp-discovery.md        # Dual-file MCP discovery protocol
-│   ├── obsidian-rag.md         # 4-File memory schema & namespace isolation
-│   └── workflow-ai-agent.md    # Hyper-granular chunking & silent QA gates
+sovereign-agent-os/
+├── AI_BOOTSTRAP_GUIDE.md          # Autonomous Onboarding Guide for AI Agents
+├── GLOBAL_RULES.md                # 11 Core Components & Binding Governance Rules
+├── Dockerfile                     # Universal Containerized Linux Sandbox
+├── docker-compose.yml             # Sandbox Compose Service Definition
+├── .devcontainer/                 # VS Code & Cursor Devcontainer Integration
+├── .github/workflows/             # Server-Side Tri-Forge Mirroring (GitHub -> GitLab + Codeberg)
+├── .gitlab-ci.yml                 # GitLab CI Mirroring Pipeline
+├── docs/                          # Master Tata Kelola Proyek
+│   ├── GLOBAL-PROJECT-STANDARD.md # 7 Inti + 2 Wajib File Standards
+│   ├── WORKFLOW-AI-AGENT-STANDARD.md # 6-Phase AI Execution Workflow
+│   └── PRD-MASTER-TEMPLATE.md     # Master PRD Blueprint
+├── rules/                         # Modular Binding Directives
+│   ├── ai-proposal-protocol.md    # RFC Standard for AI-Initiated Changes
+│   ├── git-push-restriction.md    # Strict Remote Push Authorization
+│   ├── mcp-discovery.md           # Dual-File MCP Discovery Protocol
+│   ├── obsidian-rag.md            # 4-File Namespace Schema & RAG Governance
+│   └── workflow-ai-agent.md       # Hyper-Granular Chunking Standard
+├── plugins/
+│   └── agent-skills/              # 11 Core Skills, Checklists, & Commands
 ├── templates/
-│   ├── git-hooks/             # Universal pre-commit hooks & emoji scanner
-│   │   ├── pre-commit
-│   │   └── check_emojis.py
-│   ├── mcp/                   # Sanitized zero-secret MCP configuration templates
-│   │   ├── mcp_config.template.json
-│   │   └── mcp_config_extended.template.json
-│   ├── projects/              # Dedicated project architecture standards
-│   │   ├── STANDAR_ATURAN_AI_ZYEKH_COM.md
-│   │   └── STANDAR_ATURAN_AI_SHOP_ZYEKH.md
-│   └── rag/                   # Obsidian memory & ADR templates
-│       └── ADR-TEMPLATE.md
+│   ├── dotfiles/                  # SSH, Git, & Shell Aliases Templates
+│   ├── git-hooks/                 # Pre-commit Hook & Emoji Guard
+│   ├── mcp/                       # Sanitized Zero-Secret MCP Templates
+│   ├── projects/                  # Project-Specific Rules
+│   └── rag/                       # ADR & Memory Schemas
 └── scripts/
-    ├── bootstrap.sh           # Universal environment & directory setup
-    ├── install-mcps.sh        # Installs essential global npm MCP servers
-    ├── setup-rag.sh           # Scaffolds 4-file Obsidian project memory
-    └── setup-tri-push.sh      # Automated multi-remote Git setup (GitHub + GitLab + Codeberg)
+    ├── bootstrap.sh               # Complete Machine & Environment Bootstrap
+    ├── sync-agents.sh             # Cross-Agent Parity Syncer (AGY, Claude, OpenCode, Codex)
+    ├── vault.sh                   # Encrypted Credential Locker (AES-256-CBC)
+    ├── clone-velora.sh            # Instant Velora Workspace & Repo Manager
+    ├── install-mcps.sh            # Global MCP Server Installer
+    ├── setup-rag.sh               # 4-File Obsidian Memory Scaffolder
+    ├── setup-tri-push.sh          # Git Multi-Push Remote Setup
+    ├── sync-all-repos.sh          # Batch Git Multi-Push Mirroring
+    └── verify-env.sh              # 17-Point Host Health Diagnostic
 ```
 
 ---
 
-## 2. Fast AI Bootstrapping on a Fresh Host (VPS / Laptop)
+## PANDUAN PENGGUNAAN CEPAT (QUICK START)
 
-1. Clone this repository on the target machine:
-   ```bash
-   git clone git@github.com:zyekhabdul/ai-agent-standards.git ~/Projects/ai-agent-standards
-   ```
-
-2. Instruct your AI agent:
-   > *"Baca `AI_BOOTSTRAP_GUIDE.md` di repo ini dan setup seluruh environment mesin ini."*
-
----
-
-## 3. Manual Quick-Start Commands
-
-### A. Initialize Machine Environment
+### 1. Di Mesin / VPS Baru (Native)
 ```bash
+git clone git@github.com:zyekhabdul/ai-agent-standards.git ~/Projects/sovereign-agent-os
+cd ~/Projects/sovereign-agent-os
 bash scripts/bootstrap.sh
 ```
 
-### B. Scaffold RAG Memory for a Project
+### 2. Di Lingkungan Docker / Sandbox
 ```bash
-bash scripts/setup-rag.sh <project-name> [repo-path]
+docker compose up -d
+docker compose exec agent-os bash
 ```
 
-### C. Setup Tri-Forge Multi-Push (GitHub + GitLab + Codeberg)
+### 3. Sinkronisasi Seluruh AI Agent (AGY, Claude Code, OpenCode, Codex)
 ```bash
-bash scripts/setup-tri-push.sh /path/to/repo [repo-name]
-git push all <branch>
+bash scripts/sync-agents.sh
 ```
+
+### 4. Mengunci & Membuka Vault Kredensial Terenkripsi
+```bash
+# Simpan kredensial aktif ke vault.enc terenkripsi
+./scripts/vault.sh pack
+
+# Pulihkan kredensial dari vault.enc di mesin baru
+./scripts/vault.sh unpack
+```
+
+### 5. Multi-Platform Remote Push (GitHub + GitLab + Codeberg)
+```bash
+# Setup remote 'all' di repositori aktif
+./scripts/setup-tri-push.sh
+
+# Push ke 3 platform sekaligus
+git push all main
+```
+
+---
+
+## STATUS SINKRONISASI TRI-FORGE
+- **GitHub**: `https://github.com/zyekhabdul/ai-agent-standards`
+- **GitLab**: `https://gitlab.com/aomiqaza/ai-agent-standards`
+- **Codeberg**: `https://codeberg.org/aomiqaza/ai-agent-standards`

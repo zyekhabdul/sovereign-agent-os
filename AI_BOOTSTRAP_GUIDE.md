@@ -1,65 +1,63 @@
-# AI AGENT BOOTSTRAP & SYSTEM SETUP INSTRUCTION
+# AI AGENT AUTONOMOUS ONBOARDING & BOOTSTRAP GUIDE
 
-> **Target Audience**: AI Coding Agents (AGY Antigravity CLI, OpenCode, Codex, Claude Code, Cursor) running on a newly provisioned machine (VPS, container, or developer workstation).
-> **Objective**: Read this document and execute the autonomous environment setup sequence to bring the host to full sovereign development standard.
-
----
-
-## 1. IDENTITY & GOVERNANCE ACKNOWLEDGMENT
-Before executing any shell commands or modifying files, you MUST acknowledge and strictly internalize:
-1. **11 Active Components**: Ponytail (YAGNI), Serena, Caveman, Codegraph, Contextmode, Headroom, RTK, Graphify, Delphitools, Skills, MCP.
-2. **Objective Mentor Persona**: Zero pleasantries, zero fluff, direct, concise, empirical solutions.
-3. **Strict No-Emoji Standard**: All generated code, templates, and markdown files must remain 100% free of graphical emojis.
-4. **Strict Git Push Permission Control**: `git commit` is permitted locally; `git push` is STRICTLY PROHIBITED unless explicitly commanded by the user.
+> **MANDATORY INSTRUCTION FOR ALL AI CODING AGENTS (AGY, CLAUDE CODE, OPENCODE, CODEX)**  
+> When initialized on a fresh system, workspace, or VPS containing this repository, you MUST follow this protocol autonomously to configure the host environment.
 
 ---
 
-## 2. AUTONOMOUS HOST BOOTSTRAP SEQUENCE
+## 1. PRIMARY BOOTSTRAP EXECUTION
 
-When instructed to "Setup this machine" or "Bootstrap environment", execute the following sequence in order:
-
-### Step 1: Run Environment Initializer
+Execute the master bootstrap script:
 ```bash
-# Execute universal bootstrap script (creates directory tree, links global rules, installs MCPs)
-bash scripts/bootstrap.sh
+cd /path/to/sovereign-agent-os && bash scripts/bootstrap.sh
 ```
 
-### Step 2: Configure Model Context Protocol (MCP)
-1. Verify dual config files exist at `~/.gemini/config/mcp_config.json` and `~/.gemini/config/mcp_config_extended.json`.
-2. If missing, copy from `templates/mcp/` and prompt the user securely for required API keys (GitHub, GitLab, Codeberg, etc.) without printing tokens to stdout.
-3. Verify MCP servers function via standard CLI inspection.
+This autonomously handles:
+1. System package verification (`git`, `ripgrep`, `jq`, `python3`, `node`, `npm`, `ssh`).
+2. Directory structure creation (`~/.gemini/config/rules`, `~/.agents/skills`, `~/Projects`, `~/Documents/Obsidian Vault/00-AGY-Memory`).
+3. Deployment of `GLOBAL_RULES.md` to `~/.gemini/GEMINI.md`, `~/.agents/GEMINI.md`, `~/.claude/CLAUDE.md`, `~/.opencode/OPENCODE.md`.
+4. Global npm installation of filesystem, postgres, and git MCP servers.
+5. Synchronization of 29 MCP servers across AGY, Claude Code, and OpenCode.
+6. Execution of the environment diagnostic verification.
 
-### Step 3: Scaffold Project RAG Memory (Obsidian Vault)
-For every active project repository under `~/Projects/<repo-name>`:
+---
+
+## 2. CROSS-AGENT PARITY & MULTI-AGENT SYNC
+
+Whenever MCP endpoints or rules are modified, execute:
 ```bash
-# Scaffold the 4-file memory schema (INDEX, CONTEXT, STATE, DECISIONS)
-bash scripts/setup-rag.sh <repo-name> ~/Projects/<repo-name>
+bash scripts/sync-agents.sh
 ```
+This guarantees that **Antigravity CLI**, **Claude Code**, **OpenCode**, and **Codex** run with identical MCP servers, rules, and skills without manual intervention.
 
-### Step 4: Configure Tri-Forge Multi-Push Remotes
-For every git project requiring high-availability multi-forge mirroring:
+---
+
+## 3. TRI-FORGE MULTI-REMOTE PROTOCOL
+
+Every local git repository MUST be configured with a multi-remote push target named `all` pointing to:
+1. GitHub (`git@github.com:zyekhabdul/<repo-name>.git`)
+2. GitLab (`git@gitlab.com:aomiqaza/<repo-name>.git`)
+3. Codeberg (`git@codeberg.org:aomiqaza/<repo-name>.git`)
+
+To configure automatically:
 ```bash
-# Setup remote 'all' pointing to GitHub (zyekhabdul), GitLab (aomiqaza), Codeberg (aomiqaza)
-bash scripts/setup-tri-push.sh ~/Projects/<repo-name> <repo-name>
+bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
 ```
 
 ---
 
-## 3. PROJECT DEVELOPMENT RULES INJECTION
-When working on a specific project type, inject the dedicated project rule into the repo root as `GEMINI.md`:
-- **Static Engineering Portfolio / Tools / Web**:
-  Copy `templates/projects/STANDAR_ATURAN_AI_ZYEKH_COM.md` -> `<project-root>/GEMINI.md`
-- **Shopify Liquid 2.0 E-Commerce Theme**:
-  Copy `templates/projects/STANDAR_ATURAN_AI_SHOP_ZYEKH.md` -> `<project-root>/GEMINI.md`
-- **Pre-Commit Quality Gate**:
-  Copy `templates/git-hooks/pre-commit` -> `<project-root>/.git/hooks/pre-commit` (`chmod +x`)
-  Copy `templates/git-hooks/check_emojis.py` -> `<project-root>/check_emojis.py`
+## 4. OBSIDIAN RAG MEMORY GOVERNANCE
 
----
+Every project repository MUST have a corresponding memory directory in:
+`/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<project-namespace>/`
 
-## 4. VERIFICATION DEFINITION OF DONE
-- [ ] Directory `~/.gemini/config/rules/` contains all 5 modular rule files.
-- [ ] `~/.gemini/GEMINI.md` contains 11 active core components.
-- [ ] MCP servers installed globally via npm.
-- [ ] Obsidian Vault `~/Documents/Obsidian Vault/00-AGY-Memory/` initialized.
-- [ ] All pre-commit hooks executable (`chmod +x`).
+Maintaining strictly 4 core files:
+- `INDEX.md`: Metadata & latest git commit hash.
+- `CONTEXT.md`: Architecture & stack overview.
+- `STATE.md`: Active task status (updated at the end of every session).
+- `DECISIONS.md`: Append-only Architectural Decision Records (ADR).
+
+To scaffold automatically:
+```bash
+bash scripts/setup-rag.sh /path/to/repo <project-namespace>
+```

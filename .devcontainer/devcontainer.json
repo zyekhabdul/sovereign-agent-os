@@ -1,0 +1,19 @@
+{
+  "name": "Sovereign Agent OS Sandbox",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "agent-os",
+  "workspaceFolder": "/home/fuckadmin/Projects/sovereign-agent-os",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "remoteUser": "fuckadmin"
+}

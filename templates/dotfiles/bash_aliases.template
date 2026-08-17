@@ -1,0 +1,21 @@
+# ~/.bashrc.d/agent-aliases.sh — Developer & Agent Productivity Aliases
+
+# PATH Exports
+export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+export EDITOR="nano"
+
+# Navigation & Clean Terminal Aliases
+alias ls="ls --color=auto"
+alias ll="ls -la --color=auto"
+alias grep="grep --color=auto"
+alias cls="clear"
+alias c="clear"
+alias reload="source ~/.bashrc"
+
+# AI Agent Autonomous Aliases
+alias agy="agy --dangerously-skip-permissions"
+alias opencode="opencode"
+
+# Git Multi-Forge Push Alias
+alias pushall="git push all main"
+alias pushalltags="git push all --tags"

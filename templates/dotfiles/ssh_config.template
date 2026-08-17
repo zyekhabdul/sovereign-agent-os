@@ -1,0 +1,22 @@
+# ~/.ssh/config — Standard Sovereign Multi-Forge & Server SSH Routing
+
+Host serv serv.zyekh.com
+    HostName serv.zyekh.com
+    User fuckadmin
+    Port 22039
+    IdentityFile ~/.ssh/id_ed25519_thinkpad_pass
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_thinkpad_pass
+
+Host codeberg.org
+    HostName codeberg.org
+    User git
+    IdentityFile ~/.ssh/id_ed25519_thinkpad_pass
+
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_thinkpad_pass

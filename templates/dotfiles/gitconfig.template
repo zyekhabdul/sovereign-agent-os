@@ -1,0 +1,16 @@
+[user]
+	name = zyekhabdul
+	email = zyekhabdulqadirjailani@gmail.com
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = nano
+	autocrlf = input
+
+[push]
+	autoSetupRemote = true
+
+[pull]
+	rebase = false

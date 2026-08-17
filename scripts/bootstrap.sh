@@ -15,7 +15,7 @@ echo "======================================================"
 
 # 1. Detect Package Manager and Install Essential CLI Tools
 if [ "$NO_PKG" = false ]; then
-  echo "[ 1/5 ] Detecting OS and verifying core packages..."
+  echo "[ 1/6 ] Detecting OS and verifying core packages..."
   if command -v pacman >/dev/null 2>&1; then
     echo "OS: Arch Linux detected (pacman)"
     sudo pacman -Sy --needed --noconfirm git ripgrep jq python nodejs npm openssh curl || true
@@ -27,23 +27,24 @@ if [ "$NO_PKG" = false ]; then
     echo "Package manager not auto-configured, skipping package installation."
   fi
 else
-  echo "[ 1/5 ] Skipping package manager installation (--no-pkg)."
+  echo "[ 1/6 ] Skipping package manager installation (--no-pkg)."
 fi
 
 # 2. Setup Base Directory Structures
-echo "[ 2/5 ] Creating standardized AI & Workspace directory tree..."
+echo "[ 2/6 ] Creating standardized AI & Workspace directory tree..."
 mkdir -p "$HOME/.gemini/config/rules"
+mkdir -p "$HOME/.gemini/config/plugins"
 mkdir -p "$HOME/.agents/skills"
 mkdir -p "$HOME/Projects"
 mkdir -p "$HOME/Documents/Obsidian Vault/00-AGY-Memory"
 mkdir -p "$HOME/Documents/Obsidian Vault/01-Dokumen"
 mkdir -p "$HOME/Documents/Obsidian Vault/09-Panduan-Projek"
 
-# 3. Deploy Global Rules
+# 3. Deploy Global Rules & Master Documents
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
-echo "[ 3/5 ] Deploying Global Binding Rules to ~/.gemini/..."
+echo "[ 3/6 ] Deploying Global Binding Rules to ~/.gemini/ and Obsidian Vault..."
 cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$HOME/.gemini/GEMINI.md"
 cp -v "$REPO_ROOT/rules/"*.md "$HOME/.gemini/config/rules/"
 
@@ -52,8 +53,21 @@ if [ ! -f "$HOME/.agents/GEMINI.md" ]; then
   cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$HOME/.agents/GEMINI.md"
 fi
 
-# 4. Deploy Sanitized MCP Configurations (if not already present)
-echo "[ 4/5 ] Checking MCP configurations..."
+if [ -d "$REPO_ROOT/docs" ]; then
+  cp -v "$REPO_ROOT/docs/"*.md "$HOME/Documents/Obsidian Vault/09-Panduan-Projek/" 2>/dev/null || true
+fi
+
+# 4. Deploy Agent Skills & Core Plugins
+echo "[ 4/6 ] Deploying Agent Skills & 11 Core Components..."
+if [ -d "$REPO_ROOT/plugins/agent-skills" ]; then
+  cp -r "$REPO_ROOT/plugins/agent-skills" "$HOME/.gemini/config/plugins/"
+  if [ -d "$REPO_ROOT/plugins/agent-skills/skills" ]; then
+    cp -r "$REPO_ROOT/plugins/agent-skills/skills/"* "$HOME/.agents/skills/" 2>/dev/null || true
+  fi
+fi
+
+# 5. Deploy Sanitized MCP Configurations (if not already present)
+echo "[ 5/6 ] Checking MCP configurations..."
 if [ ! -f "$HOME/.gemini/config/mcp_config.json" ]; then
   echo "Initializing ~/.gemini/config/mcp_config.json from template..."
   cp "$REPO_ROOT/templates/mcp/mcp_config.template.json" "$HOME/.gemini/config/mcp_config.json"
@@ -64,10 +78,14 @@ if [ ! -f "$HOME/.gemini/config/mcp_config_extended.json" ]; then
   cp "$REPO_ROOT/templates/mcp/mcp_config_extended.template.json" "$HOME/.gemini/config/mcp_config_extended.json"
 fi
 
-# 5. Install MCP Packages
-echo "[ 5/5 ] Installing global MCP packages..."
+# 6. Install MCP Packages & Run Health Check
+echo "[ 6/6 ] Installing global MCP packages and verifying environment..."
 if [ -f "$SCRIPT_DIR/install-mcps.sh" ]; then
   bash "$SCRIPT_DIR/install-mcps.sh"
+fi
+
+if [ -f "$SCRIPT_DIR/verify-env.sh" ]; then
+  bash "$SCRIPT_DIR/verify-env.sh"
 fi
 
 echo "======================================================"

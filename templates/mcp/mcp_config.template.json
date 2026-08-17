@@ -1,0 +1,60 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@upstash/context7-mcp/dist/index.js"
+      ]
+    },
+    "github": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "memory": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-memory/dist/index.js"
+      ]
+    },
+    "obsidian": {
+      "command": "/usr/sbin/node",
+      "args": [
+        "/home/fuckadmin/.npm-global/lib/node_modules/mcp-obsidian/dist/index.js",
+        "/home/fuckadmin/Documents/Obsidian Vault"
+      ]
+    },
+    "postgres": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-postgres/dist/index.js",
+        "postgresql://localhost/mydb"
+      ]
+    },
+    "search-tavily": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/tavily-mcp/build/index.js"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      }
+    },
+    "sequential-thinking": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-sequential-thinking/dist/index.js"
+      ]
+    }
+  }
+}

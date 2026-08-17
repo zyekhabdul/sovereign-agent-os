@@ -1,0 +1,278 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@upstash/context7-mcp/dist/index.js"
+      ]
+    },
+    "github": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "memory": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-memory/dist/index.js"
+      ]
+    },
+    "obsidian": {
+      "command": "/usr/sbin/node",
+      "args": [
+        "/home/fuckadmin/.npm-global/lib/node_modules/mcp-obsidian/dist/index.js",
+        "/home/fuckadmin/Documents/Obsidian Vault"
+      ]
+    },
+    "postgres": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-postgres/dist/index.js",
+        "postgresql://localhost/mydb"
+      ]
+    },
+    "search-tavily": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/tavily-mcp/build/index.js"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      }
+    },
+    "sequential-thinking": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-sequential-thinking/dist/index.js"
+      ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    },
+    "vercel": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-vercel"
+      ],
+      "env": {
+        "VERCEL_TOKEN": "${VERCEL_TOKEN}"
+      }
+    },
+    "cloudflare": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-cloudflare"
+      ],
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    "gitlab": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-gitlab/dist/index.js"
+      ],
+      "env": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "${GITLAB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "sentry": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sentry"
+      ],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}"
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "env": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
+      }
+    },
+    "linear": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-linear"
+      ],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      }
+    },
+    "notion": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-notion"
+      ],
+      "env": {
+        "NOTION_API_KEY": "${NOTION_API_KEY}"
+      }
+    },
+    "gdrive": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-gdrive"
+      ],
+      "env": {
+        "GDRIVE_OAUTH_PATH": "${GDRIVE_OAUTH_PATH}",
+        "GDRIVE_CREDENTIALS_PATH": "${GDRIVE_CREDENTIALS_PATH}"
+      }
+    },
+    "virustotal": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-virustotal"
+      ],
+      "env": {
+        "VIRUSTOTAL_API_KEY": "${VIRUSTOTAL_API_KEY}"
+      }
+    },
+    "shodan": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-shodan"
+      ],
+      "env": {
+        "SHODAN_API_KEY": "${SHODAN_API_KEY}"
+      }
+    },
+    "discord": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-discord"
+      ],
+      "env": {
+        "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}"
+      }
+    },
+    "telegram": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-telegram"
+      ],
+      "env": {
+        "TELEGRAM_BOT_TOKEN": "${TELEGRAM_BOT_TOKEN}"
+      }
+    },
+    "figma": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-figma"
+      ],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
+      }
+    },
+    "openai": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-openai"
+      ],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    },
+    "filesystem": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "/home/fuckadmin"
+      ]
+    },
+    "puppeteer": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
+      ]
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-docker"
+      ]
+    },
+    "bluesky": {
+      "command": "/home/fuckadmin/.gemini/antigravity-cli/mcp_bluesky_server.py",
+      "env": {
+        "BLUESKY_HANDLE": "${BLUESKY_HANDLE}",
+        "BLUESKY_APP_PASSWORD": "${BLUESKY_APP_PASSWORD}"
+      }
+    },
+    "mega": {
+      "command": "/home/fuckadmin/.gemini/antigravity-cli/mcp_mega_server.py",
+      "env": {
+        "MEGA_EMAIL": "${MEGA_EMAIL}",
+        "MEGA_PASSWORD": "${MEGA_PASSWORD}"
+      }
+    },
+    "social_media": {
+      "command": "/home/fuckadmin/.gemini/antigravity-cli/mcp_social_media.py",
+      "env": {
+        "INSTAGRAM_API_KEY": "${INSTAGRAM_API_KEY}",
+        "TIKTOK_API_KEY": "${TIKTOK_API_KEY}",
+        "YOUTUBE_API_KEY": "${YOUTUBE_API_KEY}",
+        "TWITTER_API_KEY": "${TWITTER_API_KEY}",
+        "LINKEDIN_API_KEY": "${LINKEDIN_API_KEY}",
+        "TIKTOK_CLIENT_KEY": "${TIKTOK_CLIENT_KEY}",
+        "TIKTOK_CLIENT_SECRET": "${TIKTOK_CLIENT_SECRET}",
+        "TWITTER_CONSUMER_KEY": "${TWITTER_CONSUMER_KEY}",
+        "TWITTER_CONSUMER_SECRET": "${TWITTER_CONSUMER_SECRET}",
+        "TWITTER_BEARER_TOKEN": "${TWITTER_BEARER_TOKEN}",
+        "TWITTER_CLIENT_ID": "${TWITTER_CLIENT_ID}",
+        "TWITTER_CLIENT_SECRET": "${TWITTER_CLIENT_SECRET}",
+        "LINKEDIN_CLIENT_ID": "${LINKEDIN_CLIENT_ID}",
+        "LINKEDIN_CLIENT_SECRET": "${LINKEDIN_CLIENT_SECRET}"
+      }
+    },
+    "codeberg": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=256",
+        "/home/fuckadmin/.npm-global/lib/node_modules/@amonstack/gitea-mcp/dist/index.js"
+      ],
+      "env": {
+        "GITEA_BASE_URL": "${GITEA_BASE_URL}",
+        "GITEA_TOKEN": "${GITEA_TOKEN}",
+        "GITEA_DEFAULT_OWNER": "${GITEA_DEFAULT_OWNER}"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# Security & Sensitive Credentials
+*.env
+*.env.*
+*.secret
+*.key
+*.pem
+*.token
+*_live.json
+!*.template.json
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.idea/
+.vscode/
+
+# Node
+node_modules/
+npm-debug.log*

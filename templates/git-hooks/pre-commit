@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# pre-commit — Universal Project Quality Gate & Security Rail Hook
+# Checks mandatory documentation files and audits against emoji leakage.
+
+REQUIRED_FILES=("GEMINI.md" "AGENTS.md" "DEVELOPMENT.md" "DESIGN_SYSTEM.md" "README.md")
+MISSING=()
+
+for f in "${REQUIRED_FILES[@]}"; do
+  if [ ! -f "$f" ]; then
+    MISSING+=("$f")
+  fi
+done
+
+if [ ${#MISSING[@]} -ne 0 ]; then
+  echo "[ REJECT ] COMMIT DITOLAK — berkas tata kelola wajib belum lengkap di root repo:"
+  for f in "${MISSING[@]}"; do
+    echo "   - $f"
+  done
+  echo "Lengkapi berkas di atas sebelum melanjutkan commit."
+  exit 1
+fi
+
+# Emoji Audit Scanner
+if [ -f "check_emojis.py" ]; then
+  python3 check_emojis.py > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "[ REJECT ] COMMIT DITOLAK — Terdeteksi karakter emoji di dalam source code / markdown."
+    echo "Jalankan 'python3 check_emojis.py' untuk melihat daftar pelanggaran."
+    exit 1
+  fi
+elif [ -f "scripts/check_emojis.py" ]; then
+  python3 scripts/check_emojis.py > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "[ REJECT ] COMMIT DITOLAK — Terdeteksi karakter emoji di dalam source code / markdown."
+    exit 1
+  fi
+fi
+
+echo "[ OK ] File wajib lengkap & zero-emoji lolos verifikasi. Commit dilanjutkan."
+exit 0

@@ -5,59 +5,47 @@
 
 ---
 
-## 1. PRIMARY BOOTSTRAP EXECUTION
+## 1. ONE-SHOT MASTER INSTALLATION
 
-Execute the master bootstrap script:
+Execute the master setup installer:
 ```bash
-cd /path/to/sovereign-agent-os && bash scripts/bootstrap.sh
+bash install.sh
 ```
 
-This autonomously handles:
-1. System package verification (`git`, `ripgrep`, `jq`, `python3`, `node`, `npm`, `ssh`).
-2. Directory structure creation (`~/.gemini/config/rules`, `~/.agents/skills`, `~/Projects`, `~/Documents/Obsidian Vault/00-AGY-Memory`).
-3. Deployment of `GLOBAL_RULES.md` to `~/.gemini/GEMINI.md`, `~/.agents/GEMINI.md`, `~/.claude/CLAUDE.md`, `~/.opencode/OPENCODE.md`.
-4. Global npm installation of filesystem, postgres, and git MCP servers.
-5. Synchronization of 29 MCP servers across AGY, Claude Code, and OpenCode.
-6. Execution of the environment diagnostic verification.
+This autonomously and deterministically handles:
+1. **CLI Tool Installation**: Copies `bin/agy-guard` to `~/.local/bin/agy-guard` (`chmod +x`).
+2. **Directory Architecture**: Sets up `~/.gemini/config/rules/`, `~/.gemini/config/plugins/`, `~/.agents/skills/`, and `~/Documents/Obsidian Vault/00-AGY-Memory/`.
+3. **9 Binding Rule Specs**: Deploys all 9 rules (`inspect-before-apply.md`, `empirical-verification.md`, `ponytail-yagni.md`, `sensitive-area-guard.md`, `ai-proposal-protocol.md`, `git-push-restriction.md`, `mcp-discovery.md`, `obsidian-rag.md`, `workflow-ai-agent.md`).
+4. **4-File GEMINI.md Parity**: Synchronizes `~/GEMINI.md`, `~/.gemini/GEMINI.md`, `~/.gemini/config/GEMINI.md`, and `~/.agents/GEMINI.md` byte-for-byte.
+5. **12 Active Plugins**: Deploys `caveman`, `ponytail`, `codegraph`, `serena`, `contextmode`, `headroom`, `rtk`, `skills`, `mcp`, `graphify`, `delphitools`, and `agent-skills`.
+6. **Global Git Templates & Hooks**: Configures `~/.git-templates` with `post-commit` (auto-checkpoint) and `pre-push` (push interceptor) hooks.
+7. **Empirical Status Verification**: Runs `agy-guard status` to confirm 100% compliance.
 
 ---
 
-## 2. CROSS-AGENT PARITY & MULTI-AGENT SYNC
+## 2. DAILY AGENT USAGE & COMMANDS
 
-Whenever MCP endpoints or rules are modified, execute:
-```bash
-bash scripts/sync-agents.sh
-```
-This guarantees that **Antigravity CLI**, **Claude Code**, **OpenCode**, and **Codex** run with identical MCP servers, rules, and skills without manual intervention.
+Once installed, AI agents must utilize `agy-guard` subcommands during normal workflows:
+
+| Command | Function | Principle / Rule |
+| :--- | :--- | :--- |
+| `agy-guard prep` | Instant pre-flight onboarding (Branch, Dirty files, DoD, Decisions). | `inspect-before-apply.md` |
+| `agy-guard verify` | Auto-detect stack & execute test/linter verification. | `empirical-verification.md` |
+| `agy-guard diff-guard` | Audit diff radius and flag sensitive area modifications. | `sensitive-area-guard.md` |
+| `agy-guard checkpoint` | Atomically log progress to `00-AGY-Memory/<ns>/STATE.md`. | `obsidian-rag.md` |
+| `agy-guard push` | Execute safe human-authorized git push (`ALLOW_GIT_PUSH=1`). | `git-push-restriction.md` |
+| `agy-guard status` | Full system audit of rules, MCPs, and memory limits. | `mcp-discovery.md` |
 
 ---
 
-## 3. TRI-FORGE MULTI-REMOTE PROTOCOL
+## 3. TRI-FORGE MULTI-REMOTE REPOSITORY PROTOCOL
 
-Every local git repository MUST be configured with a multi-remote push target named `all` pointing to:
-1. GitHub (`git@github.com:zyekhabdul/<repo-name>.git`)
-2. GitLab (`git@gitlab.com:aomiqaza/<repo-name>.git`)
-3. Codeberg (`git@codeberg.org:aomiqaza/<repo-name>.git`)
+Every project repository is synchronized to a 3-way multi-remote `all`:
+- **GitHub**: `git@github.com:zyekhabdul/<repo-name>.git`
+- **GitLab**: `git@gitlab.com:aomiqaza/<repo-name>.git`
+- **Codeberg**: `git@codeberg.org:aomiqaza/<repo-name>.git`
 
-To configure automatically:
+To configure on any repo:
 ```bash
 bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
-```
-
----
-
-## 4. OBSIDIAN RAG MEMORY GOVERNANCE
-
-Every project repository MUST have a corresponding memory directory in:
-`/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<project-namespace>/`
-
-Maintaining strictly 4 core files:
-- `INDEX.md`: Metadata & latest git commit hash.
-- `CONTEXT.md`: Architecture & stack overview.
-- `STATE.md`: Active task status (updated at the end of every session).
-- `DECISIONS.md`: Append-only Architectural Decision Records (ADR).
-
-To scaffold automatically:
-```bash
-bash scripts/setup-rag.sh /path/to/repo <project-namespace>
 ```

@@ -45,8 +45,9 @@ In case of conflicting directives, AI agents MUST resolve truth using this stric
 
 ---
 
-## 4. GIT-HASH SYNCHRONIZATION & STALE DETECTOR
-- At the end of every session, when updating `STATE.md` and `INDEX.md`, the agent MUST write the current git commit hash (`git rev-parse HEAD`).
+## 4. GIT-HASH SYNCHRONIZATION & MILESTONE-GATED CHECKPOINT
+- At each task milestone or successful local commit, the agent MUST update `STATE.md` using deterministic tooling: `agy-guard checkpoint --msg "<summary>"`.
+- The tooling automatically captures `git rev-parse HEAD`, active branch, and namespace mapping without probabilistic hallucination.
 - **Session Retrieval Check**: When reading RAG at session start, if `STATE.md`'s `git_commit_hash` does NOT match `git rev-parse HEAD`, RAG is considered **STALE**. The agent MUST treat the local repository source code as the absolute truth.
 
 ---

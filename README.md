@@ -51,9 +51,9 @@ sovereign-agent-os/
 
 ### 1. Di Mesin / VPS Baru (Native)
 ```bash
-git clone git@github.com:zyekhabdul/ai-agent-standards.git ~/Projects/sovereign-agent-os
+git clone git@github.com:zyekhabdul/sovereign-agent-os.git ~/Projects/sovereign-agent-os
 cd ~/Projects/sovereign-agent-os
-bash scripts/bootstrap.sh
+bash install.sh
 ```
 
 ### 2. Di Lingkungan Docker / Sandbox

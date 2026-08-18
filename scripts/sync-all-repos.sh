@@ -4,16 +4,22 @@ set -euo pipefail
 # sync-all-repos.sh — Scans ~/Projects/*, ensures 5-Platform remotes ('all'), and optional batch push
 # Usage: ./sync-all-repos.sh [--push] [--dry-run]
 
-PROJECTS_DIR="${1:-$HOME/Projects}"
+PROJECTS_DIR="$HOME/Projects"
 PUSH_MODE=false
 DRY_RUN=false
+POSITIONAL=()
 
 for arg in "$@"; do
   case "$arg" in
     --push) PUSH_MODE=true ;;
     --dry-run) DRY_RUN=true ;;
+    *) POSITIONAL+=("$arg") ;;
   esac
 done
+
+if [ ${#POSITIONAL[@]} -gt 0 ]; then
+  PROJECTS_DIR="${POSITIONAL[0]}"
+fi
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 

@@ -24,7 +24,7 @@ fi
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 echo "======================================================"
-echo "    PENTA-FORGE (5 PLATFORMS) REPOSITORY SYNCER       "
+echo "      MULTI-FORGE REPOSITORY SYNCER (ACTIVE FORGES)   "
 echo "======================================================"
 echo "Projects Directory : $PROJECTS_DIR"
 echo "Push Mode Enabled  : $PUSH_MODE"
@@ -42,7 +42,7 @@ for repo in "$PROJECTS_DIR"/*; do
       "$SCRIPT_DIR/setup-tri-push.sh" "$repo" "$REPO_NAME"
       if [ "$PUSH_MODE" = true ]; then
         BRANCH=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
-        echo "Pushing $REPO_NAME ($BRANCH) to all 5 platforms..."
+        echo "Pushing $REPO_NAME ($BRANCH) to active platforms..."
         git -C "$repo" push all "$BRANCH" || echo "[ WARN ] Push failed for $REPO_NAME"
       fi
     fi
@@ -50,5 +50,5 @@ for repo in "$PROJECTS_DIR"/*; do
 done
 
 echo -e "\n======================================================"
-echo "[ SUCCESS ] All repositories processed for 5 platforms."
+echo "[ SUCCESS ] All repositories processed successfully."
 echo "======================================================"

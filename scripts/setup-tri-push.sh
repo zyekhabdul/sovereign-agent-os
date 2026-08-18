@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# setup-tri-push.sh / setup-penta-push.sh — Configures unified multi-forge remote ('all') for 5 platforms
-# Supported platforms: GitHub + GitLab + Codeberg + Gitea + Bitbucket
+# setup-tri-push.sh — Configures multi-forge remote ('all') for active platforms (GitHub + GitLab)
+# Note: Codeberg & Gitea are frozen/optional due to quota limits; Bitbucket is removed.
 # Usage: ./setup-tri-push.sh [--dry-run] [REPO_PATH] [REPO_NAME]
 
 DRY_RUN=false
@@ -16,7 +16,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       echo "Usage: $0 [--dry-run] [REPO_PATH] [REPO_NAME]"
-      echo "Configures 'all' git remote pointing to 5 platforms (GitHub, GitLab, Codeberg, Gitea, Bitbucket)."
+      echo "Configures 'all' git remote pointing to active platforms (GitHub + GitLab)."
       exit 0
       ;;
     *)
@@ -44,23 +44,23 @@ GITLAB_USER="${GITLAB_USER:-aomiqaza}"
 CODEBERG_USER="${CODEBERG_USER:-aomiqaza}"
 GITEA_HOST="${GITEA_HOST:-gitea.com}"
 GITEA_USER="${GITEA_USER:-aomiqaza}"
-BITBUCKET_USER="${BITBUCKET_USER:-aomiqaza}"
 
 GITHUB_URL="git@github.com:${GITHUB_USER}/${REPO_NAME}.git"
 GITLAB_URL="git@gitlab.com:${GITLAB_USER}/${REPO_NAME}.git"
 CODEBERG_URL="git@codeberg.org:${CODEBERG_USER}/${REPO_NAME}.git"
 GITEA_URL="git@${GITEA_HOST}:${GITEA_USER}/${REPO_NAME}.git"
-BITBUCKET_URL="git@bitbucket.org:${BITBUCKET_USER}/${REPO_NAME}.git"
 
-echo "=== Penta-Forge (5 Platforms) Git Remote Setup ==="
+ENABLE_CODEBERG="${ENABLE_CODEBERG:-false}"
+ENABLE_GITEA="${ENABLE_GITEA:-false}"
+
+echo "=== Multi-Forge Git Remote Setup ==="
 echo "Repository Path  : $REPO_PATH"
 echo "Repository Name  : $REPO_NAME"
-echo "GitHub Remote    : $GITHUB_URL"
-echo "GitLab Remote    : $GITLAB_URL"
-echo "Codeberg Remote  : $CODEBERG_URL"
-echo "Gitea Remote     : $GITEA_URL"
-echo "Bitbucket Remote : $BITBUCKET_URL"
-echo "=================================================="
+echo "GitHub (Active)  : $GITHUB_URL"
+echo "GitLab (Active)  : $GITLAB_URL"
+echo "Codeberg (Freeze): $CODEBERG_URL"
+echo "Gitea (Freeze)   : $GITEA_URL"
+echo "===================================="
 
 if [ "$DRY_RUN" = true ]; then
   echo "[ DRY-RUN ] Commands to be executed:"
@@ -68,9 +68,12 @@ if [ "$DRY_RUN" = true ]; then
   echo "  git -C \"$REPO_PATH\" remote add all \"$GITHUB_URL\""
   echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITHUB_URL\""
   echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITLAB_URL\""
-  echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$CODEBERG_URL\""
-  echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITEA_URL\""
-  echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$BITBUCKET_URL\""
+  if [ "$ENABLE_CODEBERG" = "true" ]; then
+    echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$CODEBERG_URL\""
+  fi
+  if [ "$ENABLE_GITEA" = "true" ]; then
+    echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITEA_URL\""
+  fi
   exit 0
 fi
 
@@ -79,10 +82,29 @@ git -C "$REPO_PATH" remote remove all 2>/dev/null || true
 git -C "$REPO_PATH" remote add all "$GITHUB_URL"
 git -C "$REPO_PATH" remote set-url --add --push all "$GITHUB_URL"
 git -C "$REPO_PATH" remote set-url --add --push all "$GITLAB_URL"
-git -C "$REPO_PATH" remote set-url --add --push all "$CODEBERG_URL"
-git -C "$REPO_PATH" remote set-url --add --push all "$GITEA_URL"
-git -C "$REPO_PATH" remote set-url --add --push all "$BITBUCKET_URL"
 
-echo "[ SUCCESS ] Remote 'all' successfully configured for 5 platforms!"
-echo "To push to all 5 platforms simultaneously, run:"
+if [ "$ENABLE_CODEBERG" = "true" ]; then
+  git -C "$REPO_PATH" remote set-url --add --push all "$CODEBERG_URL"
+fi
+if [ "$ENABLE_GITEA" = "true" ]; then
+  git -C "$REPO_PATH" remote set-url --add --push all "$GITEA_URL"
+fi
+
+# Also ensure standalone remotes exist for selective individual pushes
+git -C "$REPO_PATH" remote remove github 2>/dev/null || true
+git -C "$REPO_PATH" remote add github "$GITHUB_URL" 2>/dev/null || true
+
+git -C "$REPO_PATH" remote remove gitlab 2>/dev/null || true
+git -C "$REPO_PATH" remote add gitlab "$GITLAB_URL" 2>/dev/null || true
+
+git -C "$REPO_PATH" remote remove codeberg 2>/dev/null || true
+git -C "$REPO_PATH" remote add codeberg "$CODEBERG_URL" 2>/dev/null || true
+
+git -C "$REPO_PATH" remote remove gitea 2>/dev/null || true
+git -C "$REPO_PATH" remote add gitea "$GITEA_URL" 2>/dev/null || true
+
+git -C "$REPO_PATH" remote remove bitbucket 2>/dev/null || true
+
+echo "[ SUCCESS ] Remote 'all' successfully configured (Active: GitHub + GitLab)!"
+echo "To push to active platforms simultaneously, run:"
 echo "  git push all <branch>"

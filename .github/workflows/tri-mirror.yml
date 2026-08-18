@@ -1,4 +1,4 @@
-name: Tri-Forge Sovereign Mirroring
+name: Penta-Forge Sovereign Mirroring
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   mirror:
-    name: Mirror to GitLab & Codeberg
+    name: Mirror to GitLab, Codeberg, Gitea & Bitbucket
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -17,13 +17,15 @@ jobs:
 
       - name: Configure SSH Key
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.TRI_FORGE_SSH_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.PENTA_FORGE_SSH_KEY || secrets.TRI_FORGE_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H gitlab.com >> ~/.ssh/known_hosts
           ssh-keyscan -H codeberg.org >> ~/.ssh/known_hosts
+          ssh-keyscan -H gitea.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H bitbucket.org >> ~/.ssh/known_hosts
 
       - name: Push to GitLab
         run: |
@@ -34,3 +36,13 @@ jobs:
         run: |
           git remote add codeberg git@codeberg.org:aomiqaza/${{ github.event.repository.name }}.git || true
           git push --force codeberg main:main || echo "Codeberg mirror failed or up-to-date"
+
+      - name: Push to Gitea
+        run: |
+          git remote add gitea git@gitea.com:aomiqaza/${{ github.event.repository.name }}.git || true
+          git push --force gitea main:main || echo "Gitea mirror failed or up-to-date"
+
+      - name: Push to Bitbucket
+        run: |
+          git remote add bitbucket git@bitbucket.org:aomiqaza/${{ github.event.repository.name }}.git || true
+          git push --force bitbucket main:main || echo "Bitbucket mirror failed or up-to-date"

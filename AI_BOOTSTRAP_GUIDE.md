@@ -38,14 +38,17 @@ Once installed, AI agents must utilize `agy-guard` subcommands during normal wor
 
 ---
 
-## 3. TRI-FORGE MULTI-REMOTE REPOSITORY PROTOCOL
+## 3. PENTA-FORGE (5 PLATFORMS) MULTI-REMOTE REPOSITORY PROTOCOL
 
-Every project repository is synchronized to a 3-way multi-remote `all`:
+Every project repository is synchronized to a 5-way multi-remote `all`:
 - **GitHub**: `git@github.com:zyekhabdul/<repo-name>.git`
 - **GitLab**: `git@gitlab.com:aomiqaza/<repo-name>.git`
 - **Codeberg**: `git@codeberg.org:aomiqaza/<repo-name>.git`
+- **Gitea**: `git@gitea.com:aomiqaza/<repo-name>.git`
+- **Bitbucket**: `git@bitbucket.org:aomiqaza/<repo-name>.git`
 
 To configure on any repo:
 ```bash
-bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
+bash scripts/setup-penta-push.sh /path/to/repo <repo-name>
+# or: bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
 ```

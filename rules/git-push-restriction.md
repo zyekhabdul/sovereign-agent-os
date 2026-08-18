@@ -11,3 +11,8 @@ description: Mandatory Global Rule - Allow local git commit, STRICTLY PROHIBIT a
 2. **GIT PUSH (STRICTLY PROHIBITED WITHOUT EXPLICIT USER COMMAND)**:
    - Antigravity CLI (`agy`) MUST NEVER execute `git push` to remote repositories (origin, main, master, etc.) automatically.
    - `git push` IS ONLY PERMITTED when the USER explicitly types or instructs a push command in chat (e.g., "push", "push ke main", "push repositori").
+
+3. **MANDATORY SSH PROTOCOL (ZERO HTTPS FOR GIT REMOTES)**:
+   - All AI agents MUST use SSH URLs (`git@gitlab.com:...`, `git@codeberg.org:...`, `git@github.com:...`, `git@gitea.com:...`, `git@bitbucket.org:...`) instead of HTTPS URLs when cloning, adding remotes, or managing repositories.
+   - HTTPS remote URLs are strictly forbidden for repository operations.
+

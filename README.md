@@ -76,18 +76,20 @@ bash scripts/sync-agents.sh
 ./scripts/vault.sh unpack
 ```
 
-### 5. Multi-Platform Remote Push (GitHub + GitLab + Codeberg)
+### 5. Multi-Platform Remote Push (GitHub + GitLab + Codeberg + Gitea + Bitbucket)
 ```bash
 # Setup remote 'all' di repositori aktif
-./scripts/setup-tri-push.sh
+./scripts/setup-penta-push.sh
 
-# Push ke 3 platform sekaligus
+# Push ke 5 platform sekaligus
 git push all main
 ```
 
 ---
 
-## STATUS SINKRONISASI TRI-FORGE
-- **GitHub**: `https://github.com/zyekhabdul/ai-agent-standards`
-- **GitLab**: `https://gitlab.com/aomiqaza/ai-agent-standards`
-- **Codeberg**: `https://codeberg.org/aomiqaza/ai-agent-standards`
+## STATUS SINKRONISASI PENTA-FORGE (5 PLATFORMS)
+- **GitHub**: `https://github.com/zyekhabdul/sovereign-agent-os`
+- **GitLab**: `https://gitlab.com/aomiqaza/sovereign-agent-os`
+- **Codeberg**: `https://codeberg.org/aomiqaza/sovereign-agent-os`
+- **Gitea**: `https://gitea.com/aomiqaza/sovereign-agent-os`
+- **Bitbucket**: `https://bitbucket.org/aomiqaza/sovereign-agent-os`

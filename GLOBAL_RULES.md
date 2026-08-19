@@ -27,4 +27,5 @@ The following 11 core components MUST be active and utilized in all workflows:
 - **Milestone-Gated Obsidian RAG Sync**: Every project MUST maintain memory in `/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`. Update `STATE.md` at each task milestone or successful local commit using `agy-guard checkpoint` (`/home/fuckadmin/.gemini/config/rules/obsidian-rag.md`).
 - **Threshold-Based AI RFC Protocol**: AI MUST NOT perform unrequested architectural changes or add new packages without a 3-part RFC (`/home/fuckadmin/.gemini/config/rules/ai-proposal-protocol.md`).
 - **Mandatory Project Guide & PRD Standard**: Projects without a PRD MUST reference `/home/fuckadmin/Documents/Obsidian Vault/09-Panduan-Projek/PRD-MASTER-TEMPLATE.md`.
+- **Sovereign Environment Topology (Laptop Builds, VPS Serves)**: Active development, testing, and AI code generation MUST run on the Laptop. The VPS is strictly a passive runtime host. Follow `rules/environment-topology.md`.
 - **Token Efficiency & 200-Line Cap**: Preserve context headroom by keeping terminal outputs lean, code concise, and memory files under 200 lines.

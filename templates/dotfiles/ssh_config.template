@@ -20,3 +20,11 @@ Host gitlab.com
     HostName gitlab.com
     User git
     IdentityFile ~/.ssh/id_ed25519_thinkpad_pass
+
+Host servv
+    HostName 43.157.229.233
+    User root
+    IdentityFile ~/.ssh/id_ed25519_thinkpad_pass
+    IdentityFile ~/.ssh/id_ed25519_thinkpad_no_pass
+    ForwardAgent yes
+

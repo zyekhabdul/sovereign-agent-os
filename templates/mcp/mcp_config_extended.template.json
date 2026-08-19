@@ -4,14 +4,14 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@upstash/context7-mcp/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@upstash/context7-mcp/dist/index.js"
       ]
     },
     "github": {
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-github/dist/index.js"
       ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
@@ -21,21 +21,21 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-memory/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-memory/dist/index.js"
       ]
     },
     "obsidian": {
-      "command": "/usr/sbin/node",
+      "command": "node",
       "args": [
-        "/home/fuckadmin/.npm-global/lib/node_modules/mcp-obsidian/dist/index.js",
-        "/home/fuckadmin/Documents/Obsidian Vault"
+        "__HOME__/.npm-global/lib/node_modules/mcp-obsidian/dist/index.js",
+        "__HOME__/Documents/Obsidian Vault"
       ]
     },
     "postgres": {
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-postgres/dist/index.js",
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-postgres/dist/index.js",
         "postgresql://localhost/mydb"
       ]
     },
@@ -43,7 +43,7 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/tavily-mcp/build/index.js"
+        "__HOME__/.npm-global/lib/node_modules/tavily-mcp/build/index.js"
       ],
       "env": {
         "TAVILY_API_KEY": "${TAVILY_API_KEY}"
@@ -53,7 +53,7 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-sequential-thinking/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-sequential-thinking/dist/index.js"
       ]
     },
     "supabase": {
@@ -90,7 +90,7 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-gitlab/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-gitlab/dist/index.js"
       ],
       "env": {
         "GITLAB_PERSONAL_ACCESS_TOKEN": "${GITLAB_PERSONAL_ACCESS_TOKEN}"
@@ -211,15 +211,15 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
-        "/home/fuckadmin"
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "__HOME__"
       ]
     },
     "puppeteer": {
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
       ]
     },
     "docker": {
@@ -230,21 +230,21 @@
       ]
     },
     "bluesky": {
-      "command": "/home/fuckadmin/.gemini/antigravity-cli/mcp_bluesky_server.py",
+      "command": "__HOME__/.gemini/antigravity-cli/mcp_bluesky_server.py",
       "env": {
         "BLUESKY_HANDLE": "${BLUESKY_HANDLE}",
         "BLUESKY_APP_PASSWORD": "${BLUESKY_APP_PASSWORD}"
       }
     },
     "mega": {
-      "command": "/home/fuckadmin/.gemini/antigravity-cli/mcp_mega_server.py",
+      "command": "__HOME__/.gemini/antigravity-cli/mcp_mega_server.py",
       "env": {
         "MEGA_EMAIL": "${MEGA_EMAIL}",
         "MEGA_PASSWORD": "${MEGA_PASSWORD}"
       }
     },
     "social_media": {
-      "command": "/home/fuckadmin/.gemini/antigravity-cli/mcp_social_media.py",
+      "command": "__HOME__/.gemini/antigravity-cli/mcp_social_media.py",
       "env": {
         "INSTAGRAM_API_KEY": "${INSTAGRAM_API_KEY}",
         "TIKTOK_API_KEY": "${TIKTOK_API_KEY}",
@@ -266,7 +266,7 @@
       "command": "node",
       "args": [
         "--max-old-space-size=256",
-        "/home/fuckadmin/.npm-global/lib/node_modules/@amonstack/gitea-mcp/dist/index.js"
+        "__HOME__/.npm-global/lib/node_modules/@amonstack/gitea-mcp/dist/index.js"
       ],
       "env": {
         "GITEA_BASE_URL": "${GITEA_BASE_URL}",

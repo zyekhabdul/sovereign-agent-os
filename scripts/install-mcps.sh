@@ -6,6 +6,10 @@ set -euo pipefail
 
 echo "=== Installing Essential Global MCP Servers via npm ==="
 
+mkdir -p "$HOME/.npm-global" "$HOME/.local/bin"
+npm config set prefix "$HOME/.npm-global" 2>/dev/null || true
+export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
+
 MCP_PACKAGES=(
   "@modelcontextprotocol/server-filesystem"
   "@modelcontextprotocol/server-github"

@@ -41,36 +41,21 @@ RULE_DOCS = [
     CONFIG_DIR / "rules" / "workflow-ai-agent.md",
 ]
 
-CANONICAL_GEMINI_MD = """# GLOBAL RULES & BINDING GUIDELINES — AI AGENT STANDARDS
+CANONICAL_GEMINI_MD = """# AI AGENT WORKSPACE STANDARDS & SSOT POINTER
 
-This document sets binding rules and standards for all AI coding tools and agents (OpenCode, Codex, AGY/Antigravity CLI, Antigravity IDE, Claude Code).
+Global rules and binding guidelines are centralized in the Master Configuration directory.
+All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere to the authoritative rules defined in:
+- Master Rules Index: `/home/fuckadmin/.gemini/config/GEMINI.md`
+- Modular Rule Definitions: `/home/fuckadmin/.gemini/config/rules/`
 
-## Mandatory Setup & Active Components
-The following 11 core components MUST be active and utilized in all workflows:
-1. **ponytail**: YAGNI & minimalist code generation. Zero over-engineering (`/home/fuckadmin/.gemini/config/rules/ponytail-yagni.md`).
-2. **codegraph**: AST-based code graph navigation & symbol mapping.
-3. **serena**: Semantic code retrieval & refactoring toolkit.
-4. **caveman**: High-density, terse communication & token reduction.
-5. **contextmode**: Active context window memory optimization.
-6. **headroom**: Tool output trimming & context compression.
-7. **rtk**: Terminal command output token compression.
-8. **Graphify**: Codebase knowledge graph mapping.
-9. **delphitools**: Offline utility tools & helper processing.
-10. **skills**: Agent skills system & discovery.
-11. **mcp**: Model Context Protocol integration.
-
-## Global Execution Principles
-- **Cari dulu baru terapkan (Mandatory Pre-Execution Inspection)**: NEVER mutate files without prior inspection. Follow the 2-phase execution gate (Read-Only Inspection -> Evidence-Backed Mutation) in `/home/fuckadmin/.gemini/config/rules/inspect-before-apply.md`.
-- **Empirical Verification (Silent Quality Gate)**: NEVER state code is fixed without running terminal verification (test/build/lint). Follow `/home/fuckadmin/.gemini/config/rules/empirical-verification.md`.
-- **Sensitive Area Hard-Stop**: NEVER mutate Auth, Payment, DB Schema, `.env`, or CI/CD without explicit human authorization. Follow `/home/fuckadmin/.gemini/config/rules/sensitive-area-guard.md`.
-- **Objective Mentor Persona**: Eliminate user coddling, pleasantries, and fluff. Maintain a direct, objective, highly technical mentor persona.
-- **Strict No-Emoji**: Keep code, templates, and documentation 100% free of graphical emojis. Use clean structured ASCII/Unicode symbols (`[ VERIFIED ]`, `[ NOTE ]`, `•`, `->`).
-- **Strict Git Push Permission Control**: Local commits (`git commit`) are permitted. Remote pushes (`git push`) are STRICTLY FORBIDDEN without explicit user command (`/home/fuckadmin/.gemini/config/rules/git-push-restriction.md`).
-- **Dual-File MCP Discovery & Secure Inspection**: All AI agents MUST inspect BOTH `/home/fuckadmin/.gemini/config/mcp_config.json` AND `/home/fuckadmin/.gemini/config/mcp_config_extended.json`. Follow `/home/fuckadmin/.gemini/config/rules/mcp-discovery.md`.
-- **Milestone-Gated Obsidian RAG Sync**: Every project MUST maintain memory in `/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`. Update `STATE.md` at each task milestone or successful local commit using `agy-guard checkpoint` (`/home/fuckadmin/.gemini/config/rules/obsidian-rag.md`).
-- **Threshold-Based AI RFC Protocol**: AI MUST NOT perform unrequested architectural changes or add new packages without a 3-part RFC (`/home/fuckadmin/.gemini/config/rules/ai-proposal-protocol.md`).
-- **Mandatory Project Guide & PRD Standard**: Projects without a PRD MUST reference `/home/fuckadmin/Documents/Obsidian Vault/09-Panduan-Projek/PRD-MASTER-TEMPLATE.md`.
-- **Token Efficiency & 200-Line Cap**: Preserve context headroom by keeping terminal outputs lean, code concise, and memory files under 200 lines.
+### Core Directives Summary
+- **Inspection Gate**: Cari dulu baru terapkan (`/home/fuckadmin/.gemini/config/rules/inspect-before-apply.md`)
+- **Verification Gate**: Empirical terminal proof (`/home/fuckadmin/.gemini/config/rules/empirical-verification.md`)
+- **Safety Gate**: Hard-stop on sensitive areas (`/home/fuckadmin/.gemini/config/rules/sensitive-area-guard.md`) & Git push restriction (`/home/fuckadmin/.gemini/config/rules/git-push-restriction.md`)
+- **Memory & RAG**: Obsidian 4-file governance (`/home/fuckadmin/.gemini/config/rules/obsidian-rag.md`)
+- **Code Style**: Ponytail / YAGNI minimalism (`/home/fuckadmin/.gemini/config/rules/ponytail-yagni.md`)
+- **Workflow Standard**: Hyper-Granular Chunking & Adaptive AI Workflow (`/home/fuckadmin/.gemini/config/rules/workflow-ai-agent.md`)
+- **Communication**: Caveman terse high-density, strict no-emoji.
 """
 
 def get_git_root(cwd=None):
@@ -142,16 +127,27 @@ def cmd_sync_rules(args):
     print(f"[ SUCCESS ] {synced} rule files synchronized byte-for-byte.")
 
 def cmd_status(args):
-    print("=== [ AGY-GUARD SYSTEM STATUS v3.0 ] ===")
+    fix_mode = getattr(args, "fix", False)
+    header_extra = " (AUTO-FIX MODE)" if fix_mode else ""
+    print(f"=== [ AGY-GUARD SYSTEM STATUS v5.1{header_extra} ] ===")
     
     # 1. Check GEMINI.md sync
     for target in RULE_FILES:
         if not target.exists():
-            print(f"  [ MISSING ] {target}")
+            if fix_mode:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(CANONICAL_GEMINI_MD, encoding="utf-8")
+                print(f"  [ REPAIRED ] {target}")
+            else:
+                print(f"  [ MISSING ] {target}")
         else:
             content = target.read_text(encoding="utf-8")
             if content.strip() != CANONICAL_GEMINI_MD.strip():
-                print(f"  [ DRIFT ] {target}")
+                if fix_mode:
+                    target.write_text(CANONICAL_GEMINI_MD, encoding="utf-8")
+                    print(f"  [ REPAIRED ] {target}")
+                else:
+                    print(f"  [ DRIFT ] {target}")
             else:
                 print(f"  [ OK ] {target}")
                 
@@ -175,6 +171,16 @@ def cmd_status(args):
                     print(f"  [ WARNING ] {mfile.name} is {lines} lines (>200 line cap). Split to archive!")
                 else:
                     print(f"  [ OK ] {mfile.name} ({lines}/200 lines)")
+        else:
+            if fix_mode and ns != "global-workspace":
+                ns_dir.mkdir(parents=True, exist_ok=True)
+                (ns_dir / "INDEX.md").write_text(f"# Project Index: {ns}\n", encoding="utf-8")
+                (ns_dir / "CONTEXT.md").write_text(f"# Context: {ns}\n", encoding="utf-8")
+                (ns_dir / "STATE.md").write_text(f"# Active State: {ns}\nStatus: ACTIVE\n", encoding="utf-8")
+                (ns_dir / "DECISIONS.md").write_text(f"# Architecture Decision Records: {ns}\n", encoding="utf-8")
+                print(f"  [ REPAIRED ] Scaffolded 4-file memory structure at {ns_dir}")
+            else:
+                print(f"  [ NOTICE ] Memory namespace not yet initialized for '{ns}'")
     else:
         print(f"  [ WARNING ] Obsidian Vault not found at {VAULT_PATH}")
     
@@ -200,6 +206,13 @@ def cmd_status(args):
     if git_root:
         post_commit = git_root / ".git" / "hooks" / "post-commit"
         pre_push = git_root / ".git" / "hooks" / "pre-push"
+        if fix_mode:
+            if not post_commit.exists():
+                cmd_install_hook(args)
+            if not pre_push.exists():
+                cmd_install_push_guard(args)
+            post_commit = git_root / ".git" / "hooks" / "post-commit"
+            pre_push = git_root / ".git" / "hooks" / "pre-push"
         print(f"  [{'OK' if post_commit.exists() else 'NOTICE'}] Auto-Checkpoint Hook: {'Active' if post_commit.exists() else 'Not installed'}")
         print(f"  [{'OK' if pre_push.exists() else 'NOTICE'}] Anti-Push Protection Hook: {'Active' if pre_push.exists() else 'Not installed'}")
         
@@ -918,7 +931,9 @@ def main():
     subparsers.add_parser("sync-rules", help="Synchronize all GEMINI.md rule files").set_defaults(func=cmd_sync_rules)
     
     # status
-    subparsers.add_parser("status", help="Show system rules, git root, and MCP health status").set_defaults(func=cmd_status)
+    sub_status = subparsers.add_parser("status", help="Show system rules, git root, and MCP health status")
+    sub_status.add_argument("--fix", action="store_true", help="Automatically repair rule drift, missing hooks, and memory files")
+    sub_status.set_defaults(func=cmd_status)
     
     # context
     subparsers.add_parser("context", help="Instant high-density project briefing for new sessions").set_defaults(func=cmd_context)

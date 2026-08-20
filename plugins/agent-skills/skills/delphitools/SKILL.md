@@ -1,6 +1,6 @@
 ---
 name: delphitools
-description: "Delphi Utility Tools & Helper CLI skill. Provides offline utility helpers, formatting, color, image, and data processing capabilities."
+description: "Delphi Utility Tools & Helper CLI skill. Single-binary offline developer and designer toolkit."
 ---
 
 # DelphiTools — Offline Utility Helpers

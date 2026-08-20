@@ -40,6 +40,7 @@ RULE_DOCS = [
     CONFIG_DIR / "rules" / "obsidian-rag.md",
     CONFIG_DIR / "rules" / "workflow-ai-agent.md",
     CONFIG_DIR / "rules" / "system-diagnostics.md",
+    CONFIG_DIR / "rules" / "environment-topology.md",
 ]
 
 CANONICAL_GEMINI_MD = """# AI AGENT WORKSPACE STANDARDS & SSOT POINTER

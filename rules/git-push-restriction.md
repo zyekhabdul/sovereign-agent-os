@@ -16,3 +16,8 @@ description: Mandatory Global Rule - Allow local git commit, STRICTLY PROHIBIT a
    - All AI agents MUST use SSH URLs (`git@gitlab.com:...`, `git@codeberg.org:...`, `git@github.com:...`, `git@gitea.com:...`, `git@bitbucket.org:...`) instead of HTTPS URLs when cloning, adding remotes, or managing repositories.
    - HTTPS remote URLs are strictly forbidden for repository operations.
 
+4. **MANDATORY PRE-MUTATION GIT PULL (PULL SEBELUM MEROMBAK)**:
+   - Sebelum merombak, refactor, atau memodifikasi file pada repositori project manapun, AI agent **WAJIB** menjalankan `git pull` terlebih dahulu untuk memastikan working tree lokal sinkron dengan commit remote terbaru.
+   - Mencegah konflik merge (*merge conflicts*), regresi kode, atau menimpa perubahan yang sudah ada di remote.
+
+

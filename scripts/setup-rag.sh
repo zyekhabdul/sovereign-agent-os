@@ -6,7 +6,7 @@ set -euo pipefail
 
 if [ $# -lt 1 ]; then
   echo "Usage: $0 <project-namespace> [repo-path]"
-  echo "Example: $0 shop-zyekh-theme /home/fuckadmin/Projects/shop.zyekh.com-theme"
+  echo "Example: $0 shop-zyekh-com /home/fuckadmin/Projects/shop.zyekh.com"
   exit 1
 fi
 

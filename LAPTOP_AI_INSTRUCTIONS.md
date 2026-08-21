@@ -16,7 +16,7 @@ The developer manages the following core repositories:
 | **`chat.zyekh.com`** | Next.js / Svelte / React Chat UI | Web-based AI chat client | `3001` |
 | **`bot-telegram`** | Node.js, grammY, Webhooks | Telegram bot for notifications & transactions | `8080` |
 | **`bot-whatsapp`** | Node.js, Baileys, QRIS Validator | WhatsApp automated business agent | Session daemon |
-| **`shop.zyekh.com-theme`** | Shopify Liquid, Tailwind | Custom Shopify digital storefront theme | Theme dev |
+| **`shop.zyekh.com`** | Shopify Liquid, Tailwind | Custom Shopify digital storefront theme | Theme dev |
 | **`yt_warmup`** | Python 3, Systemd Daemon | Automated browser warmup daemon | Background |
 | **`sovereign-agent-os`** | Shell, Agent Governance, RAG Rules | Central standard for AI agents & rules | Global toolkit |
 

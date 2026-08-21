@@ -15,7 +15,7 @@ description: Enterprise Standard Obsidian Vault RAG Governance & Isolation Proto
 - Every project MUST have its dedicated namespace directory in Obsidian Vault:
   `/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<project-namespace>/`
 - **Automatic CWD Auto-Binding**:
-  - `CWD = /home/fuckadmin/Projects/shop.zyekh.com-theme` -> Namespace: `00-AGY-Memory/shop-zyekh-theme/`
+  - `CWD = /home/fuckadmin/Projects/shop.zyekh.com` -> Namespace: `00-AGY-Memory/shop-zyekh-com/`
   - `CWD = /home/fuckadmin/Projects/bagisto-testing` -> Namespace: `00-AGY-Memory/bagisto-testing/`
 - **STRICT PROHIBITION**:
   - NEVER execute global wildcard RAG searches (`search_notes`) without prefixing/scoping to the active project namespace.

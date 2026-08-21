@@ -6,6 +6,7 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - Modular Rule Definitions: `/home/fuckadmin/.gemini/config/rules/`
 
 ### Core Directives Summary
+- **Runtime Troubleshooting**: AGY error recovery protocol (`/home/fuckadmin/.gemini/config/rules/agy-runtime-troubleshooting.md`)
 - **Inspection Gate**: Cari dulu baru terapkan (`/home/fuckadmin/.gemini/config/rules/inspect-before-apply.md`)
 - **Verification Gate**: Empirical terminal proof (`/home/fuckadmin/.gemini/config/rules/empirical-verification.md`)
 - **Safety Gate**: Hard-stop on sensitive areas (`/home/fuckadmin/.gemini/config/rules/sensitive-area-guard.md`) & Git push restriction (`/home/fuckadmin/.gemini/config/rules/git-push-restriction.md`)

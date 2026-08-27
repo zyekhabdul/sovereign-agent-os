@@ -10,6 +10,7 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **Inspection Gate**: Cari dulu baru terapkan (`/home/fuckadmin/.gemini/config/rules/inspect-before-apply.md`)
 - **Verification Gate**: Empirical terminal proof (`/home/fuckadmin/.gemini/config/rules/empirical-verification.md`)
 - **Safety Gate**: Hard-stop on sensitive areas (`/home/fuckadmin/.gemini/config/rules/sensitive-area-guard.md`) & Git push restriction (`/home/fuckadmin/.gemini/config/rules/git-push-restriction.md`)
+- **System Diagnostics**: Periodic VPS & endpoint verification (`/home/fuckadmin/.gemini/config/rules/system-diagnostics.md`)
 - **Memory & RAG**: Obsidian 4-file governance (`/home/fuckadmin/.gemini/config/rules/obsidian-rag.md`)
 - **Code Style**: Ponytail / YAGNI minimalism (`/home/fuckadmin/.gemini/config/rules/ponytail-yagni.md`)
 - **Workflow Standard**: Hyper-Granular Chunking & Adaptive AI Workflow (`/home/fuckadmin/.gemini/config/rules/workflow-ai-agent.md`)

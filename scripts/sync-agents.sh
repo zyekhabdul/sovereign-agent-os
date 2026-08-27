@@ -25,7 +25,9 @@ mkdir -p "$AGENTS_DIR/skills"
 
 # 2. Sync Global Binding Rules across all agents
 echo "[ 2/4 ] Synchronizing global rules across agent environments..."
+cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$HOME/GEMINI.md"
 cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$GEMINI_DIR/GEMINI.md"
+cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$GEMINI_DIR/config/GEMINI.md"
 cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$AGENTS_DIR/GEMINI.md"
 cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$CLAUDE_DIR/CLAUDE.md" 2>/dev/null || true
 cp -v "$REPO_ROOT/GLOBAL_RULES.md" "$OPENCODE_DIR/OPENCODE.md" 2>/dev/null || true

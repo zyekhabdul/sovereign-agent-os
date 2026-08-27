@@ -5,7 +5,7 @@ description: Mandatory Pre-Execution Inspection Protocol (Cari Dulu Baru Terapka
 
 # MANDATORY GLOBAL RULE: PRE-EXECUTION INSPECTION PROTOCOL ("CARI DULU BARU TERAPKAN")
 
-- **Principle**: "No Mutation Without Prior Inspection"
+- **Principle**: "No Mutation Without Prior Inspection & Zero Blind Full-File Overwrite"
 - **Applicability**: ALL AI coding agents (Antigravity CLI `agy`, Claude Code, Cursor, Codex, OpenCode).
 
 ---
@@ -16,7 +16,13 @@ description: Mandatory Pre-Execution Inspection Protocol (Cari Dulu Baru Terapka
 
 ---
 
-## 2. MANDATORY TWO-PHASE EXECUTION GATE
+## 2. ANTI-AMPUTATION INVARIANT: SURGICAL DIFF OVER BLIND OVERWRITE
+- For **EXISTING** source files: AI agents MUST use `replace_file_content` (surgical diff) to preserve peripheral functions, helpers, comments, and docstrings.
+- `write_to_file` is strictly restricted to **NEW** file creation. Using `write_to_file (Overwrite=true)` on existing source files without explicit instruction is prohibited.
+
+---
+
+## 3. MANDATORY TWO-PHASE EXECUTION GATE
 
 ### Phase 1: Inspection & Evidence Gathering (Read-Only Gate)
 Before modifying any code or proposing an implementation:
@@ -31,5 +37,5 @@ Before modifying any code or proposing an implementation:
 
 ---
 
-## 3. PROOF-OF-INSPECTION REQUIREMENT
+## 4. PROOF-OF-INSPECTION REQUIREMENT
 Every code modification MUST be preceded by a tool read step in the conversation trajectory. Generating a file modification without prior inspection is classified as a Critical Protocol Failure.

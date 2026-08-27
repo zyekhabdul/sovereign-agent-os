@@ -22,17 +22,26 @@ description: Mandatory Empirical Verification & Silent Quality Gate Protocol - Z
 
 ---
 
-## 2. AUTONOMOUS RECOVERY PROTOCOL (SELF-CORRECTION)
+## 2. THE ZERO-TEST TRAP DEFENSE (NON-EMPTY PASS MANDATE)
+- A test suite returning exit code 0 is INVALID if `tests_run == 0` or all tests were skipped (`.skip()`, `xit()`, `@pytest.mark.skip`).
+- Pass condition strictly requires:
+  1. `exit code == 0`
+  2. `tests_executed > 0`
+  3. `failures == 0` and `errors == 0`
+
+---
+
+## 3. AUTONOMOUS RECOVERY PROTOCOL (SELF-CORRECTION)
 - If an empirical check fails with errors:
   1. AI Agent MUST parse the exact compiler/linter error output.
   2. Perform targeted, minimal fixes following the *Ponytail (YAGNI)* principle.
   3. Re-run verification silently until 0 errors are achieved.
-- If an error cannot be resolved within 2 iterations, STOP and report the exact trace and root cause to the user.
+- If an error cannot be resolved within 3 iterations, STOP and report the exact trace and root cause to the user (Circuit Breaker).
 
 ---
 
-## 3. DEFINITION OF DONE (DoD)
+## 4. DEFINITION OF DONE (DoD)
 A task chunk is officially classified as COMPLETE only when:
 1. Target code has been written and verified against inspection data.
-2. Build/Lint/Test verification returns exit code 0.
+2. Build/Lint/Test verification returns exit code 0 with non-zero test execution.
 3. Checkpoint has been logged via `agy-guard checkpoint`.

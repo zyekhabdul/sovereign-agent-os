@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Enterprise Standard Obsidian Vault RAG Governance & Isolation Protocol - Mandatory for All AI Agents
+description: Enterprise Standard Obsidian Vault RAG Governance & Zero-Maintenance Isolation Protocol
 ---
 
 # MANDATORY GLOBAL RULE: OBSIDIAN RAG ENTERPRISE GOVERNANCE
@@ -15,7 +15,7 @@ description: Enterprise Standard Obsidian Vault RAG Governance & Isolation Proto
 - Every project MUST have its dedicated namespace directory in Obsidian Vault:
   `/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<project-namespace>/`
 - **Automatic CWD Auto-Binding**:
-  - `CWD = /home/fuckadmin/Projects/shop.zyekh.com` -> Namespace: `00-AGY-Memory/shop-zyekh-com/`
+  - `CWD = /home/fuckadmin/Projects/shop.zyekh.com` -> Namespace: `00-AGY-Memory/shop.zyekh.com/`
   - `CWD = /home/fuckadmin/Projects/bagisto-testing` -> Namespace: `00-AGY-Memory/bagisto-testing/`
 - **STRICT PROHIBITION**:
   - NEVER execute global wildcard RAG searches (`search_notes`) without prefixing/scoping to the active project namespace.
@@ -35,20 +35,21 @@ To prevent RAG memory bloat, noise, and stale file pollution, every project name
 
 ---
 
-## 3. STRICT AUTHORITY HIERARCHY (CONFLICT RESOLUTION)
+## 3. ZERO-MAINTENANCE DIRECTIVES & AUTOMATION INVARIANTS (RFC-RAG-003)
+1. **Auto-Scaffolding Invariant**: Before modifying code in an unmapped project, AI agent must ensure the 4-file set exists in `00-AGY-Memory/<project-namespace>/`.
+2. **Solar System Linking Invariant**: Child documents (`CONTEXT.md`, `STATE.md`, `DECISIONS.md`) must link ONLY to their namespace `INDEX.md`. Direct links from child notes to `00-MASTER-INDEX.md` are prohibited to preserve graph physics.
+3. **Rolling Archive Protocol**: When any memory note reaches 180 lines, historical completed tasks or deprecated ADRs must be archived to `_archive/` to strictly uphold the 200-line token cap.
+4. **Autonomous Git-Sync Invariant**: Git post-commit hooks (`scripts/install-rag-hooks.sh`) automatically sync `git_commit_hash` to `STATE.md` on every local commit.
+
+---
+
+## 4. STRICT AUTHORITY HIERARCHY (CONFLICT RESOLUTION)
 In case of conflicting directives, AI agents MUST resolve truth using this strict 4-tier pyramid:
 
 1. **Tier 1 (Supreme Rules)**: Global Safety & Security Rules (`.gemini/config/rules/`) [NON-OVERRIDABLE]
 2. **Tier 2 (Authoritative Source)**: Local Workspace Repository (`GEMINI.md`, `DEVELOPMENT.md`, Root PRD, Source Code)
 3. **Tier 3 (Project RAG Memory)**: Project Namespace RAG (`00-AGY-Memory/<project-namespace>/`)
 4. **Tier 4 (Global RAG Vault)**: Unscoped Obsidian Notes [LOWEST PRIORITY]
-
----
-
-## 4. GIT-HASH SYNCHRONIZATION & MILESTONE-GATED CHECKPOINT
-- At each task milestone or successful local commit, the agent MUST update `STATE.md` using deterministic tooling: `agy-guard checkpoint --msg "<summary>"`.
-- The tooling automatically captures `git rev-parse HEAD`, active branch, and namespace mapping without probabilistic hallucination.
-- **Session Retrieval Check**: When reading RAG at session start, if `STATE.md`'s `git_commit_hash` does NOT match `git rev-parse HEAD`, RAG is considered **STALE**. The agent MUST treat the local repository source code as the absolute truth.
 
 ---
 

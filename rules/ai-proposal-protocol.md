@@ -1,31 +1,34 @@
 ---
 trigger: always_on
-description: Standard Protocol for AI-Initiated Proposals, RFCs, and Proactive Ideas - Mandatory for All AI Agents
+description: ai-proposal-protocol.md
 ---
 
-# MANDATORY GLOBAL RULE: AI-INITIATED PROPOSAL PROTOCOL (RFC STANDARD)
+# MANDATORY GLOBAL RULE: ARCHITECTURAL PROPOSAL PROTOCOL (RFC STANDARD)
 
-- **Principle**: "AI Proposes, Human Disposes"
+- **Principle**: "Autonomous Local Coding, RFC for Breaking Architecture Changes Only"
 - **Applicability**: ALL AI coding agents (Antigravity CLI `agy`, Claude Code, Cursor, Codex, OpenCode).
 
 ---
 
-## 1. STRICT PROHIBITION ON UNREQUESTED CODE MUTATION
-- The AI Agent MUST NEVER directly write code, refactor architectures, or add unrequested features/libraries based purely on an autonomous "idea" without prior human approval.
-- All proactive ideas MUST pass through this proposal protocol first.
+## 1. SCOPE OF AUTONOMOUS EXECUTION VS RFC
+1. **Autonomous Execution (Zero RFC Required)**:
+   - Routine bug fixes, requested features, performance tuning, typo corrections, and localized refactoring.
+   - Proceed directly via `Inspect -> Code -> Machine Verify -> Commit`.
+2. **Mandatory RFC Protocol (Human Approval Required)**:
+   - Proposing new third-party external dependencies / packages.
+   - Major database schema overhauls or table deprecations.
+   - Fundamental architectural restructuring altering public API contracts across multiple services.
 
 ---
 
-## 2. MANDATORY 3-PART PROPOSAL FORMAT (AI RFC)
-When proposing an optimization, new feature, or architectural change, the AI Agent MUST format the proposal as follows:
-
-1. **Data-Backed Rationale (Why)**: Cite empirical logs, audit findings, theme check warnings, CWV metrics, or UX standard data. Zero speculation or subjective fluff.
-2. **Impact & Risk Assessment**: Define clear performance/conversion benefits alongside potential breaking risks.
-3. **Execution Options**: Present clear, modular implementation choices (from minimal/lean to full).
+## 2. 3-PART RFC PROPOSAL FORMAT
+When a major architectural proposal is required, format it as follows:
+1. **Data-Backed Rationale (Why)**: Cite empirical metrics, audit findings, compiler warnings, or benchmark data.
+2. **Impact & Risk Assessment**: Define performance/conversion gains alongside breaking risks and blast radius.
+3. **Execution Options**: Present modular implementation choices (minimal/lean vs full).
 
 ---
 
-## 3. RAG DECISION RECORDING PROTOCOL
-- **APPROVED Proposals**: Added to the active project task checklist (`STATE.md` & `DEVELOPMENT.md`) and implemented incrementally.
-- **REJECTED Proposals**: The decision and rejection reason MUST be logged immediately to `00-AGY-Memory/<project-namespace>/DECISIONS.md`.
-- **STRICT AGENT CONSTRAINT**: Future AI agents MUST inspect `DECISIONS.md` at session start. An agent MUST NEVER re-propose or re-attempt an idea that has been previously rejected by the user.
+## 3. DECISION RECORDING (RAG)
+- **Approved Architectural Decisions**: Logged to project `DECISIONS.md` as standard single-line ADRs.
+- **Rejected Proposals**: Logged to `00-AGY-Memory/<project-namespace>/DECISIONS.md`. AI agents must never re-propose previously rejected concepts.

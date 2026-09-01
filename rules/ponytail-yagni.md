@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Mandatory Ponytail / YAGNI Minimalist Code Generation Standard - Zero Over-Engineering
+description: ponytail-yagni.md
 ---
 
 # MANDATORY GLOBAL RULE: PONYTAIL / YAGNI CODE MINIMALISM

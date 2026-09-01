@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: system-diagnostics.md
+---
+
 # MANDATORY GLOBAL RULE: CONTINUOUS EMPIRICAL DIAGNOSTICS & SYSTEM DOCTOR SYNCHRONIZATION
 
 - **Principle**: "Zero Speculation, Zero Hallucination, Continuous Empirical Verification"

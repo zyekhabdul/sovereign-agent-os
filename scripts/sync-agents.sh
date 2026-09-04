@@ -73,13 +73,23 @@ if all_servers:
     claude_data["mcpServers"] = all_servers
     with open(claude_cfg, "w") as fp:
         json.dump(claude_data, fp, indent=2)
+    os.chmod(claude_cfg, 0o600)
     print(f"  [ PASS ] Updated ~/.claude.json with {len(all_servers)} MCP servers.")
 
 # 2. Update ~/.opencode/opencode.json
     opencode_data = {"mcp": all_servers}
     with open(opencode_cfg, "w") as fp:
         json.dump(opencode_data, fp, indent=2)
+    os.chmod(opencode_cfg, 0o600)
     print(f"  [ PASS ] Updated ~/.opencode/opencode.json with {len(all_servers)} MCP servers.")
+
+# 3. Update ~/.config/antigravity/mcp_config.json
+    antigravity_cfg = os.path.expanduser("~/.config/antigravity/mcp_config.json")
+    if os.path.exists(os.path.dirname(antigravity_cfg)):
+        with open(antigravity_cfg, "w") as fp:
+            json.dump({"mcpServers": all_servers}, fp, indent=2)
+        os.chmod(antigravity_cfg, 0o600)
+        print(f"  [ PASS ] Updated ~/.config/antigravity/mcp_config.json with {len(all_servers)} MCP servers.")
 
 EOF
 

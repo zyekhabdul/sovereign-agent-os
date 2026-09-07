@@ -18,6 +18,7 @@ sovereign-agent-os/
 ├── docs/                          # Master Tata Kelola Proyek
 │   ├── GLOBAL-PROJECT-STANDARD.md # 7 Inti + 2 Wajib File Standards
 │   ├── WORKFLOW-AI-AGENT-STANDARD.md # 6-Phase AI Execution Workflow
+│   ├── USER-OPERATING-STANDARD.md # Human-AI Deterministic Interaction Standard
 │   └── PRD-MASTER-TEMPLATE.md     # Master PRD Blueprint
 ├── rules/                         # 15 Modular Binding Directives
 │   ├── agent-persona-invariants.md # Cognitive Persona & Autonomous Single-Stream
@@ -44,6 +45,7 @@ sovereign-agent-os/
 │   ├── projects/                  # Project-Specific Rules
 │   └── rag/                       # ADR & Memory Schemas
 └── scripts/
+    ├── agy-recover.sh             # Automated AI Runtime & Network Recovery
     ├── bootstrap.sh               # Complete Machine & Environment Bootstrap
     ├── sync-agents.sh             # Cross-Agent Parity Syncer (AGY, Claude, OpenCode, Codex)
     ├── vault.sh                   # Encrypted Credential Locker (AES-256-CBC)

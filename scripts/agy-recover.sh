@@ -12,13 +12,15 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "[1/5] Memperbaiki Ownership & Izin File .gemini & .agents..."
-sudo chown -R fuckadmin:fuckadmin /home/fuckadmin/.gemini /home/fuckadmin/.agents 2>/dev/null || true
-chmod -R u+rwX /home/fuckadmin/.gemini /home/fuckadmin/.agents 2>/dev/null || true
+CURRENT_USER="$(id -un)"
+CURRENT_GROUP="$(id -gn)"
+sudo chown -R "${CURRENT_USER}:${CURRENT_GROUP}" "$HOME/.gemini" "$HOME/.agents" 2>/dev/null || true
+chmod -R u+rwX "$HOME/.gemini" "$HOME/.agents" 2>/dev/null || true
 echo -e "[ OK ] Ownership dan permission berhasil dinormalisasi."
 
 echo -e "[2/5] Membersihkan Orphaned Presence Locks..."
-REMOVED_LOCKS=$(ls /home/fuckadmin/.gemini/antigravity-cli/presence/*.lock 2>/dev/null | wc -l)
-sudo rm -f /home/fuckadmin/.gemini/antigravity-cli/presence/*.lock
+REMOVED_LOCKS=$(ls "$HOME/.gemini/antigravity-cli/presence/"*.lock 2>/dev/null | wc -l)
+rm -f "$HOME/.gemini/antigravity-cli/presence/"*.lock 2>/dev/null || true
 echo -e "[ OK ] Berhasil membersihkan $REMOVED_LOCKS presence lock file."
 
 echo -e "[3/5] Me-refresh Koneksi Network & Cloudflare WARP..."
@@ -36,7 +38,7 @@ echo -e "  - Google CloudCode API: HTTP $GOOGLE_HTTP"
 echo -e "  - GitHub API          : HTTP $GITHUB_HTTP"
 
 echo -e "[5/5] Memeriksa Riwayat Error Log Terakhir..."
-LATEST_LOG=$(ls -t /home/fuckadmin/.gemini/antigravity-cli/log/*.log 2>/dev/null | head -n 1)
+LATEST_LOG=$(ls -t "$HOME/.gemini/antigravity-cli/log/"*.log 2>/dev/null | head -n 1)
 if [ -n "$LATEST_LOG" ]; then
   echo -e "  Log Aktif: $LATEST_LOG"
   RECENT_ERRORS=$(grep -E 'FAILED_PRECONDITION|RESOURCE_EXHAUSTED|UNAVAILABLE|permission denied' "$LATEST_LOG" | tail -n 3 || true)

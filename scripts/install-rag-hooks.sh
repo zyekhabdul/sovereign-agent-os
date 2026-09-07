@@ -5,8 +5,8 @@
 # ==============================================================================
 set -euo pipefail
 
-VAULT_MEMORY="/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory"
-PROJECTS_DIR="/home/fuckadmin/Projects"
+VAULT_MEMORY="${VAULT_MEMORY:-$HOME/Documents/Obsidian Vault/00-AGY-Memory}"
+PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Projects}"
 
 echo "[ RAG-HOOKS ] Installing post-commit auto-sync hooks with namespace resolution..."
 
@@ -15,7 +15,7 @@ HOOK_CONTENT='#!/usr/bin/env bash
 (
     REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
     REPO_NAME="$(basename "$REPO_DIR")"
-    MEMORY_BASE="/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory"
+    MEMORY_BASE="${HOME}/Documents/Obsidian Vault/00-AGY-Memory"
     
     # Try exact match, dot-to-dash match, or theme alias
     TARGET_DIR="${MEMORY_BASE}/${REPO_NAME}"

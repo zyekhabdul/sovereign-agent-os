@@ -15,10 +15,10 @@ bash install.sh
 This autonomously and deterministically handles:
 1. **CLI Tool Installation**: Copies `bin/agy-guard` to `~/.local/bin/agy-guard` (`chmod +x`).
 2. **Directory Architecture**: Sets up `~/.gemini/config/rules/`, `~/.gemini/config/plugins/`, `~/.agents/skills/`, and `~/Documents/Obsidian Vault/00-AGY-Memory/`.
-3. **9 Binding Rule Specs**: Deploys all 9 rules (`inspect-before-apply.md`, `empirical-verification.md`, `ponytail-yagni.md`, `sensitive-area-guard.md`, `ai-proposal-protocol.md`, `git-push-restriction.md`, `mcp-discovery.md`, `obsidian-rag.md`, `workflow-ai-agent.md`).
-4. **4-File GEMINI.md Parity**: Synchronizes `~/GEMINI.md`, `~/.gemini/GEMINI.md`, `~/.gemini/config/GEMINI.md`, and `~/.agents/GEMINI.md` byte-for-byte.
+3. **15 Binding Rule Specs**: Deploys all 15 formal rules (`inspect-before-apply.md`, `empirical-verification.md`, `ponytail-yagni.md`, `sensitive-area-guard.md`, `ai-proposal-protocol.md`, `git-push-restriction.md`, `mcp-discovery.md`, `obsidian-rag.md`, `workflow-ai-agent.md`, `agent-persona-invariants.md`, `agy-runtime-troubleshooting.md`, `autonomous-failure-modes.md`, `deterministic-machine-harness.md`, `environment-topology.md`, `system-diagnostics.md`).
+4. **4-File GEMINI.md Parity & Cross-Agent Sync**: Synchronizes `~/GEMINI.md`, `~/.gemini/GEMINI.md`, `~/.gemini/config/GEMINI.md`, and `~/.agents/GEMINI.md` byte-for-byte, plus auto-configures Claude Code, OpenCode, and Codex.
 5. **12 Active Plugins**: Deploys `caveman`, `ponytail`, `codegraph`, `serena`, `contextmode`, `headroom`, `rtk`, `skills`, `mcp`, `graphify`, `delphitools`, and `agent-skills`.
-6. **Global Git Templates & Hooks**: Configures `~/.git-templates` with `post-commit` (auto-checkpoint) and `pre-push` (push interceptor) hooks.
+6. **Global Git Templates & Anti-Blunder Hooks**: Configures `~/.git-templates` with `pre-commit` (anti-blunder, anti-lazy truncation, anti-emoji, test guard), `post-commit` (auto-checkpoint), and `pre-push` (push interceptor) hooks.
 7. **Empirical Status Verification**: Runs `agy-guard status` to confirm 100% compliance.
 
 ---

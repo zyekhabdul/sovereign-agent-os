@@ -5,7 +5,7 @@
 # ==============================================================================
 set -euo pipefail
 
-VAULT_DIR="/home/fuckadmin/Documents/Obsidian Vault"
+VAULT_DIR="${VAULT_DIR:-$HOME/Documents/Obsidian Vault}"
 MEMORY_DIR="${VAULT_DIR}/00-AGY-Memory"
 MASTER_INDEX="${MEMORY_DIR}/00-MASTER-INDEX.md"
 

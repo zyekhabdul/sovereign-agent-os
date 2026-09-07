@@ -54,6 +54,13 @@ cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/config/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.agents/GEMINI.md"
 
+# Adapt absolute paths to current user home directory if different
+if [ "$HOME" != "/home/fuckadmin" ]; then
+    echo "  -> Normalizing absolute paths for local host environment ($HOME)..."
+    find "$HOME/.gemini/config/rules" -type f -name "*.md" -exec sed -i "s|/home/fuckadmin|$HOME|g" {} + 2>/dev/null || true
+    sed -i "s|/home/fuckadmin|$HOME|g" "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" 2>/dev/null || true
+fi
+
 # Cross-agent configuration parity (Claude Code, OpenCode, Codex)
 bash "$SCRIPT_DIR/scripts/sync-agents.sh" || true
 

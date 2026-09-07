@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Mandatory Global Rule - Dual-File MCP Discovery Protocol (mcp_config.json & mcp_config_extended.json) - Strictly On-Demand
+description: mcp-discovery.md
 ---
 
 # MANDATORY GLOBAL RULE: DUAL-FILE MCP DISCOVERY PROTOCOL

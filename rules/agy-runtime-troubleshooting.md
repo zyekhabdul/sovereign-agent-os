@@ -1,3 +1,7 @@
+---
+trigger: always_on
+description: Mandatory AGY Runtime Error Recovery & Empirical Log Triage Protocol
+---
 # MANDATORY GLOBAL RULE: AGY RUNTIME ERROR RECOVERY & TROUBLESHOOTING
 
 - **Principle**: "Empirical Log Triage Before Mutation"

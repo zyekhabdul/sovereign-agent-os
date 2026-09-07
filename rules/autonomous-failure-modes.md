@@ -1,3 +1,7 @@
+---
+trigger: always_on
+description: Mandatory Defense Invariants Against 10 Autonomous AI Blunders and Failure Modes
+---
 # MANDATORY GLOBAL RULE: AUTONOMOUS FAILURE MODES & HARDENING DEFENSE
 
 - **Principle**: "Anticipate, Block, and Harden Against Autonomous AI Blunders"
@@ -74,3 +78,15 @@
 ### Failure Mode 15: Namespace / Alias Mismatch in Automation Hooks
 - **Mechanism**: Repository folder names differing from memory vault namespaces cause background git hooks to fail silently.
 - **Defense Invariant**: Canonical namespace mapping resolution in scripts (`scripts/install-rag-hooks.sh` and `scripts/rag-lint.sh`).
+<<<<<<< HEAD
+=======
+
+### Failure Mode 16: The "False 100% Verified" / Superficial Verification Fallacy
+- **Mechanism**: AI claims a feature or system is "100% verified" or "ready for live production" solely because synthetic unit tests, linters, or compilation passed with exit code 0, while ignoring real-world execution friction, microstructural edge cases, and temporal deadlocks.
+- **Defense Invariants (Mandatory 4-Dimension Forensic Reality Gate)**:
+  1. **Dimension A (Protocol Precision & Formatting)**: Verify that numbers and parameters sent to external APIs comply with strict exchange/third-party filters (`stepSize`, `tickSize`, `min_notional`, native protocol flags like `timeInForce: 'GTX'`).
+  2. **Dimension B (Adverse Selection & Real-World Friction)**: Audit whether logic assumes frictionless execution (e.g. assuming limit orders at best_bid are instantly filled during momentum breakout, whereas in reality they suffer adverse selection).
+  3. **Dimension C (Temporal Deadlocks & Capital Prison)**: Verify that single-resource or single-position algorithms include timeout watchdogs / time-stops (`max_hold_minutes`) to prevent capital/state from locking forever during sideways/inactivity periods.
+  4. **Dimension D (Intra-Lifecycle State Integrity)**: Verify that decision logic evaluates settled/closed states (e.g. `df.iloc[-2]` closed candle) rather than dirty/unclosed states (`df.iloc[-1]`) that suffer from repainting or volume distortion.
+  5. **Claim Discipline**: AI must distinguish between `[ SYNTACTICALLY_VERIFIED ]` (code passes local harness) and `[ PRODUCTION_EXECUTION_AUDITED ]` (verified against real-world friction). Strict prohibition on unconditional "100% ready" claims without executing the 4-dimension audit.
+>>>>>>> e01224c6f8c771912fa65b41e66ea6ecda33f336

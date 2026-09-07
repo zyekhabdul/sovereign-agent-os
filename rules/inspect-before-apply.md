@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Mandatory Pre-Execution Inspection Protocol (Cari Dulu Baru Terapkan) - Anti-Hallucination Gate
+description: inspect-before-apply.md
 ---
 
 # MANDATORY GLOBAL RULE: PRE-EXECUTION INSPECTION PROTOCOL ("CARI DULU BARU TERAPKAN")

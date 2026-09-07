@@ -42,7 +42,6 @@ Pause execution and solicit human confirmation ONLY at:
 2. Remote `git push` operations.
 3. Production server deployments.
 4. Circuit breaker trip (after 3 failed self-healing attempts).
-
 ---
 
 ## 3. SLIDING PACKET WINDOW & EPHEMERAL PLAN INVARIANT

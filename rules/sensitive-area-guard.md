@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Mandatory Sensitive Area Hard-Stop & Authorization Gate Protocol
+description: sensitive-area-guard.md
 ---
 
 # MANDATORY GLOBAL RULE: SENSITIVE AREA HARD-STOP & AUTHORIZATION GATE

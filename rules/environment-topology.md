@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Sovereign Environment Topology - Decoupled Workspace & Direct Sovereign Host Dual-Mode Standard
+description: environment-topology.md
 ---
 
 # MANDATORY GLOBAL RULE: SOVEREIGN ENVIRONMENT TOPOLOGY & DUAL-MODE WORKSPACE

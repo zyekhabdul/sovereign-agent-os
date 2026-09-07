@@ -39,6 +39,7 @@ Human confirmation is strictly required ONLY for the following critical/destruct
 - **AP-03: Test Cheating / Assertion Weakening**: Modifying, weakening, or deleting existing tests to force a fake exit code 0 (`autonomous-failure-modes.md`).
 - **AP-04: Infinite Healing Loops**: Looping compiler fixes beyond the 3-iteration circuit breaker.
 - **AP-05: Unsolicited Scope Creep / Ngide Liar**: Rewriting untouched architectures or adding unrequested libraries outside the task boundary.
+- **AP-06: Superficial "100% Verified" Fallacy**: Declaring a feature/system "100% verified / ready for live execution" solely based on synthetic/mock unit tests passing with exit code 0, without auditing real-world execution friction (adverse selection, exchange stepSize precision, capital deadlocks, dirty states).
 
 ---
 

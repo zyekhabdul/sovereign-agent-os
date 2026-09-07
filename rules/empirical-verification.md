@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Mandatory Empirical Verification & Silent Quality Gate Protocol - Zero Assumptions
+description: empirical-verification.md
 ---
 
 # MANDATORY GLOBAL RULE: EMPIRICAL VERIFICATION & SILENT QUALITY GATE
@@ -45,3 +45,20 @@ A task chunk is officially classified as COMPLETE only when:
 1. Target code has been written and verified against inspection data.
 2. Build/Lint/Test verification returns exit code 0 with non-zero test execution.
 3. Checkpoint has been logged via `agy-guard checkpoint`.
+
+---
+
+## 5. THE TWO-TIER VERIFICATION CONTRACT (SYNTAX VS FORENSIC REALITY)
+AI agents MUST never conflate "test runner passed" with "production ready". All completion reports must adhere to a strict two-tier contract:
+
+1. **Tier 1: Syntax & Unit Test Pass (`[ SYNTACTICALLY_VERIFIED ]`)**:
+   - Exit code 0 on linter, typechecker, and unit test suite.
+   - Proves code does not crash internally within mock/synthetic parameters.
+
+2. **Tier 2: Forensic Reality Gate (`[ PRODUCTION_EXECUTION_AUDITED ]`)**:
+   - **Precision Compliance**: Strict alignment with real third-party API filters (`LOT_SIZE`, `stepSize`, `tickSize`, `min_notional`).
+   - **Friction & Adverse Selection**: Audited order fill probabilities, slippage, and adverse selection under live orderbook dynamics.
+   - **Temporal Bounds**: Mandatory time-stops / activity timeouts preventing infinite state/capital deadlocks during market chops.
+   - **Settled State Integrity**: Elimination of unclosed/repainting data frames in decision engines.
+
+**Mandate**: Declaring a task "100% production ready" without passing both Tier 1 and Tier 2 constitutes a Critical Agent Protocol Violation.

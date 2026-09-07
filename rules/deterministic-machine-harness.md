@@ -1,3 +1,7 @@
+---
+trigger: always_on
+description: Mandatory Deterministic Machine Harness & Autonomous Scale-Up Architecture
+---
 # MANDATORY GLOBAL RULE: DETERMINISTIC MACHINE HARNESS & AUTONOMOUS SCALE-UP
 
 - **Principle**: "Replace Human Bureaucracy with Machine Harness (Compilers, AST Blast Radius, Automated Tests, Git Sandboxes)"

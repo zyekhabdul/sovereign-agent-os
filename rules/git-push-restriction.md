@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: Mandatory Global Rule - Allow local git commit, STRICTLY PROHIBIT automatic git push without explicit user command
+description: git-push-restriction.md
 ---
 
 # MANDATORY GLOBAL RULE: GIT PUSH PERMISSION CONTROL

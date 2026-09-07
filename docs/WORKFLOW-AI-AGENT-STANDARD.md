@@ -34,10 +34,11 @@ Pola ini menggantikan "approve tiap chunk satu-satu" — dipakai untuk eksekusi 
 
 ## 2. Tahapan Kerja Wajib
 
-### Tahap 1 — Baca PRD, Buat Hyper-Granular `PLAN.md`
+### Tahap 1 — Baca PRD, Buat Hyper-Granular `PLAN.md` (Pola Sliding Packet)
 Ketika diberi `PRD.md` atau requirement baru:
 - Baca dan pahami seluruh isi PRD.
 - Tulis rencana teknis ke `PLAN.md`: breakdown task kecil, file target & lokasi eksplisit, urutan dependency, dan Definition of Done (DoD) per chunk.
+- **Pola Sliding Packet (Maksimal 10 Chunks Detail Aktif)**: Jika sebuah fase memiliki banyak chunk (misal 20–30), kelompokkan ke dalam paket-paket kerja (Paket 1: Chunks 1-10, Paket 2: Chunks 11-20, dst.). `PLAN.md` memuat roadmap outline seluruh paket, namun **hanya meng-expand detail spesifikasi DoD untuk maksimal 10 chunks pada paket yang sedang aktif**. Paket berikutnya di-expand setelah paket aktif tuntas.
 - **JANGAN menulis atau mengubah kode apa pun di tahap ini.**
 - Berhenti dan tunggu review dari dev.
 
@@ -93,6 +94,8 @@ Jika ada dua aturan bertentangan, ikuti urutan hierarki berikut (paling tinggi m
 - `DEVELOPMENT.md` hanya berisi task **aktif**. Task lama dipindah ke `DEVELOPMENT-ARCHIVE.md`.
 - `CHANGELOG.md` hanya menyimpan entri **beberapa sesi terakhir**. Entri lama dipindah ke `CHANGELOG-ARCHIVE.md`.
 - File RAG `CONTEXT.md` maksimal **200 baris**.
+- **Single-Plan Invariant**: Di root repo hanya ada **satu** file `PLAN.md`. Dilarang membuat file pecahan (`PLAN-old.md`, `PLAN-part2.md`, `task-detail.md`). Setelah satu paket kerja selesai, bagian detail ditimpa (overwrite) untuk paket berikutnya.
+- **RAG State Cap**: Checklist task aktif di `STATE.md` RAG dibatasi **maksimal 10 item** level milestone/paket, bukan dump puluhan mikro-DoD.
 
 ---
 

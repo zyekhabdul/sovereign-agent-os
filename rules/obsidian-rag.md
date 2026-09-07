@@ -28,10 +28,13 @@ To prevent RAG memory bloat, noise, and stale file pollution, every project name
 
 1. `INDEX.md`: Project metadata, local repo path mapping, and Latest Git Commit Hash stamp (`git_commit_hash`).
 2. `CONTEXT.md`: High-density project overview, technical stack, and architectural constraints (max 200 lines).
-3. `STATE.md`: Active task status, current phase, and checkpoint (OVERWRITTEN at the end of each session).
+3. `STATE.md`: Active task status, current phase, and checkpoint (OVERWRITTEN at the end of each session, MAX 10 active tasks).
 4. `DECISIONS.md`: Architectural Decision Records (ADR) & fixed technical laws (Append-only).
 
-> **Archiving Protocol**: Any session logs or deprecated PRD notes MUST be moved to `00-AGY-Memory/<project-namespace>/_archive/`. AI agents MUST IGNORE any files inside `_archive/` or starting with `_`.
+- **Strict 4-File Whitelist**: Namespaces MUST NOT contain any additional files (e.g. `Session-*.md`, `task-detail.md`, `PLAN-*.md`, scratch dumps). All execution step details are ephemeral (terminal/chat only).
+- **10-Task Cap Invariant**: `STATE.md` task checklists MUST NOT exceed 10 active items (packet/milestone level). Micro-chunks and granular DoDs belong strictly in the local repository's `PLAN.md`.
+
+> **Archiving Protocol**: Any deprecated notes MUST be moved to `00-AGY-Memory/<project-namespace>/_archive/`. AI agents MUST IGNORE any files inside `_archive/` or starting with `_`.
 
 ---
 
@@ -40,6 +43,7 @@ To prevent RAG memory bloat, noise, and stale file pollution, every project name
 2. **Solar System Linking Invariant**: Child documents (`CONTEXT.md`, `STATE.md`, `DECISIONS.md`) must link ONLY to their namespace `INDEX.md`. Direct links from child notes to `00-MASTER-INDEX.md` are prohibited to preserve graph physics.
 3. **Rolling Archive Protocol**: When any memory note reaches 180 lines, historical completed tasks or deprecated ADRs must be archived to `_archive/` to strictly uphold the 200-line token cap.
 4. **Autonomous Git-Sync Invariant**: Git post-commit hooks (`scripts/install-rag-hooks.sh`) automatically sync `git_commit_hash` to `STATE.md` on every local commit.
+5. **Zero-File Execution Dump Invariant**: Agents are strictly prohibited from writing session logs, temporary plan files, or execution dumps into the vault. RAG memory is updated solely via in-place overwrites to `STATE.md` and append to `DECISIONS.md`.
 
 ---
 

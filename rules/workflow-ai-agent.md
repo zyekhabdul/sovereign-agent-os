@@ -42,3 +42,14 @@ Pause execution and solicit human confirmation ONLY at:
 2. Remote `git push` operations.
 3. Production server deployments.
 4. Circuit breaker trip (after 3 failed self-healing attempts).
+
+---
+
+## 3. SLIDING PACKET WINDOW & EPHEMERAL PLAN INVARIANT
+1. **10-Chunk Active Packet Invariant**:
+   - `PLAN.md` may contain a high-level roadmap outline of all phase packets, but MUST ONLY expand granular step-by-step DoD for a maximum of 10 chunks (1 active work packet) at any time.
+   - Future chunks remain in the roadmap outline; they are expanded only when the active packet is completed.
+2. **Ephemeral Single-Plan Invariant**:
+   - Exactly ONE `PLAN.md` file is allowed in the local repository root.
+   - Creating ad-hoc execution dump files (`PLAN-part2.md`, `Session-XX.md`, `task-detail.md`, `scratch-plan.md`) is strictly forbidden.
+   - Once an active packet of 10 chunks is verified (exit code 0) and committed, the detail section of `PLAN.md` is overwritten with the next packet.

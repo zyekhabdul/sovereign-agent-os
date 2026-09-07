@@ -34,8 +34,8 @@ if [ "$ACTION" == "clone" ]; then
     echo "[ WARN ] Directory $DEST already exists. Pulling latest..."
     git -C "$DEST" pull origin main || git -C "$DEST" pull origin master || true
   else
-    echo "Cloning https://github.com/velora-1d/$REPO_NAME.git to $DEST..."
-    git clone "https://github.com/velora-1d/$REPO_NAME.git" "$DEST"
+    echo "Cloning git@github-sec:velora-1d/$REPO_NAME.git to $DEST..."
+    git clone "git@github-sec:velora-1d/$REPO_NAME.git" "$DEST"
   fi
   echo "[ SUCCESS ] Repository ready at: $DEST"
   exit 0
@@ -46,7 +46,7 @@ if [ "$ACTION" == "clone-all" ]; then
   REPOS=$(curl -s "https://api.github.com/users/velora-1d/repos?per_page=100" | jq -r '.[].name')
   for r in $REPOS; do
     echo "\n>>> Cloning $r..."
-    git clone "https://github.com/velora-1d/$r.git" "$TARGET_DIR/$r" 2>/dev/null || echo "Skipping $r (already cloned or error)"
+    git clone "git@github-sec:velora-1d/$r.git" "$TARGET_DIR/$r" 2>/dev/null || echo "Skipping $r (already cloned or error)"
   done
   echo "\n[ SUCCESS ] All repos cloned into $TARGET_DIR"
   exit 0

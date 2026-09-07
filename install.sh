@@ -39,9 +39,13 @@ mkdir -p "$HOME/Projects"
 mkdir -p "$HOME/Documents/Obsidian Vault/00-AGY-Memory"
 mkdir -p "$HOME/Documents/Obsidian Vault/09-Panduan-Projek"
 
-# 4. Deploy 15 Formal Rule Specifications
-echo "[ 3/7 ] Deploying 15 formal binding rule files..."
+# 4. Deploy 15 Formal Rule Specifications, Guides & Helper Scripts
+echo "[ 3/7 ] Deploying 15 formal binding rule files, project guides & scripts..."
 cp -v "$SCRIPT_DIR/rules/"*.md "$HOME/.gemini/config/rules/"
+cp -v "$SCRIPT_DIR/docs/"*.md "$HOME/Documents/Obsidian Vault/09-Panduan-Projek/"
+mkdir -p "$HOME/scripts"
+cp -v "$SCRIPT_DIR/scripts/"*.sh "$HOME/scripts/" 2>/dev/null || true
+chmod +x "$HOME/scripts/"*.sh 2>/dev/null || true
 
 # 5. Synchronize All 4 Physical GEMINI.md Files Byte-for-Byte
 echo "[ 4/7 ] Synchronizing GEMINI.md rules across all active endpoints..."

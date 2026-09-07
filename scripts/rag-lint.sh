@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # RAG-LINT: Deterministic Obsidian RAG & Memory Governance Health Checker
-# Spec: RFC-RAG-003 (5-Gate Validation Standard)
+# Spec: RFC-RAG-003 (7-Gate Validation Standard)
 # ==============================================================================
 set -euo pipefail
 
@@ -12,7 +12,7 @@ MASTER_INDEX="${MEMORY_DIR}/00-MASTER-INDEX.md"
 ERRORS=0
 WARNINGS=0
 
-echo "[ RAG-LINT ] Starting 5-Gate Vault Integrity Verification..."
+echo "[ RAG-LINT ] Starting 7-Gate Vault Integrity Verification..."
 
 # --- GATE 1: Scaffolding Completeness ---
 echo "-> Checking Gate 1: 4-File Core Scaffolding..."
@@ -28,32 +28,64 @@ for dir in "${MEMORY_DIR}"/*/; do
     done
 done
 
-# --- GATE 2: Master Index Hub Existence ---
-echo "-> Checking Gate 2: Master Index Hub Existence..."
+# --- GATE 2: Strict 4-File Whitelist (Zero Stale File Dumps) ---
+echo "-> Checking Gate 2: Strict 4-File Whitelist (Zero Stale Dumps)..."
+for dir in "${MEMORY_DIR}"/*/; do
+    [ -d "$dir" ] || continue
+    ns=$(basename "$dir")
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects|velora-account-backup|projects-audit) ]] && continue
+    for f in "${dir}"*; do
+        [ -e "$f" ] || continue
+        fname=$(basename "$f")
+        if [[ "$fname" != "INDEX.md" && "$fname" != "CONTEXT.md" && "$fname" != "STATE.md" && "$fname" != "DECISIONS.md" && "$fname" != "_archive" ]]; then
+            echo "[ ERROR ] [Gate 2] Stray non-whitelist file found in ${ns}: ${fname}"
+            ERRORS=$((ERRORS + 1))
+        fi
+    done
+done
+
+# --- GATE 3: Master Index Hub Existence ---
+echo "-> Checking Gate 3: Master Index Hub Existence..."
 if [ ! -f "${MASTER_INDEX}" ]; then
-    echo "[ ERROR ] [Gate 2] Master Hub ${MASTER_INDEX} not found"
+    echo "[ ERROR ] [Gate 3] Master Hub ${MASTER_INDEX} not found"
     ERRORS=$((ERRORS + 1))
 fi
 
-# --- GATE 3: Anti-Knot Decoupling Invariant ---
-echo "-> Checking Gate 3: Anti-Knot Solar System Linking..."
+# --- GATE 4: Anti-Knot Decoupling Invariant ---
+echo "-> Checking Gate 4: Anti-Knot Solar System Linking..."
 find "${MEMORY_DIR}" -type f -name "*.md" ! -name "INDEX.md" ! -name "00-MASTER-INDEX.md" ! -path "*/_archive/*" -print0 | while IFS= read -r -d '' file; do
     if grep -q "00-MASTER-INDEX.md" "$file" 2>/dev/null; then
-        echo "[ WARN ] [Gate 3] Direct master link found in child note: $(basename "$file")"
+        echo "[ WARN ] [Gate 4] Direct master link found in child note: $(basename "$file")"
     fi
 done
 
-# --- GATE 4: Token Capacity & Line Cap (<= 200 lines) ---
-echo "-> Checking Gate 4: Line Cap Enforcement (Max 200 lines)..."
+# --- GATE 5: Token Capacity & Line Cap (<= 200 lines) ---
+echo "-> Checking Gate 5: Line Cap Enforcement (Max 200 lines)..."
 find "${MEMORY_DIR}" -type f -name "*.md" ! -path "*/_archive/*" -print0 | while IFS= read -r -d '' file; do
     lines=$(wc -l < "$file")
     if [ "$lines" -gt 200 ]; then
-        echo "[ WARN ] [Gate 4] File exceeds 200 lines (${lines} lines): $(basename "$file")"
+        echo "[ WARN ] [Gate 5] File exceeds 200 lines (${lines} lines): $(basename "$file")"
     fi
 done
 
-# --- GATE 5: Git Hash Parity Check ---
-echo "-> Checking Gate 5: Git Hash Parity..."
+# --- GATE 6: Active Task Cap in STATE.md (Max 10 tasks) ---
+echo "-> Checking Gate 6: Active Task Cap in STATE.md (Max 10 tasks)..."
+for dir in "${MEMORY_DIR}"/*/; do
+    [ -d "$dir" ] || continue
+    ns=$(basename "$dir")
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects|velora-account-backup) ]] && continue
+    state_file="${dir}STATE.md"
+    if [ -f "$state_file" ]; then
+        tasks=$(awk '/## Active Milestone/{flag=1} /## Invariant/{flag=0} flag && /^- \[/ {print}' "$state_file" | wc -l)
+        if [ "$tasks" -gt 10 ]; then
+            echo "[ ERROR ] [Gate 6] Active tasks in ${ns}/STATE.md exceeds 10 (${tasks} tasks found)"
+            ERRORS=$((ERRORS + 1))
+        fi
+    fi
+done
+
+# --- GATE 7: Git Hash Parity Check ---
+echo "-> Checking Gate 7: Git Hash Parity..."
 if [ -d ".git" ]; then
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "")
     if [ -n "$CURRENT_HASH" ]; then
@@ -61,7 +93,7 @@ if [ -d ".git" ]; then
         STATE_FILE="${MEMORY_DIR}/${CWD_NAME}/STATE.md"
         if [ -f "$STATE_FILE" ]; then
             if ! grep -q "$CURRENT_HASH" "$STATE_FILE" 2>/dev/null; then
-                echo "[ INFO ] [Gate 5] Current branch HEAD (${CURRENT_HASH:0:7}) not yet synced to ${CWD_NAME}/STATE.md"
+                echo "[ INFO ] [Gate 7] Current branch HEAD (${CURRENT_HASH:0:7}) not yet synced to ${CWD_NAME}/STATE.md"
             fi
         fi
     fi

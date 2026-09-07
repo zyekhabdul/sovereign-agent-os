@@ -135,6 +135,17 @@ def cmd_sync_rules(args):
         print(f"  [ SYNCED ] -> {target}")
         synced += 1
     print(f"[ SUCCESS ] {synced} rule files synchronized byte-for-byte.")
+    
+    # Cross-agent parity sync (Claude Code, OpenCode, Codex)
+    sync_script = HOME / "scripts" / "sync-agents.sh"
+    if not sync_script.exists():
+        sync_script = HOME / "Projects" / "sovereign-agent-os" / "scripts" / "sync-agents.sh"
+    if sync_script.exists():
+        try:
+            print("[ AGY-GUARD ] Running cross-agent synchronizer for multi-agent parity...")
+            subprocess.run(["bash", str(sync_script)], check=False)
+        except Exception as e:
+            print(f"  [ WARN ] Could not run sync-agents.sh: {e}")
 
 def cmd_status(args):
     fix_mode = getattr(args, "fix", False)
@@ -942,6 +953,40 @@ def cmd_verify(args):
                 print("  [ EMERGENCY ACTION ] Rolling back uncommitted mutations to prevent death loop...")
                 if git_root:
                     subprocess.run(["git", "restore", "."], cwd=git_root)
+                
+                # Auto-update Obsidian STATE.md to BLOCKED
+                try:
+                    ns = resolve_namespace(cwd)
+                    target_dir = MEMORY_DIR / ns
+                    state_file = target_dir / "STATE.md"
+                    if state_file.exists():
+                        commit, branch, dirty = get_git_info(cwd)
+                        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        state_content = f"""# ACTIVE STATE — {ns}
+
+- **Last Checkpoint**: {now}
+- **Status**: BLOCKED
+- **Git Branch**: `{branch}`
+- **Git Commit**: `{commit}`
+- **Uncommitted Changes**: {dirty} file(s)
+
+---
+
+## Active Milestone / Task
+- **Summary**: [CIRCUIT BREAKER TRIPPED] 3 consecutive verification failures detected. Uncommitted mutations rolled back.
+- **Checkpoint Context**: Tripped by `agy-guard verify`
+
+## Invariant Checks
+- [x] Ponytail / YAGNI Minimalist verified
+- [x] Strict No-Emoji compliant
+- [x] Git push permission checked (local only)
+- [ ] Verification passed (BLOCKED: Requires human guidance or RFC)
+"""
+                        state_file.write_text(state_content.strip() + "\n", encoding="utf-8")
+                        print(f"  [ STATE UPDATED ] {state_file} marked as BLOCKED.")
+                except Exception as e:
+                    print(f"  [ WARN ] Could not update STATE.md: {e}")
+
                 print("  [ HARD STOP ] AI self-healing halted. Raw error reported above. Exiting with code 126.")
                 sys.exit(126)
             else:

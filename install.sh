@@ -54,6 +54,9 @@ cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/config/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.agents/GEMINI.md"
 
+# Cross-agent configuration parity (Claude Code, OpenCode, Codex)
+bash "$SCRIPT_DIR/scripts/sync-agents.sh" || true
+
 # 6. Deploy 12 Plugins & Config
 echo "[ 5/7 ] Deploying plugins to ~/.gemini/config/plugins/..."
 cp -r "$SCRIPT_DIR/plugins/"* "$HOME/.gemini/config/plugins/" 2>/dev/null || true

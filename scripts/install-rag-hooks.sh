@@ -26,18 +26,74 @@ HOOK_CONTENT='#!/usr/bin/env bash
         fi
     fi
     
-    MEMORY_FILE="${TARGET_DIR}/STATE.md"
+    HASH="$(git rev-parse HEAD 2>/dev/null || echo "unknown")"
+    BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")"
+    TIMESTAMP="$(date +"%Y-%m-%d %H:%M:%S")"
     
-    if [ -f "$MEMORY_FILE" ]; then
-        HASH="$(git rev-parse HEAD 2>/dev/null || echo "unknown")"
-        BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")"
-        TIMESTAMP="$(date +"%Y-%m-%d %H:%M:%S")"
-        
+    # Auto-scaffold complete 4-file set if namespace directory or files are missing
+    mkdir -p "$TARGET_DIR"
+    
+    # 1. INDEX.md
+    if [ ! -f "${TARGET_DIR}/INDEX.md" ]; then
+        cat << EOF > "${TARGET_DIR}/INDEX.md"
+# PROJECT INDEX — ${REPO_NAME}
+
+- **Project Name**: \`${REPO_NAME}\`
+- **Repository Path**: \`${REPO_DIR}\`
+- **Git Commit Hash**: \`${HASH}\`
+- **Active Branch**: \`${BRANCH}\`
+- **Last Memory Sync**: ${TIMESTAMP}
+EOF
+    fi
+
+    # 2. CONTEXT.md
+    if [ ! -f "${TARGET_DIR}/CONTEXT.md" ]; then
+        cat << EOF > "${TARGET_DIR}/CONTEXT.md"
+# PROJECT CONTEXT — ${REPO_NAME}
+
+## Technical Overview
+- **Repository**: \`${REPO_DIR}\`
+- **Active Branch**: \`${BRANCH}\`
+- **Architectural Constraints**: Minimalist code generation, Ponytail / YAGNI, 4-file RAG schema compliant.
+EOF
+    fi
+
+    # 3. STATE.md
+    MEMORY_FILE="${TARGET_DIR}/STATE.md"
+    if [ ! -f "$MEMORY_FILE" ]; then
+        cat << EOF > "$MEMORY_FILE"
+# ACTIVE STATE — ${REPO_NAME}
+
+- **Last Session Timestamp**: ${TIMESTAMP}
+- **Git Commit Hash**: "${HASH}"
+- **Active Branch**: \`${BRANCH}\`
+- **Active Task Phase**: Active Development
+- **Pending Deliverables**:
+  - [ ] Implement features per PLAN.md chunks.
+  - [ ] Maintain deterministic test and verification gates.
+EOF
+    else
         # Fast non-blocking update of header hash
-        if grep -q "git_commit_hash:" "$MEMORY_FILE"; then
+        if grep -q "git_commit_hash:" "$MEMORY_FILE" 2>/dev/null; then
             sed -i "s/git_commit_hash:.*/git_commit_hash: \"$HASH\"/" "$MEMORY_FILE" 2>/dev/null || true
             sed -i "s/last_updated:.*/last_updated: \"$TIMESTAMP\"/" "$MEMORY_FILE" 2>/dev/null || true
         fi
+        if grep -q "Git Commit:" "$MEMORY_FILE" 2>/dev/null; then
+            sed -i "s/- \*\*Git Commit\*\*:.*/- \*\*Git Commit\*\*: \`$HASH\`/" "$MEMORY_FILE" 2>/dev/null || true
+            sed -i "s/- \*\*Last Checkpoint\*\*:.*/- \*\*Last Checkpoint\*\*: $TIMESTAMP/" "$MEMORY_FILE" 2>/dev/null || true
+        fi
+    fi
+
+    # 4. DECISIONS.md
+    if [ ! -f "${TARGET_DIR}/DECISIONS.md" ]; then
+        cat << EOF > "${TARGET_DIR}/DECISIONS.md"
+# ARCHITECTURAL DECISIONS (ADR) — ${REPO_NAME}
+
+## Standard Laws
+- **Law 1**: Ponytail / YAGNI - Minimalist code generation, zero unsolicited refactoring.
+- **Law 2**: Empirical Verification - Always verify build/test before concluding task.
+- **Law 3**: Git Push Guard - Remote push forbidden without explicit human command.
+EOF
     fi
 ) &>/dev/null &
 '

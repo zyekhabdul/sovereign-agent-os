@@ -9,3 +9,6 @@
 - **Architecture Standard**: Ponytail / YAGNI Minimalism (RFC-001).
 - **Line Cap**: Maximum 200 lines per file.
 - **Safety Gate**: Zero unmasked secrets, remote push restricted.
+
+## Known Gotchas & Environment Traps
+- Gotcha 1: [Document solved traps, edge cases, and environment quirks to prevent regression]

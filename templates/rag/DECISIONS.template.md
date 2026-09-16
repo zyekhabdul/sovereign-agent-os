@@ -9,5 +9,5 @@
 
 ---
 
-## ADR Registry
-- None recorded yet. (Use `templates/rag/ADR-TEMPLATE.md` to append new decisions).
+## ADR Registry (Format: `ADR-XXX: [TITLE] [STATUS: ACTIVE | SUPERSEDED | DEPRECATED]`)
+- None recorded yet. (Use `templates/rag/ADR-TEMPLATE.md` to append new decisions with explicit lifecycle tag).

@@ -459,6 +459,88 @@ if [ -f "PLAN.md" ]; then
     done
 fi
 
+# 6. Diff-Size Guard (Ponytail / YAGNI Minimalist Diff Law: Max 150 lines)
+if [ "${ALLOW_LARGE_DIFF:-0}" != "1" ]; then
+    DIFF_STATS=$(git diff --cached --numstat -- . \
+        ':!*.lock' \
+        ':!package-lock.json' \
+        ':!pnpm-lock.yaml' \
+        ':!yarn.lock' \
+        ':!Cargo.lock' \
+        ':!poetry.lock' \
+        ':!composer.lock' \
+        ':!go.sum' 2>/dev/null || true)
+    
+    TOTAL_DIFF_LINES=$(echo "$DIFF_STATS" | awk '{
+        if ($1 != "-" && $2 != "-") {
+            sum += $1 + $2
+        }
+    } END { print sum+0 }')
+    
+    if [ "$TOTAL_DIFF_LINES" -gt 150 ]; then
+        echo "[ HARDBLOCK ] Staged diff (${TOTAL_DIFF_LINES} baris) melebihi batas Ponytail / YAGNI (150 baris)!" >&2
+        echo "AI diwajibkan memecah pekerjaan menjadi atomic commits / chunks kecil." >&2
+        echo "Untuk mengizinkan diff besar jika benar-benar diperlukan, jalankan: ALLOW_LARGE_DIFF=1 git commit" >&2
+        exit 1
+    fi
+fi
+
+# 7. Dependency Addition Lock (Native Standard Library First)
+if [ "${ALLOW_DEP_MUTATION:-0}" != "1" ]; then
+    DEP_MUTATION_DETECTED=0
+    DEP_DETAILS=""
+
+    # 7a. Check package.json: inspect added dependency keys
+    if git diff --cached --name-only | grep -Eq '(^|/)package\.json$'; then
+        ADDED_DEPS=$(python3 -c "
+import json, subprocess
+def get_deps(rev):
+    try:
+        cmd = ['git', 'show', f'{rev}:package.json'] if rev else ['git', 'show', ':package.json']
+        out = subprocess.check_output(cmd, stderr=subprocess.DEVNULL)
+        d = json.loads(out)
+        return set(d.get('dependencies', {}).keys()) | set(d.get('devDependencies', {}).keys()) | set(d.get('optionalDependencies', {}).keys())
+    except Exception:
+        return set()
+old_d = get_deps('HEAD')
+new_d = get_deps('')
+added = new_d - old_d
+if added:
+    print(', '.join(sorted(added)))
+" 2>/dev/null || true)
+        if [ -n "$ADDED_DEPS" ]; then
+            DEP_MUTATION_DETECTED=1
+            DEP_DETAILS="${DEP_DETAILS}\n  • package.json: ${ADDED_DEPS}"
+        fi
+    fi
+
+    # 7b. Check requirements*.txt: newly added non-comment packages
+    if git diff --cached --name-only | grep -Eq '(^|/)requirements.*\.txt$'; then
+        ADDED_REQS=$(git diff --cached -U0 -- '*requirements*.txt' 2>/dev/null | grep -E '^\+[a-zA-Z0-9_-]+' | tr -d '+' | tr '\n' ', ' || true)
+        if [ -n "$ADDED_REQS" ]; then
+            DEP_MUTATION_DETECTED=1
+            DEP_DETAILS="${DEP_DETAILS}\n  • requirements.txt: ${ADDED_REQS}"
+        fi
+    fi
+
+    # 7c. Check Cargo.toml: newly added dependencies
+    if git diff --cached --name-only | grep -Eq '(^|/)Cargo\.toml$'; then
+        ADDED_CARGO=$(git diff --cached -U0 -- '*Cargo.toml' 2>/dev/null | grep -E '^\+[a-zA-Z0-9_-]+\s*=' | grep -vE '^\+(name|version|edition|authors|description|license|readme|repository|homepage|documentation|keywords|categories)\s*=' | tr -d '+' | tr '\n' ', ' || true)
+        if [ -n "$ADDED_CARGO" ]; then
+            DEP_MUTATION_DETECTED=1
+            DEP_DETAILS="${DEP_DETAILS}\n  • Cargo.toml: ${ADDED_CARGO}"
+        fi
+    fi
+
+    if [ "$DEP_MUTATION_DETECTED" -eq 1 ]; then
+        echo "[ HARDBLOCK ] Terdeteksi penambahan third-party dependency baru di staged files!" >&2
+        echo -e "Detail penambahan:${DEP_DETAILS}" >&2
+        echo "Aturan: Native Standard Library First. Penambahan lib baru membutuhkan persetujuan/RFC." >&2
+        echo "Untuk mengizinkan penambahan dependency ini, jalankan: ALLOW_DEP_MUTATION=1 git commit" >&2
+        exit 1
+    fi
+fi
+
 echo "[ PASS ] Pre-commit deterministic checks verified (exit 0)."
 exit 0
 """
@@ -958,7 +1040,33 @@ def cmd_verify(args):
     print(f"  • Running Command: {' '.join(cmd)}")
     try:
         res = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True, timeout=120)
-        if res.returncode == 0:
+        
+        # Zero-Test Trap Defense (Non-Empty Pass Mandate)
+        output_combined = f"{res.stdout or ''}\n{res.stderr or ''}"
+        is_test_cmd = any(k in " ".join(cmd).lower() for k in ["test", "pytest", "jest", "vitest"])
+        zero_test_detected = False
+        matched_zero_pattern = ""
+        
+        if is_test_cmd or "pytest" in output_combined.lower() or "passed" in output_combined.lower():
+            zero_patterns = [
+                r"collected 0 items",
+                r"0 passed,\s*0 failed",
+                r"no tests ran",
+                r"No tests found",
+                r"Tests:\s+0 (passed,\s+)?0 total",
+                r"Tests:\s+0 passed",
+                r"Ran 0 tests",
+                r"running 0 tests",
+                r"test result: ok\.\s*0 passed;\s*0 failed",
+                r"\[no test files\]"
+            ]
+            for pat in zero_patterns:
+                if re.search(pat, output_combined, re.IGNORECASE):
+                    zero_test_detected = True
+                    matched_zero_pattern = pat
+                    break
+
+        if res.returncode == 0 and not zero_test_detected:
             if breaker_file.exists():
                 try:
                     breaker_file.unlink()
@@ -978,7 +1086,15 @@ def cmd_verify(args):
                     fail_count = 0
             fail_count += 1
             
-            print(f"  [ FAIL ] Verification exited with code {res.returncode} (Attempt {fail_count}/3):")
+            if zero_test_detected and res.returncode == 0:
+                print(f"  [ ZERO-TEST TRAP DETECTED ] Runner exited code 0 but executed 0 tests!")
+                print(f"  • Matched indicator: '{matched_zero_pattern}'")
+                print("  • Non-Empty Pass Mandate violated: test_count must be > 0.")
+                effective_code = 1
+            else:
+                effective_code = res.returncode
+            
+            print(f"  [ FAIL ] Verification exited with code {effective_code} (Attempt {fail_count}/3):")
             out = (res.stderr or res.stdout).strip().splitlines()
             for l in out[:15]:
                 print(f"    [ERR] {l}")
@@ -1035,7 +1151,7 @@ def cmd_verify(args):
                     print(f"  [ CIRCUIT BREAKER ] Failure recorded ({fail_count}/3). Self-heal allowed.")
                 except Exception:
                     pass
-            sys.exit(res.returncode)
+            sys.exit(effective_code or 1)
     except Exception as e:
         print(f"  [ ERROR ] Could not execute verification: {e}")
         sys.exit(1)

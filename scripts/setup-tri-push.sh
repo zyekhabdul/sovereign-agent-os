@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# setup-tri-push.sh — Configures multi-forge remote ('all') for active platforms (GitHub + GitLab)
-# Note: Codeberg & Gitea are frozen/optional due to quota limits; Bitbucket is removed.
-# Usage: ./setup-tri-push.sh [--dry-run] [REPO_PATH] [REPO_NAME]
+# setup-tri-push.sh — Configures tiered multi-forge remote ('all') based on repo category
+# FOSS Tools (sshm, agy-quota, etc.): GitHub + GitLab + Codeberg
+# Web / Commercial Apps (zyekh.com, etc.): GitHub + GitLab (Codeberg excluded to respect FOSS TOS)
+# Usage: ./setup-tri-push.sh [--dry-run] [--foss|--web] [REPO_PATH] [REPO_NAME]
 
 DRY_RUN=false
+PROFILE="auto"
 POSITIONAL=()
 
 while [[ $# -gt 0 ]]; do
@@ -14,9 +16,23 @@ while [[ $# -gt 0 ]]; do
       DRY_RUN=true
       shift
       ;;
+    --foss|--tool)
+      PROFILE="foss"
+      shift
+      ;;
+    --web|--app|--private)
+      PROFILE="web"
+      shift
+      ;;
+    --profile)
+      PROFILE="$2"
+      shift 2
+      ;;
     -h|--help)
-      echo "Usage: $0 [--dry-run] [REPO_PATH] [REPO_NAME]"
-      echo "Configures 'all' git remote pointing to active platforms (GitHub + GitLab)."
+      echo "Usage: $0 [--dry-run] [--foss|--web] [REPO_PATH] [REPO_NAME]"
+      echo "Configures 'all' git remote with tiered routing:"
+      echo "  --foss : GitHub + GitLab + Codeberg (for public open-source tools)"
+      echo "  --web  : GitHub + GitLab only (for websites/apps, avoiding Codeberg TOS/quota)"
       exit 0
       ;;
     *)
@@ -39,6 +55,16 @@ if [ -z "$REPO_NAME" ]; then
   REPO_NAME=$(basename "$REPO_PATH")
 fi
 
+# Auto-detect profile if set to auto
+if [ "$PROFILE" = "auto" ]; then
+  if [[ "$REPO_NAME" =~ ^(sshm|agy-quota|agy-guard|sovereign-agent-os|vol3.*|volatility.*|os-debloat.*|paru|RAG-Template|termux-tap|homebrew-tap)$ ]] || \
+     [[ "$REPO_NAME" =~ (cli|tool|detector|triage|debloat) ]]; then
+    PROFILE="foss"
+  else
+    PROFILE="web"
+  fi
+fi
+
 GITHUB_USER="${GITHUB_USER:-zyekhabdul}"
 GITLAB_USER="${GITLAB_USER:-aomiqaza}"
 CODEBERG_USER="${CODEBERG_USER:-aomiqaza}"
@@ -50,17 +76,24 @@ GITLAB_URL="git@gitlab.com:${GITLAB_USER}/${REPO_NAME}.git"
 CODEBERG_URL="git@codeberg.org:${CODEBERG_USER}/${REPO_NAME}.git"
 GITEA_URL="git@${GITEA_HOST}:${GITEA_USER}/${REPO_NAME}.git"
 
-ENABLE_CODEBERG="${ENABLE_CODEBERG:-false}"
+if [ "$PROFILE" = "foss" ]; then
+  ENABLE_CODEBERG=true
+  PROFILE_DESC="FOSS Tool (GitHub + GitLab + Codeberg)"
+else
+  ENABLE_CODEBERG=false
+  PROFILE_DESC="Web/Commercial App (GitHub + GitLab only — Codeberg Excluded)"
+fi
 ENABLE_GITEA="${ENABLE_GITEA:-false}"
 
-echo "=== Multi-Forge Git Remote Setup ==="
+echo "=== Tiered Multi-Forge Git Remote Setup ==="
 echo "Repository Path  : $REPO_PATH"
 echo "Repository Name  : $REPO_NAME"
+echo "Profile Class    : [ $PROFILE_DESC ]"
 echo "GitHub (Active)  : $GITHUB_URL"
 echo "GitLab (Active)  : $GITLAB_URL"
-echo "Codeberg (Freeze): $CODEBERG_URL"
+echo "Codeberg (FOSS)  : $CODEBERG_URL (In 'all': $ENABLE_CODEBERG)"
 echo "Gitea (Freeze)   : $GITEA_URL"
-echo "===================================="
+echo "==========================================="
 
 if [ "$DRY_RUN" = true ]; then
   echo "[ DRY-RUN ] Commands to be executed:"
@@ -105,6 +138,6 @@ git -C "$REPO_PATH" remote add gitea "$GITEA_URL" 2>/dev/null || true
 
 git -C "$REPO_PATH" remote remove bitbucket 2>/dev/null || true
 
-echo "[ SUCCESS ] Remote 'all' successfully configured (Active: GitHub + GitLab)!"
+echo "[ SUCCESS ] Remote 'all' successfully configured: ${PROFILE_DESC}!"
 echo "To push to active platforms simultaneously, run:"
-echo "  git push all <branch>"
+echo "  ALLOW_GIT_PUSH=1 git push all <branch>"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # RAG-LINT: Deterministic Obsidian RAG & Memory Governance Health Checker
-# Spec: RFC-RAG-003 (7-Gate Validation Standard)
+# Spec: RFC-RAG-003 (8-Gate Validation Standard)
 # ==============================================================================
 set -euo pipefail
 
@@ -12,14 +12,14 @@ MASTER_INDEX="${MEMORY_DIR}/00-MASTER-INDEX.md"
 ERRORS=0
 WARNINGS=0
 
-echo "[ RAG-LINT ] Starting 7-Gate Vault Integrity Verification..."
+echo "[ RAG-LINT ] Starting 8-Gate Vault Integrity Verification..."
 
 # --- GATE 1: Scaffolding Completeness ---
 echo "-> Checking Gate 1: 4-File Core Scaffolding..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
-    [[ "$ns" =~ ^(_|global|system|pgp|Projects) || "$ns" =~ (backup|archive) ]] && continue
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects|projects-audit) || "$ns" =~ (^backup|_backup|backup$|_archive) ]] && continue
     for file in "INDEX.md" "CONTEXT.md" "STATE.md" "DECISIONS.md"; do
         if [ ! -f "${dir}${file}" ]; then
             echo "[ ERROR ] [Gate 1] Missing ${file} in namespace: ${ns}"
@@ -33,7 +33,7 @@ echo "-> Checking Gate 2: Strict 4-File Whitelist (Zero Stale Dumps)..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
-    [[ "$ns" =~ ^(_|global|system|pgp|Projects|projects-audit) || "$ns" =~ (backup|archive) ]] && continue
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects|projects-audit) || "$ns" =~ (^backup|_backup|backup$|_archive) ]] && continue
     for f in "${dir}"*; do
         [ -e "$f" ] || continue
         fname=$(basename "$f")
@@ -73,7 +73,7 @@ echo "-> Checking Gate 6: Active Task Cap in STATE.md (Max 10 tasks)..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
-    [[ "$ns" =~ ^(_|global|system|pgp|Projects) || "$ns" =~ (backup|archive) ]] && continue
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects|projects-audit) || "$ns" =~ (^backup|_backup|backup$|_archive) ]] && continue
     state_file="${dir}STATE.md"
     if [ -f "$state_file" ]; then
         tasks=$(awk '/## Active Milestone/{flag=1} /## Invariant/{flag=0} flag && /^- \[/ {print}' "$state_file" | wc -l)
@@ -98,6 +98,25 @@ if [ -d ".git" ]; then
         fi
     fi
 fi
+
+# --- GATE 8: ADR Lifecycle Governance ---
+echo "-> Checking Gate 8: ADR Lifecycle Tag Verification..."
+for dir in "${MEMORY_DIR}"/*/; do
+    [ -d "$dir" ] || continue
+    ns=$(basename "$dir")
+    [[ "$ns" =~ ^_ || "$ns" =~ ^(Projects|projects-audit) ]] && continue
+    decisions_file="${dir}DECISIONS.md"
+    if [ -f "$decisions_file" ]; then
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^#{2,3}[[:space:]]+.*ADR ]]; then
+                if ! [[ "$line" =~ \[(ACTIVE|SUPERSEDED|DEPRECATED) ]]; then
+                    echo "[ ERROR ] [Gate 8] ADR header in ${ns}/DECISIONS.md missing lifecycle tag [ACTIVE|SUPERSEDED|DEPRECATED]: ${line}"
+                    ERRORS=$((ERRORS + 1))
+                fi
+            fi
+        done < "$decisions_file"
+    fi
+done
 
 echo "--------------------------------------------------------"
 if [ "$ERRORS" -gt 0 ]; then

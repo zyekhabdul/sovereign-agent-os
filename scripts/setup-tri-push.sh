@@ -143,9 +143,13 @@ if [ "$DRY_RUN" = true ]; then
   echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITLAB_URL\""
   if [ "$ENABLE_CODEBERG" = "true" ]; then
     echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$CODEBERG_URL\""
+    echo "  git -C \"$REPO_PATH\" remote add codeberg \"$CODEBERG_URL\""
+  else
+    echo "  git -C \"$REPO_PATH\" remote remove codeberg (Isolation enforced: Codeberg blocked)"
   fi
   if [ "$ENABLE_GITEA" = "true" ]; then
     echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITEA_URL\""
+    echo "  git -C \"$REPO_PATH\" remote add gitea \"$GITEA_URL\""
   fi
   exit 0
 fi
@@ -170,11 +174,17 @@ git -C "$REPO_PATH" remote add github "$GITHUB_URL" 2>/dev/null || true
 git -C "$REPO_PATH" remote remove gitlab 2>/dev/null || true
 git -C "$REPO_PATH" remote add gitlab "$GITLAB_URL" 2>/dev/null || true
 
+# Codeberg standalone remote: ONLY present if repo is FOSS compliant
 git -C "$REPO_PATH" remote remove codeberg 2>/dev/null || true
-git -C "$REPO_PATH" remote add codeberg "$CODEBERG_URL" 2>/dev/null || true
+if [ "$ENABLE_CODEBERG" = "true" ]; then
+  git -C "$REPO_PATH" remote add codeberg "$CODEBERG_URL" 2>/dev/null || true
+fi
 
+# Gitea standalone remote: ONLY present if explicitly enabled
 git -C "$REPO_PATH" remote remove gitea 2>/dev/null || true
-git -C "$REPO_PATH" remote add gitea "$GITEA_URL" 2>/dev/null || true
+if [ "$ENABLE_GITEA" = "true" ]; then
+  git -C "$REPO_PATH" remote add gitea "$GITEA_URL" 2>/dev/null || true
+fi
 
 git -C "$REPO_PATH" remote remove bitbucket 2>/dev/null || true
 

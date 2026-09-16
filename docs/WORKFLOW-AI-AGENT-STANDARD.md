@@ -1,4 +1,4 @@
-# Standar Workflow: Dari PRD ke Eksekusi dengan AI Agent
+# Standar Workflow: Dari Ide/Kebutuhan ke PRD hingga Eksekusi dengan AI Agent
 
 Panduan alur kerja standar yang WAJIB dipatuhi oleh seluruh AI coding agent (AGY / Antigravity CLI, Antigravity IDE, Claude Code, Cursor, Codex, OpenCode, dll) dalam berkolaborasi dari perencanaan sampai eksekusi kode.
 
@@ -7,11 +7,20 @@ Panduan alur kerja standar yang WAJIB dipatuhi oleh seluruh AI coding agent (AGY
 ## Ringkasan Alur Standar
 
 ```
-PRD.md → PLAN.md (hyper-granular chunks, dibuat agent) → Upfront Approval (sekali di awal)
-        → Autonomous Batch Execution (silent verification & commit per chunk)
-        → STOP TOTAL jika ada satu chunk gagal verifikasi / menyentuh area sensitif
-        → Strategic Checkpoints (re-acknowledge aturan)
-        → Human Review Checkpoint sebelum merge/deploy
+[HULU: Discovery & Definition]
+Ide Mentah / Kebutuhan Bisnis
+  → Triage & Klasifikasi Kompleksitas (T1 Ringan / T2 Menengah / T3 Kompleks)
+  → Clarify & Problem Boundaries (Falsifiable problem, Non-Goals, Scope Wedge)
+  → Mini-Research / Feasibility Spike (Opsional untuk T1, Wajib untuk T2/T3)
+  → PRD.md (Spesifikasi "What & Why" — Track A Lite atau Track B Full Enterprise)
+
+[HILIR: Deterministic Execution]
+  → PLAN.md (Hyper-granular chunks, dibuat agent, pola Sliding Packet max 10 chunks aktif)
+  → Upfront Approval (Dev review & approve sekali di awal)
+  → Autonomous Batch Execution (Silent machine verification & commit per chunk)
+  → STOP TOTAL jika ada satu chunk gagal verifikasi / menyentuh area sensitif
+  → Strategic Checkpoints (Re-acknowledge aturan)
+  → Human Review Checkpoint (Sebelum merge/deploy)
 ```
 
 Pola ini menggantikan "approve tiap chunk satu-satu" — dipakai untuk eksekusi cepat chunk kecil dan berisiko rendah, dengan syarat pengaman (Hard Stop & Checkpoint) dijalankan ketat.
@@ -20,19 +29,32 @@ Pola ini menggantikan "approve tiap chunk satu-satu" — dipakai untuk eksekusi 
 
 ## 1. Structure & File Role
 
-| File | Fungsi | Dibuat oleh |
+| File / Artefak | Fungsi | Dibuat oleh |
 |---|---|---|
-| `PRD.md` | Requirement level "what & why" | Dev/PM |
+| `questions.md` / Brief | Klarifikasi batas masalah, asumsi, dan Non-Goals (fase pra-PRD) | Dev / AI Agent |
+| `PRD.md` | Requirement level "what & why" (falsifiable spec, personas, metrics, non-goals) | Dev / PM / AI Agent |
 | `PLAN.md` | Breakdown teknis & task list, level "how" (hyper-granular chunks) | AI Agent, direview dev |
 | `AGENTS.md` | Aturan permanen alur kerja lokal | Dev, sekali dibuat per repo |
 | `GEMINI.md` | Identitas proyek & binding rules supreme | Dev / System |
 | `/src` (atau source code) | Kode aktual | AI Agent, hanya setelah plan di-approve |
 
-> **Catatan PRD Master**: Semua proyek baru atau existing yang belum memiliki PRD WAJIB dibuatkan PRD terlebih dahulu mengacu pada template `09-Panduan-Projek/PRD-MASTER-TEMPLATE.md`.
+> **Catatan PRD Master**: Semua proyek baru atau existing yang belum memiliki PRD WAJIB dibuatkan PRD terlebih dahulu mengacu pada template `09-Panduan-Projek/PRD-MASTER-TEMPLATE.md` (Dual-Track: Track A Lite untuk task/fitur kecil, Track B Full Enterprise untuk sistem/SaaS).
 
 ---
 
 ## 2. Tahapan Kerja Wajib
+
+### Tahap 0 — Dari Ide/Kebutuhan ke PRD (Pre-PRD Discovery & Clarification Gate)
+Ketika menerima ide mentah, problem statement, atau permintaan fitur baru:
+1. **Triage Kompleksitas Ide**:
+   - **T1 (Ringan/Utilitas/Surgical Fix)**: Perbaikan bug spesifik, skrip utilitas mandiri, atau penambahan komponen UI tunggal. Langsung gunakan *Track A (Lite PRD)* tanpa riset panjang.
+   - **T2 (Menengah/Fitur Baru/SaaS MVP)**: Integrasi modul baru, perombakan alur data, atau fitur multi-halaman. Wajib melalui tahap klarifikasi tertulis dan riset kompetitor/API.
+   - **T3 (Kompleks/Arsitektur/Regulated)**: Platform multi-tenant, e-commerce enterprise, sistem finansial/kripto, atau migrasi backend. Wajib riset mendalam, audit keamanan, dan *Track B (Full Enterprise PRD)*.
+2. **Klarifikasi Batasan & Non-Goals**:
+   - Ajukan pertanyaan tajam yang menentukan arah arsitektur (Who, Pain Point, Constraints).
+   - Kunci **Non-Goals** (apa yang secara sadar TIDAK akan dibangun pada iterasi ini) untuk mematikan scope creep sejak hulu.
+3. **Anti-Hallucination Entry Gate (Pre-PRD Invariant)**:
+   - AI Agent DILARANG merumuskan `PRD.md` jika problem statement masih abstrak (*unfalsifiable*) atau batas *Non-Goals* belum disepakati bersama manusia.
 
 ### Tahap 1 — Baca PRD, Buat Hyper-Granular `PLAN.md` (Pola Sliding Packet)
 Ketika diberi `PRD.md` atau requirement baru:

@@ -33,15 +33,17 @@ Pola ini memisahkan secara tegas antara eksplorasi arsitektur, penguncian keputu
 
 ## 1. Structure & File Role
 
-| File / Artefak | Fungsi | Dibuat oleh |
+| File / Artefak | Fungsi & Lokasi | Dibuat oleh |
 |---|---|---|
 | `questions.md` / Brief | Klarifikasi batas masalah, asumsi, dan Non-Goals (fase pra-PRD) | Dev / AI Agent |
-| `PRD.md` | Requirement level "what & why" (falsifiable spec, personas, metrics, non-goals) | Dev / PM / AI Agent |
+| `PRD.md` | Requirement level "what & why" (falsifiable spec, personas, metrics, non-goals) di root repo | Dev / PM / AI Agent |
 | `RFC` (Opsional) | Eksplorasi opsi teknis, trade-offs, dan mitigasi risiko arsitektur | AI Agent / Architect |
-| `DECISIONS.md` (ADR) | Catatan keputusan arsitektur permanen (Architecture Decision Records) | Dev / AI Agent (Append-only) |
-| `PLAN.md` | Breakdown teknis level "how" dengan Traceability ID ke PRD (max 10 chunks aktif) | AI Agent, direview dev |
-| `AGENTS.md` | Aturan permanen alur kerja lokal | Dev, sekali dibuat per repo |
-| `GEMINI.md` | Identitas proyek & binding rules supreme | Dev / System |
+| `DECISIONS.md` (ADR) | Catatan keputusan arsitektur permanen di Obsidian RAG (`00-AGY-Memory/<namespace>/DECISIONS.md`) | Dev / AI Agent (Append-only) |
+| `PLAN.md` | Breakdown teknis level "how" dengan Traceability ID ke PRD (max 10 chunks aktif) di root repo | AI Agent, direview dev |
+| `AGENTS.md` | Aturan permanen alur kerja lokal di root repo | Dev, sekali dibuat per repo |
+| `GEMINI.md` | Identitas proyek & binding rules supreme di root repo | Dev / System |
+| `STATE.md` | **AI Machine Memory SSOT** (fase aktif, checkpoint, status milestone, max 10 task aktif) di Obsidian RAG | AI Agent (Ditimpa per sesi) |
+| `DEVELOPMENT.md` | **Human Narrative Log** (catatan kerja dev, log naratif manual, handoff antar manusia) di root repo | Manusia / AI Agent |
 | `/src` (source code) | Kode aktual hasil mutasi bedah | AI Agent, hanya setelah plan di-approve |
 
 > **Catatan PRD Master**: Semua proyek baru atau existing yang belum memiliki PRD WAJIB dibuatkan PRD terlebih dahulu mengacu pada template `09-Panduan-Projek/PRD-MASTER-TEMPLATE.md` (Dual-Track: Track A Lite untuk task/fitur kecil, Track B Full Enterprise untuk sistem/SaaS).
@@ -57,7 +59,7 @@ Ketika menerima ide mentah, problem statement, atau permintaan fitur baru:
    - **T2 (Menengah/Fitur Baru/SaaS MVP)**: Integrasi modul baru, perombakan alur data, atau fitur multi-halaman. Wajib melalui tahap klarifikasi tertulis dan riset kompetitor/API.
    - **T3 (Kompleks/Arsitektur/Regulated)**: Platform multi-tenant, e-commerce enterprise, sistem finansial/kripto, atau migrasi backend. Wajib riset mendalam, audit keamanan, dan *Track B (Full Enterprise PRD)*.
 2. **Pre-Flight ADR Invariant Scan**:
-   - AI Agent WAJIB membaca 10 entri terakhir dari `DECISIONS.md` untuk memastikan solusi tidak melanggar hukum arsitektur yang sudah disepakati sebelumnya atau mengusulkan ulang ide yang pernah ditolak.
+   - AI Agent WAJIB membaca 10 entri terakhir dari `DECISIONS.md` yang tersimpan di namespace Obsidian RAG (`00-AGY-Memory/<project-namespace>/DECISIONS.md`) untuk memastikan solusi tidak melanggar hukum arsitektur yang sudah disepakati sebelumnya atau mengusulkan ulang ide yang pernah ditolak.
 3. **Klarifikasi Batasan & Non-Goals**:
    - Ajukan pertanyaan tajam yang menentukan arah arsitektur (Who, Pain Point, Constraints).
    - Kunci **Non-Goals** (apa yang secara sadar TIDAK akan dibangun pada iterasi ini) untuk mematikan scope creep sejak hulu.
@@ -71,7 +73,7 @@ Tidak semua tugas membutuhkan RFC. AI Agent mengevaluasi ambang batas secara det
    - Mengubah skema database (migration / perombakan tabel).
    - Mengubah kontrak public API yang dikonsumsi oleh service atau client lain.
    - Blast radius mutasi menyentuh > 3 modul independen sekaligus.
-   *Jika memenuhi kondisi di atas: Tulis dokumen RFC (pilihan opsi teknis & mitigasi risiko), diskusikan, lalu kunci opsi terpilih sebagai ADR di `DECISIONS.md`.*
+   *Jika memenuhi kondisi di atas: Tulis dokumen RFC (pilihan opsi teknis & mitigasi risiko), diskusikan, lalu kunci opsi terpilih sebagai ADR di `00-AGY-Memory/<project-namespace>/DECISIONS.md`.*
 2. **Bypass RFC/ADR (Jalur Cepat)**:
    - Jika perubahan tidak menyentuh 4 kondisi di atas (misal refactoring lokal, bugfix, styling, penambahan endpoint rutin), **Bypass RFC/ADR langsung ke Tahap 2**.
 
@@ -131,9 +133,11 @@ Jika ada dua aturan bertentangan, ikuti urutan hierarki berikut (paling tinggi m
 
 ---
 
-## 4. Batasan Panjang File (Anti Context-Bloat)
+## 4. Batasan Panjang File & Pemisahan Peran State (Anti Context-Bloat)
 
-- `DEVELOPMENT.md` hanya berisi task **aktif**. Task lama dipindah ke `DEVELOPMENT-ARCHIVE.md`.
+- **Pemisahan Peran `STATE.md` vs `DEVELOPMENT.md`**:
+  - `STATE.md` (di Obsidian RAG `00-AGY-Memory/<namespace>/STATE.md`): Merupakan **Machine Memory SSOT khusus AI Agent**. Berisi status fase aktif, commit hash terakhir, dan checklist paket aktif (maksimal 10 item). Ditimpa (*in-place overwrite*) di akhir tiap sesi/milestone.
+  - `DEVELOPMENT.md` (di Root Git Repo): Merupakan **Human Narrative Dev Log**. Berisi catatan kerja manusia, kronologi pengerjaan informal, catatan handoff, dan riwayat lokal developer. Hanya menyimpan task aktif saat ini; task yang sudah selesai dipindahkan ke `DEVELOPMENT-ARCHIVE.md`.
 - `CHANGELOG.md` hanya menyimpan entri **beberapa sesi terakhir**. Entri lama dipindah ke `CHANGELOG-ARCHIVE.md`.
 - File RAG `CONTEXT.md` maksimal **200 baris**.
 - **Single-Plan Invariant**: Di root repo hanya ada **satu** file `PLAN.md`. Dilarang membuat file pecahan (`PLAN-old.md`, `PLAN-part2.md`, `task-detail.md`). Setelah satu paket kerja selesai, bagian detail ditimpa (overwrite) untuk paket berikutnya.

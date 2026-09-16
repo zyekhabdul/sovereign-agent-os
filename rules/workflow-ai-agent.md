@@ -16,7 +16,7 @@ Ide / Request → PRD / Non-Goals → [RFC/ADR Threshold Gate] → Traceable PLA
 ## 1. SIX-STAGE AUTONOMOUS EXECUTION LIFECYCLE
 
 ### Stage 0: Pre-Flight ADR Scan & Traceability Setup
-- Scan the last 10 entries of `DECISIONS.md` to prevent violating existing architectural laws.
+- Scan the last 10 entries of project ADRs (`00-AGY-Memory/<project-namespace>/DECISIONS.md`) to prevent violating existing architectural laws.
 - Every planned chunk MUST link to a specific PRD acceptance criterion ID (e.g. `[Chunk 1] -> [PRD-REQ-01]`). Unlinked chunks are strictly rejected as scope creep.
 
 ### Stage 1: Pre-Scan & Grounding (Inspect Before Apply)

@@ -5,15 +5,15 @@ set -euo pipefail
 
 # 1. Block Lazy Truncation Placeholders (Membunuh: // ... existing code ...)
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
-    if git diff --cached | grep -Eiq '(existing code|remaining unchanged|TODO: implement|rest of (the|your) code)'; then
-        echo "[ HARDBLOCK ] Terdeteksi placeholder kode malas/terpotong di staged diff!" >&2
+    if git diff --cached -- . ':!*.md' ':!*pre-commit*' | grep -E '^\+[^+]' | grep -Eiq '(existing code|remaining unchanged|TODO: implement|rest of (the|your) code)'; then
+        echo "[ HARDBLOCK ] Terdeteksi placeholder kode malas/terpotong di staged diff source code!" >&2
         echo "Contoh terlarang: '// ... existing code ...', 'TODO: implement'" >&2
         exit 1
     fi
 fi
 
 # 2. Block Emojis in staged files (Membunuh: Polusi Emoji di Codebase)
-if git diff --cached | grep -P "[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]" 2>/dev/null; then
+if git diff --cached | grep -E '^\+[^+]' | grep -P "[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]" 2>/dev/null; then
     echo "[ HARDBLOCK ] Terdeteksi karakter emoji dalam staged files." >&2
     echo "Gunakan ikon SVG/Lucide atau token teks sesuai aturan strict no-emoji." >&2
     exit 1

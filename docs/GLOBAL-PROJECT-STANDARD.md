@@ -22,79 +22,98 @@ Sebelum menulis referensi path di `PLAN.md`, `AGENTS.md`, atau `GEMINI.md` manap
 
 ## 2. Daftar File Wajib per Repositori Lokal (Update)
 
-Selain 7 file yang sudah baku (`PRD.md`, `PLAN.md`, `AGENTS.md`, `GEMINI.md`, `DEVELOPMENT.md`, `DESIGN_SYSTEM.md`, `CHANGELOG.md`), tambahkan:
+Selain 6 file inti yang selalu wajib (`PRD.md`, `PLAN.md`, `AGENTS.md`, `GEMINI.md`, `DEVELOPMENT.md`, `CHANGELOG.md`) dan 1 file kondisional (`DESIGN_SYSTEM.md` — Wajib untuk Frontend/UI/Theme, N/A untuk Backend/CLI/Service), tambahkan:
 
 | Nama File | Fungsi | Wajib Untuk |
 |---|---|---|
 | `README.md` | Entry point manusia: cara install/run, tech stack ringkas, link ke PRD/AGENTS.md | Semua proyek |
 | `.env.example` | Template environment variable tanpa secret asli | Semua proyek yang pakai env var |
 | `DEPLOYMENT.md` | Cara deploy, environment staging/production, rollback procedure | Proyek yang sudah/akan production |
+| `DESIGN_SYSTEM.md` | Token warna, tipografi, komponen UI, rules styling | Kondisional: Wajib untuk Frontend/UI/Theme (N/A untuk Backend/CLI/Service) |
 | `DEVELOPMENT-ARCHIVE.md` | Arsip task lama dari `DEVELOPMENT.md` (lihat AGENTS.md Bagian 6) | Proyek berjalan lama |
 | `CHANGELOG-ARCHIVE.md` | Arsip entri lama dari `CHANGELOG.md` | Proyek berjalan lama |
 
-Total file wajib per repo: **7 file inti + 2 file wajib (README.md, .env.example) + 1 kondisional (DEPLOYMENT.md untuk proyek production)**. File archive dibuat begitu file induknya melewati batas panjang (lihat AGENTS.md Bagian 6).
+Total file wajib per repo: **6 file inti + 2 file wajib (README.md, .env.example) + 2 kondisional (DEPLOYMENT.md untuk proyek production, DESIGN_SYSTEM.md untuk Frontend/UI)**. File archive dibuat begitu file induknya melewati batas panjang (lihat AGENTS.md Bagian 6).
 
 ---
 
 ## 3. Enforcement Mekanis (Git Pre-Commit Hook)
 
-Kepatuhan terhadap file wajib **tidak boleh 100% bergantung pada AI agent mengingat aturan**. Pasang git hook berikut supaya sistem yang memaksa, bukan cuma instruksi tertulis.
+Kepatuhan terhadap file wajib dan sanitasi kode **tidak boleh 100% bergantung pada AI agent mengingat aturan**. Pasang git hook berikut supaya sistem yang memaksa, bukan cuma instruksi tertulis.
 
 ### 3.1 Cara Pasang
 
-Simpan script di bawah sebagai `.git/hooks/pre-commit` di tiap repo (atau di template repo baru), lalu jalankan `chmod +x .git/hooks/pre-commit`.
+Gunakan script bawaan sovereign-agent-os di `templates/git-hooks/pre-commit` atau simpan script di bawah sebagai `.git/hooks/pre-commit` di tiap repo, lalu jalankan `chmod +x .git/hooks/pre-commit`.
 
 ```bash
-#!/bin/bash
-# pre-commit hook — Standar Global Proyek
-# Memverifikasi file wajib ada & CHANGELOG.md diupdate sebelum commit diterima
+#!/usr/bin/env bash
+# PRE-COMMIT HARNESS: Deterministic Anti-Blunder Sanitizer
+set -euo pipefail
 
-REQUIRED_FILES=("PRD.md" "PLAN.md" "AGENTS.md" "GEMINI.md" "DEVELOPMENT.md" "DESIGN_SYSTEM.md" "CHANGELOG.md" "README.md")
-MISSING=()
-
-for f in "${REQUIRED_FILES[@]}"; do
-  if [ ! -f "$f" ]; then
-    MISSING+=("$f")
-  fi
-done
-
-if [ ${#MISSING[@]} -ne 0 ]; then
-  echo "❌ COMMIT DITOLAK — file wajib tidak ditemukan di root repo:"
-  for f in "${MISSING[@]}"; do
-    echo "   - $f"
-  done
-  echo "Lengkapi file di atas sesuai GLOBAL-PROJECT-STANDARD.md sebelum commit."
-  exit 1
-fi
-
-# Cek apakah CHANGELOG.md ikut berubah di commit ini
-# (skip pengecekan ini untuk commit pertama / initial commit)
+# 1. Block Lazy Truncation Placeholders (Membunuh: // ... existing code ...)
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
-  CHANGED_FILES=$(git diff --cached --name-only)
-  if ! echo "$CHANGED_FILES" | grep -q "CHANGELOG.md"; then
-    echo "⚠️  PERINGATAN — commit ini tidak menyertakan update di CHANGELOG.md."
-    echo "   Jika perubahan ini memang perlu dicatat, tambahkan entry sebelum commit."
-    echo "   Ketik 'y' untuk lanjut tanpa update CHANGELOG, atau apa pun untuk batal:"
-    read -r CONFIRM < /dev/tty
-    if [ "$CONFIRM" != "y" ]; then
-      echo "Commit dibatalkan."
-      exit 1
+    if git diff --cached -- . ':!*.md' ':!*pre-commit*' | grep -E '^\+[^+]' | grep -Eiq '(existing code|remaining unchanged|TODO: implement|rest of (the|your) code)'; then
+        echo "[ HARDBLOCK ] Terdeteksi placeholder kode malas/terpotong di staged diff source code!" >&2
+        echo "Contoh terlarang: '// ... existing code ...', 'TODO: implement'" >&2
+        exit 1
     fi
-  fi
 fi
 
-echo "✅ File wajib lengkap. Commit dilanjutkan."
+# 2. Block Emojis in staged files (Membunuh: Polusi Emoji di Codebase)
+if git diff --cached | grep -E '^\+[^+]' | grep -P "[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]" 2>/dev/null; then
+    echo "[ HARDBLOCK ] Terdeteksi karakter emoji dalam staged files." >&2
+    echo "Gunakan ikon SVG/Lucide atau token teks sesuai aturan strict no-emoji." >&2
+    exit 1
+fi
+
+# 3. Block Test Tampering (Membunuh: Mengubah tes saat mengerjakan fitur)
+if [ "${ALLOW_TEST_MUTATION:-0}" != "1" ]; then
+    STAGED_TESTS=$(git diff --cached --name-only | grep -E '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
+    STAGED_SRC=$(git diff --cached --name-only | grep -vE '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
+    if [ -n "$STAGED_TESTS" ] && [ -n "$STAGED_SRC" ]; then
+        echo "[ HARDBLOCK ] Mengubah file tes bersamaan dengan source code dilarang." >&2
+        echo "Untuk mengizinkan perubahan tes secara sadar, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
+        exit 1
+    fi
+fi
+
+# 4. Block Secret & Private Key Leaks
+STAGED_SECRETS=$(git diff --cached --name-only | grep -E '(^|/)\.env$|\.pem$|\.key$|id_rsa' || true)
+if [ -n "$STAGED_SECRETS" ]; then
+    if [ "${ALLOW_SECRET_COMMIT:-0}" != "1" ]; then
+        echo "[ HARDBLOCK ] File rahasia/kredensial terdeteksi di staged files: $STAGED_SECRETS" >&2
+        echo "Gunakan .env.example atau password manager." >&2
+        exit 1
+    fi
+fi
+
+# 5. Check Required Files on projects with PRD.md
+if [ -f "PRD.md" ]; then
+    REQUIRED_FILES=("PRD.md" "PLAN.md" "GEMINI.md" "CHANGELOG.md" "README.md")
+    for f in "${REQUIRED_FILES[@]}"; do
+        if [ ! -f "$f" ]; then
+            echo "[ HARDBLOCK ] File standar proyek wajib ada: $f" >&2
+            exit 1
+        fi
+    done
+fi
+
+echo "[ PASS ] Pre-commit deterministic checks verified (exit 0)."
 exit 0
 ```
 
 ### 3.2 Yang Diverifikasi Hook Ini
-- Semua file wajib ada di root repo — commit ditolak keras (`exit 1`) kalau tidak lengkap.
-- `CHANGELOG.md` ikut berubah di commit ini — kalau tidak, hook **memperingatkan** (bukan block otomatis, karena tidak semua commit butuh entry changelog) dan minta konfirmasi manual.
+- **Anti-Lazy Code**: Mencegah commit placeholder pemalas (`// ... existing code ...`, `TODO: implement`).
+- **Strict No-Emoji**: Menolak karakter emoji pada file yang di-stage.
+- **Anti Test-Cheating**: Mencegah mutasi file test bersamaan dengan source code fitur tanpa `ALLOW_TEST_MUTATION=1`.
+- **Secret Defense**: Menolak commit file `.env`, file `.pem`/`.key`, dan SSH private keys.
+- **File Inti Wajib**: Memastikan file inti dasar (`PRD.md`, `PLAN.md`, `GEMINI.md`, `CHANGELOG.md`, `README.md`) tersedia pada repositori aktif.
+- **Non-Interactive & Autonomous Friendly**: Hook ini berjalan tanpa interupsi interaktif (`read < /dev/tty`), sehingga aman dieksekusi oleh agent secara otomatis. Update `CHANGELOG.md` dilakukan saat penuntasan paket kerja/milestone.
 
 ### 3.3 Yang TIDAK Bisa Dicek Hook Ini (tetap tanggung jawab AI/dev)
 - Isi/kualitas konten tiap file (hook cuma cek file *ada*, bukan *benar*)
 - Apakah `PLAN.md` sudah di-approve sebelum eksekusi
-- Apakah chunk sudah lulus test sebelum commit — ini idealnya jadi hook terpisah (`pre-commit` tambahan yang jalankan test suite) jika project sudah punya test otomatis
+- Apakah chunk sudah lulus test sebelum commit — ini diverifikasi lewat Two-Tier Verification Gate di tahap eksekusi
 
 ---
 
@@ -108,7 +127,8 @@ Kalau `PRD-MASTER-TEMPLATE.md` atau `WORKFLOW-AI-AGENT-STANDARD.md` diupdate di 
 
 ## 5. Ringkasan Checklist Setup Proyek Baru
 
-- [ ] 7 file inti dibuat (`PRD.md`, `PLAN.md`, `AGENTS.md`, `GEMINI.md`, `DEVELOPMENT.md`, `DESIGN_SYSTEM.md`, `CHANGELOG.md`)
+- [ ] File inti repo dibuat (`PRD.md`, `PLAN.md`, `AGENTS.md`, `GEMINI.md`, `DEVELOPMENT.md`, `CHANGELOG.md`)
+- [ ] `DESIGN_SYSTEM.md` dibuat jika proyek memiliki tampilan UI/Frontend/Theme
 - [ ] `README.md` dan `.env.example` dibuat
 - [ ] `DEPLOYMENT.md` dibuat jika proyek akan production
 - [ ] Semua path referensi antar file dicocokkan ke tabel Bagian 1

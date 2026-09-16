@@ -30,11 +30,12 @@ Sebelum menyusun PRD, tentukan jalur spesifikasi berdasarkan kompleksitas:
 - **In-Scope**: [Apa yang dibangun pada iterasi ini]
 - **Non-Goals (WAJIB)**: [Apa yang secara sadar TIDAK dibangun untuk mencegah scope creep]
 
-## 3. Functional Requirements & User Stories
+## 3. Functional Requirements & Traceable Acceptance Criteria
 - **User Story**: As a [role], I want [action] so that [benefit].
-- **Acceptance Criteria**:
-  - [ ] Criteria 1 (Spesifik & Terukur)
-  - [ ] Criteria 2 (Data Contract / Output format)
+- **Acceptance Criteria (Wajib Ber-ID untuk Traceability di PLAN.md)**:
+  - [ ] **[PRD-REQ-01]**: [Kriteria fungsional spesifik & terukur]
+  - [ ] **[PRD-REQ-02]**: [Data Contract / format output / validasi edge-case]
+  - [ ] **[PRD-REQ-03]**: [Error handling & recovery behavior]
 
 ## 4. Technical Stack & Architectural Constraints
 - **Runtime / Framework**: [Contoh: Node.js / Go / Python / Astro]
@@ -89,9 +90,11 @@ flowchart TD
     Validation -- Tidak --> Error["Error Feedback"]
 ```
 
-## 8. Functional Requirements & Data Contracts
-- **Data Model / Schema**: [Struktur entitas inti & relasi]
-- **API Contracts**: [Endpoint, request payload, response schema]
+## 8. Functional Requirements & Traceable Data Contracts
+- **Traceable Acceptance Criteria (Wajib Ber-ID untuk Traceability di PLAN.md)**:
+  - [ ] **[PRD-REQ-01]**: [Definisi model entitas & relasi skema data]
+  - [ ] **[PRD-REQ-02]**: [Kontrak API: Endpoint, request payload, response schema]
+  - [ ] **[PRD-REQ-03]**: [Validasi logika bisnis, state machine, dan idempotensi transaksi]
 
 ## 9. Business Processes & State Machine
 - [Definisi transisi status, edge case handling, dan idempotency rules]

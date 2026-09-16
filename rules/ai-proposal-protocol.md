@@ -21,7 +21,7 @@ description: Standard Protocol for Architectural Changes, RFCs, and Proactive Pr
    - **Condition 3**: Fundamental architectural restructuring altering public API contracts across multiple services.
    - **Condition 4**: Multi-module blast radius touching > 3 independent modules/packages simultaneously.
 3. **Pre-Flight ADR Scan Invariant**:
-   - Before drafting any PRD, RFC, or PLAN, AI agents MUST scan the last 10 entries of `DECISIONS.md` to ensure proposed architectures do not violate prior ADRs or resurrect rejected concepts.
+   - Before drafting any PRD, RFC, or PLAN, AI agents MUST scan the last 10 entries of project ADRs located in the Obsidian RAG namespace: `00-AGY-Memory/<project-namespace>/DECISIONS.md` (via Obsidian MCP or direct filesystem path) to ensure proposed architectures do not violate prior ADRs or resurrect rejected concepts.
 
 ---
 
@@ -34,5 +34,5 @@ When a major architectural proposal is required, format it as follows:
 ---
 
 ## 3. DECISION RECORDING (RAG)
-- **Approved Architectural Decisions**: Logged to project `DECISIONS.md` as standard single-line ADRs.
-- **Rejected Proposals**: Logged to `00-AGY-Memory/<project-namespace>/DECISIONS.md`. AI agents must never re-propose previously rejected concepts.
+- **Approved Architectural Decisions**: Logged to `00-AGY-Memory/<project-namespace>/DECISIONS.md` as standard single-line ADRs.
+- **Rejected Proposals**: Logged to `00-AGY-Memory/<project-namespace>/DECISIONS.md` with status `[REJECTED]`. AI agents must never re-propose previously rejected concepts.

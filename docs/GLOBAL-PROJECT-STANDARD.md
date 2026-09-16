@@ -20,20 +20,33 @@ Sebelum menulis referensi path di `PLAN.md`, `AGENTS.md`, atau `GEMINI.md` manap
 
 ---
 
-## 2. Daftar File Wajib per Repositori Lokal (Update)
+## 2. Daftar File Standar per Repositori Lokal (Klasifikasi Wajib vs Kondisional)
 
-Selain 6 file inti yang selalu wajib (`PRD.md`, `PLAN.md`, `AGENTS.md`, `GEMINI.md`, `DEVELOPMENT.md`, `CHANGELOG.md`) dan 1 file kondisional (`DESIGN_SYSTEM.md` — Wajib untuk Frontend/UI/Theme, N/A untuk Backend/CLI/Service), tambahkan:
+Untuk mencegah pemaksaan file yang tidak relevan ("ngide liar"), file repositori distandarkan dengan batas kebutuhan nyata:
 
+### A. File Wajib Universal (Semua Repositori)
 | Nama File | Fungsi | Wajib Untuk |
 |---|---|---|
-| `README.md` | Entry point manusia: cara install/run, tech stack ringkas, link ke PRD/AGENTS.md | Semua proyek |
-| `.env.example` | Template environment variable tanpa secret asli | Semua proyek yang pakai env var |
-| `DEPLOYMENT.md` | Cara deploy, environment staging/production, rollback procedure | Proyek yang sudah/akan production |
-| `DESIGN_SYSTEM.md` | Token warna, tipografi, komponen UI, rules styling | Kondisional: Wajib untuk Frontend/UI/Theme (N/A untuk Backend/CLI/Service) |
-| `DEVELOPMENT-ARCHIVE.md` | Arsip task lama dari `DEVELOPMENT.md` (lihat AGENTS.md Bagian 6) | Proyek berjalan lama |
-| `CHANGELOG-ARCHIVE.md` | Arsip entri lama dari `CHANGELOG.md` | Proyek berjalan lama |
+| `README.md` | Entry point manusia: deskripsi proyek, cara install/run, tech stack ringkas | Semua proyek |
+| `.env.example` | Template variabel lingkungan tanpa secret asli | Semua proyek yang menggunakan env |
 
-Total file wajib per repo: **6 file inti + 2 file wajib (README.md, .env.example) + 2 kondisional (DEPLOYMENT.md untuk proyek production, DESIGN_SYSTEM.md untuk Frontend/UI)**. File archive dibuat begitu file induknya melewati batas panjang (lihat AGENTS.md Bagian 6).
+### B. File Wajib Proyek Terstruktur / Feature Track (Saat Ada PRD & Eksekusi PLAN)
+| Nama File | Fungsi | Wajib Untuk |
+|---|---|---|
+| `PRD.md` | Requirement level "what & why" dan batasan Non-Goals | Proyek berbasis fitur/SaaS/aplikasi |
+| `PLAN.md` | Rencana kerja teknis bertahap dengan DoD terukur (fase eksekusi) | Proyek dengan PRD aktif |
+| `GEMINI.md` | Identitas proyek & binding rules supreme lokal | Proyek yang dikerjakan AI agent |
+| `CHANGELOG.md` | Riwayat rilis perubahan user-facing (format standar) | Proyek dengan rilis/milestone |
+
+### C. File Kondisional & Opsional (Sesuai Kebutuhan Nyata)
+| Nama File | Fungsi | Status |
+|---|---|---|
+| `DESIGN_SYSTEM.md` | Token warna, tipografi, komponen UI, rules styling | **Kondisional**: Wajib untuk Frontend/UI/Theme (N/A untuk Backend/CLI/Service) |
+| `DEPLOYMENT.md` | Cara deploy, environment staging/production, rollback procedure | **Kondisional**: Wajib untuk proyek production/staging |
+| `AGENTS.md` | Aturan alur kerja spesifik lokal di luar standar global | **Opsional**: Hanya jika repo butuh aturan agen khusus tingkat lokal |
+| `DEVELOPMENT.md` | Catatan naratif kerja manusia & handoff manual developer | **Opsional**: Dev log manual developer manusia |
+| `DEVELOPMENT-ARCHIVE.md` | Arsip task lama dari `DEVELOPMENT.md` | Proyek berjalan lama jika `DEVELOPMENT.md` melebihi batas |
+| `CHANGELOG-ARCHIVE.md` | Arsip entri lama dari `CHANGELOG.md` | Proyek berjalan lama jika `CHANGELOG.md` melebihi batas |
 
 ---
 
@@ -66,13 +79,13 @@ if git diff --cached | grep -E '^\+[^+]' | grep -P "[\x{1F600}-\x{1F64F}\x{1F300
     exit 1
 fi
 
-# 3. Block Test Tampering (Membunuh: Mengubah tes saat mengerjakan fitur)
+# 3. Block Test Tampering (Membunuh: Mengubah tes eksisting saat mengerjakan fitur)
 if [ "${ALLOW_TEST_MUTATION:-0}" != "1" ]; then
-    STAGED_TESTS=$(git diff --cached --name-only | grep -E '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
+    MODIFIED_TESTS=$(git diff --cached --diff-filter=M --name-only | grep -E '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
     STAGED_SRC=$(git diff --cached --name-only | grep -vE '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
-    if [ -n "$STAGED_TESTS" ] && [ -n "$STAGED_SRC" ]; then
-        echo "[ HARDBLOCK ] Mengubah file tes bersamaan dengan source code dilarang." >&2
-        echo "Untuk mengizinkan perubahan tes secara sadar, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
+    if [ -n "$MODIFIED_TESTS" ] && [ -n "$STAGED_SRC" ]; then
+        echo "[ HARDBLOCK ] Memodifikasi file tes eksisting bersamaan dengan source code dilarang." >&2
+        echo "Penambahan file tes baru diizinkan. Untuk memodifikasi tes eksisting, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
         exit 1
     fi
 fi
@@ -87,12 +100,12 @@ if [ -n "$STAGED_SECRETS" ]; then
     fi
 fi
 
-# 5. Check Required Files on projects with PRD.md
-if [ -f "PRD.md" ]; then
+# 5. Check Required Files on projects in execution phase (PLAN.md present)
+if [ -f "PLAN.md" ]; then
     REQUIRED_FILES=("PRD.md" "PLAN.md" "GEMINI.md" "CHANGELOG.md" "README.md")
     for f in "${REQUIRED_FILES[@]}"; do
         if [ ! -f "$f" ]; then
-            echo "[ HARDBLOCK ] File standar proyek wajib ada: $f" >&2
+            echo "[ HARDBLOCK ] File standar proyek wajib ada saat fase eksekusi: $f" >&2
             exit 1
         fi
     done
@@ -103,11 +116,11 @@ exit 0
 ```
 
 ### 3.2 Yang Diverifikasi Hook Ini
-- **Anti-Lazy Code**: Mencegah commit placeholder pemalas (`// ... existing code ...`, `TODO: implement`).
-- **Strict No-Emoji**: Menolak karakter emoji pada file yang di-stage.
-- **Anti Test-Cheating**: Mencegah mutasi file test bersamaan dengan source code fitur tanpa `ALLOW_TEST_MUTATION=1`.
+- **Anti-Lazy Code**: Mencegah commit placeholder pemalas (`// ... existing code ...`, `TODO: implement`). Berkas dokumentasi dan skrip guard dikecualikan dari false positive.
+- **Strict No-Emoji**: Menolak karakter emoji pada baris yang ditambahkan.
+- **Anti Test-Cheating (TDD-Friendly)**: Mencegah modifikasi tes *eksisting* bersamaan dengan perubahan fitur tanpa `ALLOW_TEST_MUTATION=1`. Penambahan file tes baru (`diff-filter=A`) sepenuhnya diizinkan untuk mendukung alur kerja TDD dan penambahan test coverage.
 - **Secret Defense**: Menolak commit file `.env`, file `.pem`/`.key`, dan SSH private keys.
-- **File Inti Wajib**: Memastikan file inti dasar (`PRD.md`, `PLAN.md`, `GEMINI.md`, `CHANGELOG.md`, `README.md`) tersedia pada repositori aktif.
+- **File Inti Fase Eksekusi**: Memastikan kelengkapan file standar (`PRD.md`, `PLAN.md`, `GEMINI.md`, `CHANGELOG.md`, `README.md`) saat proyek masuk ke fase eksekusi (`PLAN.md` dibuat). Tahap drafting `PRD.md` awal tidak terblokir.
 - **Non-Interactive & Autonomous Friendly**: Hook ini berjalan tanpa interupsi interaktif (`read < /dev/tty`), sehingga aman dieksekusi oleh agent secara otomatis. Update `CHANGELOG.md` dilakukan saat penuntasan paket kerja/milestone.
 
 ### 3.3 Yang TIDAK Bisa Dicek Hook Ini (tetap tanggung jawab AI/dev)
@@ -127,10 +140,11 @@ Kalau `PRD-MASTER-TEMPLATE.md` atau `WORKFLOW-AI-AGENT-STANDARD.md` diupdate di 
 
 ## 5. Ringkasan Checklist Setup Proyek Baru
 
-- [ ] File inti repo dibuat (`PRD.md`, `PLAN.md`, `AGENTS.md`, `GEMINI.md`, `DEVELOPMENT.md`, `CHANGELOG.md`)
-- [ ] `DESIGN_SYSTEM.md` dibuat jika proyek memiliki tampilan UI/Frontend/Theme
 - [ ] `README.md` dan `.env.example` dibuat
-- [ ] `DEPLOYMENT.md` dibuat jika proyek akan production
+- [ ] File standar alur kerja dibuat saat memulai fase fitur terstruktur (`PRD.md`, `PLAN.md`, `GEMINI.md`, `CHANGELOG.md`)
+- [ ] `DESIGN_SYSTEM.md` dibuat jika proyek memiliki tampilan UI/Frontend/Theme
+- [ ] `DEPLOYMENT.md` dibuat jika proyek akan dideploy ke production
+- [ ] `AGENTS.md` dan `DEVELOPMENT.md` dibuat secara opsional jika dibutuhkan oleh dev lokal
 - [ ] Semua path referensi antar file dicocokkan ke tabel Bagian 1
 - [ ] Git pre-commit hook Bagian 3 dipasang
 - [ ] Namespace RAG (`INDEX.md`, `CONTEXT.md`, `STATE.md`, `DECISIONS.md`) dibuat di Obsidian Vault

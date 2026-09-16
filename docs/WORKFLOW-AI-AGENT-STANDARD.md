@@ -79,7 +79,10 @@ Tidak semua tugas membutuhkan RFC. AI Agent mengevaluasi ambang batas secara det
 
 ### Tahap 2 — Buat Hyper-Granular `PLAN.md` (Traceability Link & Sliding Packet)
 Ketika menyusun rencana eksekusi:
-- **Mandatory Traceability Invariant**: Setiap task chunk di `PLAN.md` WAJIB menyertakan ID kriteria penerimaan dari PRD (misal `[Chunk 1] -> [PRD-REQ-01]`). Chunk tanpa mapping PRD otomatis DITOLAK karena terindikasi ngide liar/scope creep.
+- **Mandatory Traceability Invariant**:
+  - **Feature Track (Proyek dengan PRD)**: Setiap task chunk di `PLAN.md` WAJIB menyertakan ID kriteria penerimaan dari PRD (misal `[Chunk 1] -> [PRD-REQ-01]`).
+  - **Maintenance / Bugfix Track (Perbaikan Bug, Refactor, Task Non-PRD)**: Task chunk ditautkan ke kriteria prompt pengguna atau ID issue (misal `[Chunk 1] -> [BUG-FIX-01]`, `[CHORE-01]`, `[REFACTOR-01]`). Dilarang membuat file `PRD.md` baru tanpa diminta untuk perbaikan bug rutin.
+  - Chunk di luar lingkup tugas yang disepakati otomatis DITOLAK sebagai scope creep/ngide liar.
 - **Pola Sliding Packet (Maksimal 10 Chunks Detail Aktif)**: Jika fase memiliki banyak chunk (misal 20–30), kelompokkan ke dalam paket kerja. `PLAN.md` memuat roadmap outline seluruh paket, namun **hanya meng-expand detail spesifikasi DoD untuk maksimal 10 chunks pada paket yang sedang aktif**. Paket berikutnya di-expand setelah paket aktif tuntas.
 - **JANGAN menulis atau mengubah kode apa pun di tahap ini.**
 - Berhenti dan tunggu review dari dev.
@@ -125,11 +128,12 @@ Laporkan progress ringkas dan re-acknowledge aturan pada titik berikut:
 
 Jika ada dua aturan bertentangan, ikuti urutan hierarki berikut (paling tinggi menang):
 
-1. `GEMINI.md` — Identitas proyek & binding rules (paling otoritatif)
-2. `AGENTS.md` — Aturan alur kerja lokal
-3. `PLAN.md` — Breakdown teknis yang sudah di-approve
-4. `DEVELOPMENT.md` — Status & keputusan aktif
-5. `PRD.md` — Requirement dasar ("what & why")
+1. `GEMINI.md` / Master Rules — Identitas proyek & binding rules supreme (paling otoritatif)
+2. `DECISIONS.md` (ADR) — Catatan hukum arsitektur permanen di Obsidian RAG (`00-AGY-Memory/<namespace>/DECISIONS.md`)
+3. `PRD.md` — Kontrak spesifikasi requirement dasar & batasan Non-Goals
+4. `AGENTS.md` — Aturan alur kerja lokal (jika ada)
+5. `PLAN.md` — Breakdown teknis level "how" yang sudah di-approve dev
+6. `STATE.md` (RAG) / `DEVELOPMENT.md` (Repo) — Status aktif pengerjaan & log naratif dev
 
 ---
 

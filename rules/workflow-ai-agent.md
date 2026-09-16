@@ -17,7 +17,10 @@ Ide / Request → PRD / Non-Goals → [RFC/ADR Threshold Gate] → Traceable PLA
 
 ### Stage 0: Pre-Flight ADR Scan & Traceability Setup
 - Scan the last 10 entries of project ADRs (`00-AGY-Memory/<project-namespace>/DECISIONS.md`) to prevent violating existing architectural laws.
-- Every planned chunk MUST link to a specific PRD acceptance criterion ID (e.g. `[Chunk 1] -> [PRD-REQ-01]`). Unlinked chunks are strictly rejected as scope creep.
+- **Traceability Link Mandate**:
+  - **Feature Track (with PRD)**: Every planned chunk MUST link to a specific PRD acceptance criterion ID (e.g. `[Chunk 1] -> [PRD-REQ-01]`).
+  - **Maintenance / Bugfix Track (ad-hoc / non-PRD task)**: Chunks link to user prompt criteria or defect ID (e.g. `[Chunk 1] -> [BUG-FIX-01]`, `[CHORE-01]`, `[REFACTOR-01]`). Never generate unrequested PRD files for routine bugfixes or chores.
+  - Unmapped chunks outside the task boundary are strictly rejected as scope creep.
 
 ### Stage 1: Pre-Scan & Grounding (Inspect Before Apply)
 - Read target files and scan global call-sites/references via AST or grep (`inspect-before-apply.md`).
@@ -61,5 +64,5 @@ Pause execution and solicit human confirmation ONLY at:
 ---
 
 ## 4. PRD-TO-PLAN TRACEABILITY & THRESHOLD GATE
-1. **Traceability Invariant**: Every actionable task chunk in `PLAN.md` must cite an explicit acceptance criterion from `PRD.md` (e.g. `[PRD-REQ-XX]`). Unmapped chunks are rejected immediately.
+1. **Traceability Invariant**: Actionable task chunks in `PLAN.md` must cite an explicit acceptance criterion from `PRD.md` (`[PRD-REQ-XX]`) on Feature Track, or user-prompt/defect criteria (`[BUG-FIX-XX]`, `[CHORE-XX]`) on Maintenance Track. Unmapped chunks outside the task boundary are rejected immediately.
 2. **RFC/ADR Threshold Gate**: RFC is strictly bypassed for routine work. RFC is triggered ONLY when touching new dependencies, DB schemas, breaking public API contracts, or >3 modules blast radius.

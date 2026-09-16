@@ -427,13 +427,13 @@ if git diff --cached | grep -E '^\+[^+]' | grep -P "[\x{1F600}-\x{1F64F}\x{1F300
     exit 1
 fi
 
-# 3. Block Test Tampering (Membunuh: Mengubah tes saat mengerjakan fitur)
+# 3. Block Test Tampering (Membunuh: Mengubah tes eksisting saat mengerjakan fitur)
 if [ "${ALLOW_TEST_MUTATION:-0}" != "1" ]; then
-    STAGED_TESTS=$(git diff --cached --name-only | grep -E '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
+    MODIFIED_TESTS=$(git diff --cached --diff-filter=M --name-only | grep -E '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
     STAGED_SRC=$(git diff --cached --name-only | grep -vE '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
-    if [ -n "$STAGED_TESTS" ] && [ -n "$STAGED_SRC" ]; then
-        echo "[ HARDBLOCK ] Mengubah file tes bersamaan dengan source code dilarang." >&2
-        echo "Untuk mengizinkan perubahan tes secara sadar, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
+    if [ -n "$MODIFIED_TESTS" ] && [ -n "$STAGED_SRC" ]; then
+        echo "[ HARDBLOCK ] Memodifikasi file tes eksisting bersamaan dengan source code dilarang." >&2
+        echo "Penambahan file tes baru diizinkan. Untuk memodifikasi tes eksisting, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
         exit 1
     fi
 fi
@@ -448,12 +448,12 @@ if [ -n "$STAGED_SECRETS" ]; then
     fi
 fi
 
-# 5. Check Required Files on projects with PRD.md
-if [ -f "PRD.md" ]; then
+# 5. Check Required Files on projects in execution phase (PLAN.md present)
+if [ -f "PLAN.md" ]; then
     REQUIRED_FILES=("PRD.md" "PLAN.md" "GEMINI.md" "CHANGELOG.md" "README.md")
     for f in "${REQUIRED_FILES[@]}"; do
         if [ ! -f "$f" ]; then
-            echo "[ HARDBLOCK ] File standar proyek wajib ada: $f" >&2
+            echo "[ HARDBLOCK ] File standar proyek wajib ada saat fase eksekusi: $f" >&2
             exit 1
         fi
     done

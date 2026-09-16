@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # AGY RUNTIME & AI ENVIRONMENT AUTOMATED RECOVERY SCRIPT (VPS SERVV)
-# Single Source of Truth: /home/fuckadmin/.gemini/config/rules/agy-runtime-troubleshooting.md
+# Single Source of Truth: ~/.gemini/config/rules/agy-runtime-troubleshooting.md
 # ==============================================================================
 set -e
 

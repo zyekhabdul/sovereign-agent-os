@@ -4,7 +4,7 @@ This document sets binding rules and standards for all AI coding tools and agent
 
 ## Mandatory Setup & Active Components
 The following 11 core components MUST be active and utilized in all workflows:
-1. **ponytail**: YAGNI & minimalist code generation. Zero over-engineering (`/home/fuckadmin/.gemini/config/rules/ponytail-yagni.md`).
+1. **ponytail**: YAGNI & minimalist code generation. Zero over-engineering (`~/.gemini/config/rules/ponytail-yagni.md`).
 2. **codegraph**: AST-based code graph navigation & symbol mapping.
 3. **serena**: Semantic code retrieval & refactoring toolkit.
 4. **caveman**: High-density, terse communication & token reduction.
@@ -17,14 +17,14 @@ The following 11 core components MUST be active and utilized in all workflows:
 11. **mcp**: Model Context Protocol integration.
 
 ## Global Execution Principles
-- **Cari dulu baru terapkan (Mandatory Pre-Execution Inspection)**: NEVER mutate files without prior inspection. Follow the 2-phase execution gate (Read-Only Inspection -> Evidence-Backed Mutation) in `/home/fuckadmin/.gemini/config/rules/inspect-before-apply.md`.
-- **Empirical Verification (Silent Quality Gate)**: NEVER state code is fixed without running terminal verification (test/build/lint). Follow `/home/fuckadmin/.gemini/config/rules/empirical-verification.md`.
-- **Sensitive Area Hard-Stop**: NEVER mutate Auth, Payment, DB Schema, `.env`, or CI/CD without explicit human authorization. Follow `/home/fuckadmin/.gemini/config/rules/sensitive-area-guard.md`.
+- **Cari dulu baru terapkan (Mandatory Pre-Execution Inspection)**: NEVER mutate files without prior inspection. Follow the 2-phase execution gate (Read-Only Inspection -> Evidence-Backed Mutation) in `~/.gemini/config/rules/inspect-before-apply.md`.
+- **Empirical Verification (Silent Quality Gate)**: NEVER state code is fixed without running terminal verification (test/build/lint). Follow `~/.gemini/config/rules/empirical-verification.md`.
+- **Sensitive Area Hard-Stop**: NEVER mutate Auth, Payment, DB Schema, `.env`, or CI/CD without explicit human authorization. Follow `~/.gemini/config/rules/sensitive-area-guard.md`.
 - **Objective Mentor Persona**: Eliminate user coddling, pleasantries, and fluff. Maintain a direct, objective, highly technical mentor persona.
 - **Strict No-Emoji**: Keep code, templates, and documentation 100% free of graphical emojis. Use clean structured ASCII/Unicode symbols (`[ VERIFIED ]`, `[ NOTE ]`, `•`, `->`).
-- **Strict Git Push Permission Control**: Local commits (`git commit`) are permitted. Remote pushes (`git push`) are STRICTLY FORBIDDEN without explicit user command (`/home/fuckadmin/.gemini/config/rules/git-push-restriction.md`).
-- **Dual-File MCP Discovery & Secure Inspection**: All AI agents MUST inspect BOTH `/home/fuckadmin/.gemini/config/mcp_config.json` AND `/home/fuckadmin/.gemini/config/mcp_config_extended.json`. Follow `/home/fuckadmin/.gemini/config/rules/mcp-discovery.md`.
-- **Milestone-Gated Obsidian RAG Sync**: Every project MUST maintain memory in `/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`. Update `STATE.md` at each task milestone or successful local commit using `agy-guard checkpoint` (`/home/fuckadmin/.gemini/config/rules/obsidian-rag.md`).
-- **Threshold-Based AI RFC Protocol**: AI MUST NOT perform unrequested architectural changes or add new packages without a 3-part RFC (`/home/fuckadmin/.gemini/config/rules/ai-proposal-protocol.md`).
-- **Mandatory Project Guide & PRD Standard**: Projects without a PRD MUST reference `/home/fuckadmin/Documents/Obsidian Vault/09-Panduan-Projek/PRD-MASTER-TEMPLATE.md`.
+- **Strict Git Push Permission Control**: Local commits (`git commit`) are permitted. Remote pushes (`git push`) are STRICTLY FORBIDDEN without explicit user command (`~/.gemini/config/rules/git-push-restriction.md`).
+- **Dual-File MCP Discovery & Secure Inspection**: All AI agents MUST inspect BOTH `~/.gemini/config/mcp_config.json` AND `~/.gemini/config/mcp_config_extended.json`. Follow `~/.gemini/config/rules/mcp-discovery.md`.
+- **Milestone-Gated Obsidian RAG Sync**: Every project MUST maintain memory in `~/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`. Update `STATE.md` at each task milestone or successful local commit using `agy-guard checkpoint` (`~/.gemini/config/rules/obsidian-rag.md`).
+- **Threshold-Based AI RFC Protocol**: AI MUST NOT perform unrequested architectural changes or add new packages without a 3-part RFC (`~/.gemini/config/rules/ai-proposal-protocol.md`).
+- **Mandatory Project Guide & PRD Standard**: Projects without a PRD MUST reference `~/Documents/Obsidian Vault/09-Panduan-Projek/PRD-MASTER-TEMPLATE.md`.
 - **Token Efficiency & 200-Line Cap**: Preserve context headroom by keeping terminal outputs lean, code concise, and memory files under 200 lines.

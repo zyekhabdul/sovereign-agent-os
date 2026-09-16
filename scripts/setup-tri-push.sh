@@ -7,7 +7,8 @@ set -euo pipefail
 # Usage: ./setup-tri-push.sh [--dry-run] [--foss|--web] [REPO_PATH] [REPO_NAME]
 
 DRY_RUN=false
-PROFILE="auto"
+EXPLICIT_PROFILE=""
+SET_PROFILE=""
 POSITIONAL=()
 
 while [[ $# -gt 0 ]]; do
@@ -17,22 +18,24 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --foss|--tool)
-      PROFILE="foss"
+      EXPLICIT_PROFILE="foss"
       shift
       ;;
     --web|--app|--private)
-      PROFILE="web"
+      EXPLICIT_PROFILE="web"
       shift
       ;;
-    --profile)
-      PROFILE="$2"
+    --set-profile)
+      SET_PROFILE="$2"
       shift 2
       ;;
     -h|--help)
-      echo "Usage: $0 [--dry-run] [--foss|--web] [REPO_PATH] [REPO_NAME]"
-      echo "Configures 'all' git remote with tiered routing:"
-      echo "  --foss : GitHub + GitLab + Codeberg (for public open-source tools)"
-      echo "  --web  : GitHub + GitLab only (for websites/apps, avoiding Codeberg TOS/quota)"
+      echo "Usage: $0 [--dry-run] [--foss|--web] [--set-profile foss|web] [REPO_PATH] [REPO_NAME]"
+      echo "Deterministic Multi-Forge Git Remote Setup:"
+      echo "  --foss          : Route to GitHub + GitLab + Codeberg (FOSS Tools)"
+      echo "  --web           : Route to GitHub + GitLab only (Web/Commercial apps)"
+      echo "  --set-profile X : Persistently save git config sovereign.profile = X (foss|web)"
+      echo "  --dry-run       : Display execution plan without applying"
       exit 0
       ;;
     *)
@@ -55,14 +58,50 @@ if [ -z "$REPO_NAME" ]; then
   REPO_NAME=$(basename "$REPO_PATH")
 fi
 
-# Auto-detect profile if set to auto
-if [ "$PROFILE" = "auto" ]; then
-  if [[ "$REPO_NAME" =~ ^(sshm|agy-quota|agy-guard|sovereign-agent-os|vol3.*|volatility.*|os-debloat.*|paru|RAG-Template|termux-tap|homebrew-tap)$ ]] || \
-     [[ "$REPO_NAME" =~ (cli|tool|detector|triage|debloat) ]]; then
-    PROFILE="foss"
-  else
-    PROFILE="web"
+# Persist profile to repo git config if requested
+if [ -n "$SET_PROFILE" ]; then
+  git -C "$REPO_PATH" config sovereign.profile "$SET_PROFILE"
+  echo "[ CONFIG ] Saved sovereign.profile = $SET_PROFILE in $REPO_PATH/.git/config"
+fi
+
+# --- DETERMINISTIC PROFILE RESOLUTION STATE MACHINE ---
+IS_PRIVATE=false
+PRIVATE_REASON=""
+
+# Gate 1: Manifest inspection for private flags (Immutable Hardblock)
+if [ -f "$REPO_PATH/package.json" ]; then
+  if grep -Eq '"private"[[:space:]]*:[[:space:]]*true' "$REPO_PATH/package.json" 2>/dev/null; then
+    IS_PRIVATE=true
+    PRIVATE_REASON="package.json declares 'private: true'"
   fi
+fi
+
+if [ -f "$REPO_PATH/Cargo.toml" ]; then
+  if grep -Eq 'publish[[:space:]]*=[[:space:]]*false' "$REPO_PATH/Cargo.toml" 2>/dev/null; then
+    IS_PRIVATE=true
+    PRIVATE_REASON="Cargo.toml declares 'publish = false'"
+  fi
+fi
+
+# Gate 2: Local Git Config inspection
+LOCAL_CONFIG=$(git -C "$REPO_PATH" config --get sovereign.profile 2>/dev/null || echo "")
+
+# Gate 3: State Machine Resolution (Priority Order)
+if [ "$IS_PRIVATE" = true ]; then
+  PROFILE="web"
+  RESOLUTION="Hardblock: $PRIVATE_REASON (Codeberg strictly prohibited)"
+elif [ -n "$EXPLICIT_PROFILE" ]; then
+  PROFILE="$EXPLICIT_PROFILE"
+  RESOLUTION="Explicit CLI parameter (--${EXPLICIT_PROFILE})"
+elif [ -n "$LOCAL_CONFIG" ]; then
+  PROFILE="$LOCAL_CONFIG"
+  RESOLUTION="Repository Git Config (sovereign.profile = ${LOCAL_CONFIG})"
+elif [ -f "$REPO_PATH/LICENSE" ] || [ -f "$REPO_PATH/LICENSE.md" ] || [ -f "$REPO_PATH/LICENSE.txt" ]; then
+  PROFILE="foss"
+  RESOLUTION="Declarative: Open-source LICENSE file detected"
+else
+  PROFILE="web"
+  RESOLUTION="Safe-by-Default: No explicit FOSS config or LICENSE found"
 fi
 
 GITHUB_USER="${GITHUB_USER:-zyekhabdul}"
@@ -81,19 +120,20 @@ if [ "$PROFILE" = "foss" ]; then
   PROFILE_DESC="FOSS Tool (GitHub + GitLab + Codeberg)"
 else
   ENABLE_CODEBERG=false
-  PROFILE_DESC="Web/Commercial App (GitHub + GitLab only — Codeberg Excluded)"
+  PROFILE_DESC="Web/Restricted App (GitHub + GitLab only — Codeberg Excluded)"
 fi
 ENABLE_GITEA="${ENABLE_GITEA:-false}"
 
-echo "=== Tiered Multi-Forge Git Remote Setup ==="
+echo "=== Deterministic Multi-Forge Git Remote Setup ==="
 echo "Repository Path  : $REPO_PATH"
 echo "Repository Name  : $REPO_NAME"
+echo "Resolution       : $RESOLUTION"
 echo "Profile Class    : [ $PROFILE_DESC ]"
 echo "GitHub (Active)  : $GITHUB_URL"
 echo "GitLab (Active)  : $GITLAB_URL"
 echo "Codeberg (FOSS)  : $CODEBERG_URL (In 'all': $ENABLE_CODEBERG)"
 echo "Gitea (Freeze)   : $GITEA_URL"
-echo "==========================================="
+echo "=================================================="
 
 if [ "$DRY_RUN" = true ]; then
   echo "[ DRY-RUN ] Commands to be executed:"

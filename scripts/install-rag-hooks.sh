@@ -12,7 +12,8 @@ echo "[ RAG-HOOKS ] Installing post-commit auto-sync hooks with namespace resolu
 
 HOOK_CONTENT='#!/usr/bin/env bash
 # Autonomous RAG State Sync Hook (RFC-RAG-003)
-(
+# Execute synchronously to guarantee git hash parity without race condition (< 50ms)
+{
     REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
     REPO_NAME="$(basename "$REPO_DIR")"
     MEMORY_BASE="${HOME}/Documents/Obsidian Vault/00-AGY-Memory"
@@ -100,7 +101,7 @@ EOF
 - **Law 3**: Git Push Guard - Remote push forbidden without explicit human command.
 EOF
     fi
-) &>/dev/null &
+} 2>/dev/null || true
 '
 
 INSTALLED=0

@@ -24,33 +24,33 @@ description: environment-topology.md
 
 ---
 
-### MODE B: Direct Sovereign Host Mode (VPS as Primary Autonomous Workspace)
-*Active when the developer/admin runs AI agents directly inside the VPS environment (`fuckadmin@...`).*
+### MODE B: Direct Sovereign Host Mode (Host/Server as Primary Autonomous Workspace)
+*Active when the developer/admin runs AI agents directly inside the server or host environment.*
 
-When running directly on the VPS host, AI agents ARE PERMITTED to perform maintenance, configuration, and feature development under these strict operational guardrails:
+When running directly on the sovereign host, AI agents ARE PERMITTED to perform maintenance, configuration, and feature development under these strict operational guardrails:
 
 1. **Port Collision Guard**:
-   - AI agents MUST NEVER bind dev servers to active production container ports (e.g. Port `3000` for `zyekh-ai-core`, Ports `80`/`443` for Traefik/Cloudflare Tunnel).
+   - AI agents MUST NEVER bind dev servers to active production service ports (e.g. active application containers, Ports `80`/`443` for web ingress/reverse proxies/tunnels).
    - Use ephemeral or isolated development ports (e.g., `3001`, `8085`, `4321`) or dry-run testing.
 
 2. **Resource & OOM Defense**:
    - Limit Node.js / tool memory allocations (`--max-old-space-size=256` or `512`) to prevent Linux Out-Of-Memory (OOM) Killer from terminating critical production daemons.
-   - Avoid excessive concurrent subagents on the VPS host; prioritize sequential, token-efficient batch execution.
+   - Avoid excessive concurrent subagents on the host; prioritize sequential, token-efficient batch execution.
 
 3. **Empirical Quality Gate & Local Checkpoint**:
    - Code modifications MUST pass silent terminal verification (`agy-guard verify`, `npm test`, `npm run build`) before committing.
    - Changes MUST be recorded via `git commit` and Obsidian RAG checkpoint (`agy-guard checkpoint`).
 
 4. **Deterministic Service Reloading**:
-   - Live container updates MUST be executed via standard container controls (`docker compose restart <service>` or Dokploy redeploy) only after clean verification and commit.
+   - Live container updates MUST be executed via standard service controls (`docker compose restart <service>` or container orchestrator redeploy) only after clean verification and commit.
 
 5. **Physical Anti-Push Compliance**:
-   - Pushes to remote repositories from the VPS must pass the pre-push guardrail using `agy-guard push` or explicit `ALLOW_GIT_PUSH=1`.
+   - Pushes to remote repositories from the host must pass the pre-push guardrail using `agy-guard push` or explicit `ALLOW_GIT_PUSH=1`.
 
 ---
 
 ## 2. PRODUCTION SECRETS & CREDENTIAL BOUNDARIES
 
-1. Production `.env` files and `~/Projects/.env.dokploy` are locked to mode `0600` on the VPS.
+1. Production `.env` files and server deployment configurations are locked to mode `0600` on the host.
 2. AI agents MUST NEVER dump, print, or exfiltrate raw production secrets into conversation transcripts, RAG notes, or Git repositories.
 3. Secret management MUST utilize the encrypted vault (`scripts/vault.sh`) or sanitized environment inspection (`agy-guard inspect-env`).

@@ -11,7 +11,7 @@ description: Mandatory AGY Runtime Error Recovery & Empirical Log Triage Protoco
 
 ## 1. MANDATORY LOG INSPECTION FIRST (ZERO GUESSWORK)
 When `agy` terminates with error or user reports runtime failures:
-1. AI Agent MUST immediately inspect the active log in `/home/fuckadmin/.gemini/antigravity-cli/log/` (e.g. `ls -lat /home/fuckadmin/.gemini/antigravity-cli/log | head -n 5`).
+1. AI Agent MUST immediately inspect the active log in `~/.gemini/antigravity-cli/log/` (e.g. `ls -lat ~/.gemini/antigravity-cli/log | head -n 5`).
 2. Search for exact failure traces: `grep -E "agent executor error|FAILED_PRECONDITION|RESOURCE_EXHAUSTED|UNAVAILABLE" <latest_log>`.
 3. NEVER guess, speculate, or make unsolicited model/proxy modifications without empirical log proof.
 

@@ -14,8 +14,8 @@ description: mcp-discovery.md
 HANYA ketika ada perintah atau kebutuhan untuk memeriksa ketersediaan endpoint/server MCP (e.g. GitHub, Supabase, Cloudflare, Vercel, Sentry, Slack, Google Drive / gdrive, MEGA, Social Media, dll):
 
 - AI Agent **WAJIB** mengecek KEDUA file:
-  1. `/home/fuckadmin/.gemini/config/mcp_config.json`
-  2. `/home/fuckadmin/.gemini/config/mcp_config_extended.json`
+  1. `~/.gemini/config/mcp_config.json`
+  2. `~/.gemini/config/mcp_config_extended.json`
 
 - **STRICT PROHIBITION**:
   - DILARANG membaca file MCP di awal sesi jika tidak diminta/dibutuhkan.

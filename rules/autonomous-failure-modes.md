@@ -52,7 +52,7 @@ description: Mandatory Defense Invariants Against 10 Autonomous AI Blunders and 
 - **Defense Invariant**: Native Standard Library First (`node:fs`, `node:crypto`, `fetch`, `datetime`). New third-party dependencies strictly require human approval.
 
 ### Failure Mode 9: Hardcoded Local Path & Environment Leakage
-- **Mechanism**: AI hardcodes local paths (`/home/fuckadmin/...`) or relies on uncommitted local `.env` variables.
+- **Mechanism**: AI hardcodes local paths (e.g. `/home/user/...` or `/Users/user/...`) or relies on uncommitted local `.env` variables.
 - **Defense Invariant**: Absolute paths strictly prohibited in application source code. Enforce relative path resolution and sanitized config loaders.
 
 ### Failure Mode 10: Zombie Processes & Port Collisions

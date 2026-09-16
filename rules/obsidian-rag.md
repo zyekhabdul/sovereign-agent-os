@@ -5,7 +5,7 @@ description: Enterprise Standard Obsidian Vault RAG Governance & Zero-Maintenanc
 
 # MANDATORY GLOBAL RULE: OBSIDIAN RAG ENTERPRISE GOVERNANCE
 
-- **Global Obsidian Vault Path**: `/home/fuckadmin/Documents/Obsidian Vault`
+- **Global Obsidian Vault Path**: `~/Documents/Obsidian Vault`
 - **MCP Server Name**: `obsidian`
 - **Applicability**: ALL AI coding agents (Antigravity CLI `agy`, Claude Code, Cursor, Codex, OpenCode).
 
@@ -13,10 +13,10 @@ description: Enterprise Standard Obsidian Vault RAG Governance & Zero-Maintenanc
 
 ## 1. STRICT NAMESPACE ISOLATION & CWD AUTO-BINDING
 - Every project MUST have its dedicated namespace directory in Obsidian Vault:
-  `/home/fuckadmin/Documents/Obsidian Vault/00-AGY-Memory/<project-namespace>/`
+  `~/Documents/Obsidian Vault/00-AGY-Memory/<project-namespace>/`
 - **Automatic CWD Auto-Binding**:
-  - `CWD = /home/fuckadmin/Projects/shop.zyekh.com` -> Namespace: `00-AGY-Memory/shop.zyekh.com/`
-  - `CWD = /home/fuckadmin/Projects/bagisto-testing` -> Namespace: `00-AGY-Memory/bagisto-testing/`
+  - `CWD = ~/Projects/my-app` -> Namespace: `00-AGY-Memory/my-app/`
+  - `CWD = ~/Projects/payment-service` -> Namespace: `00-AGY-Memory/payment-service/`
 - **STRICT PROHIBITION**:
   - NEVER execute global wildcard RAG searches (`search_notes`) without prefixing/scoping to the active project namespace.
   - NEVER read or cross-reference notes from another project's namespace.

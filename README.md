@@ -42,14 +42,12 @@ sovereign-agent-os/
 │   ├── dotfiles/                  # SSH, Git, & Shell Aliases Templates
 │   ├── git-hooks/                 # Pre-commit Hook & Emoji Guard
 │   ├── mcp/                       # Sanitized Zero-Secret MCP Templates
-│   ├── projects/                  # Project-Specific Rules
 │   └── rag/                       # ADR & Memory Schemas
 └── scripts/
     ├── agy-recover.sh             # Automated AI Runtime & Network Recovery
     ├── bootstrap.sh               # Complete Machine & Environment Bootstrap
     ├── sync-agents.sh             # Cross-Agent Parity Syncer (AGY, Claude, OpenCode, Codex)
-    ├── vault.sh                   # Encrypted Credential Locker (AES-256-CBC)
-    ├── clone-workspace.sh         # Universal Git Org/User Workspace & Repo Manager
+    ├── vault.sh                   # Encrypted Credential Locker (AES-256-CBC & KeePass KDBX)
     ├── install-mcps.sh            # Global MCP Server Installer
     ├── install-rag-hooks.sh       # Post-Commit Auto-Sync Hook Installer
     ├── rag-lint.sh                # Obsidian RAG Integrity Linter

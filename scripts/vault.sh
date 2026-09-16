@@ -81,8 +81,33 @@ if [ "$ACTION" == "status" ]; then
   exit 0
 fi
 
+resolve_kdbx_path() {
+  local explicit="${1:-}"
+  if [ -n "$explicit" ]; then
+    echo "$explicit"
+    return
+  fi
+  if [ -n "${SOVEREIGN_KDBX_PATH:-}" ]; then
+    echo "$SOVEREIGN_KDBX_PATH"
+    return
+  fi
+  if [ -f "$HOME/.keepass/sovereign-credentials.kdbx" ]; then
+    echo "$HOME/.keepass/sovereign-credentials.kdbx"
+    return
+  fi
+  if [ -f "$HOME/.keepass/passwords.kdbx" ]; then
+    echo "$HOME/.keepass/passwords.kdbx"
+    return
+  fi
+  if [ -f "$HOME/shared-storage/passwords.kdbx" ]; then
+    echo "$HOME/shared-storage/passwords.kdbx"
+    return
+  fi
+  echo "$HOME/.keepass/sovereign-credentials.kdbx"
+}
+
 if [ "$ACTION" == "kdbx-status" ]; then
-  KDBX_PATH="${2:-$HOME/vault.kdbx}"
+  KDBX_PATH="$(resolve_kdbx_path "${2:-}")"
   if command -v keepassxc-cli >/dev/null 2>&1; then
     echo "keepassxc-cli           : [ INSTALLED ] ($(which keepassxc-cli))"
   else
@@ -97,14 +122,14 @@ if [ "$ACTION" == "kdbx-status" ]; then
 fi
 
 if [ "$ACTION" == "kdbx-inject" ]; then
-  KDBX_PATH="${2:-$HOME/vault.kdbx}"
+  KDBX_PATH="$(resolve_kdbx_path "${2:-}")"
   if ! command -v keepassxc-cli >/dev/null 2>&1; then
     echo "[ ERROR ] keepassxc-cli is not installed. Install via: sudo apt install keepassxc"
     exit 1
   fi
   if [ ! -f "$KDBX_PATH" ]; then
     echo "[ ERROR ] KeePass database file not found at: $KDBX_PATH"
-    echo "Usage: ./scripts/vault.sh kdbx-inject /path/to/vault.kdbx"
+    echo "Usage: ./scripts/vault.sh kdbx-inject [/path/to/sovereign-credentials.kdbx]"
     exit 1
   fi
 

@@ -62,8 +62,16 @@ if [ ! -f "$HOME/.gemini/config/mcp_config_extended.json" ]; then
 fi
 
 # 4. Secret Vault Notice
-if [ -f "$HOME/vault.kdbx" ] && command -v keepassxc-cli >/dev/null 2>&1; then
-  echo "[ NOTE ] Found KeePass vault at ~/vault.kdbx. Run './scripts/vault.sh kdbx-inject' to inject credentials."
+KDBX_FOUND=""
+for p in "${SOVEREIGN_KDBX_PATH:-}" "$HOME/.keepass/sovereign-credentials.kdbx" "$HOME/.keepass/passwords.kdbx" "$HOME/shared-storage/passwords.kdbx"; do
+  if [ -n "$p" ] && [ -f "$p" ]; then
+    KDBX_FOUND="$p"
+    break
+  fi
+done
+
+if [ -n "$KDBX_FOUND" ] && command -v keepassxc-cli >/dev/null 2>&1; then
+  echo "[ NOTE ] Found KeePass vault at $KDBX_FOUND. Run './scripts/vault.sh kdbx-inject' to inject credentials."
 elif [ -f "$REPO_ROOT/vault.enc" ]; then
   echo "[ NOTE ] Found encrypted vault.enc. Run './scripts/vault.sh unpack' to restore credentials."
 fi

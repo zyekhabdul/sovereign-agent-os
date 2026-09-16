@@ -54,8 +54,20 @@ if [ ! -d "$REPO_PATH/.git" ]; then
   exit 1
 fi
 
+ORIGIN_URL=$(git -C "$REPO_PATH" config --get remote.origin.url 2>/dev/null || echo "")
+
+# Gate 0: Third-party upstream guard (AUR / external vendor mirrors)
+if echo "$ORIGIN_URL" | grep -Eq 'aur\.archlinux\.org|gitlab\.archlinux\.org'; then
+  echo "[ SKIP ] Third-party upstream repository detected (AUR/Arch): $ORIGIN_URL"
+  exit 0
+fi
+
 if [ -z "$REPO_NAME" ]; then
-  REPO_NAME=$(basename "$REPO_PATH")
+  if [ -n "$ORIGIN_URL" ] && echo "$ORIGIN_URL" | grep -Eq '(zyekhabdul|aomiqaza)'; then
+    REPO_NAME=$(basename "$ORIGIN_URL" .git)
+  else
+    REPO_NAME=$(basename "$REPO_PATH")
+  fi
 fi
 
 # Persist profile to repo git config if requested

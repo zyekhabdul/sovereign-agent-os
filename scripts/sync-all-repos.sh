@@ -32,14 +32,15 @@ echo "Dry Run Mode       : $DRY_RUN"
 echo "======================================================"
 
 for repo in "$PROJECTS_DIR"/*; do
+  [ -L "$repo" ] && continue
   if [ -d "$repo/.git" ]; then
     REPO_NAME=$(basename "$repo")
     echo -e "\n>>> Processing: $REPO_NAME"
     
     if [ "$DRY_RUN" = true ]; then
-      "$SCRIPT_DIR/setup-tri-push.sh" --dry-run "$repo" "$REPO_NAME"
+      "$SCRIPT_DIR/setup-tri-push.sh" --dry-run "$repo"
     else
-      "$SCRIPT_DIR/setup-tri-push.sh" "$repo" "$REPO_NAME"
+      "$SCRIPT_DIR/setup-tri-push.sh" "$repo"
       if [ "$PUSH_MODE" = true ]; then
         BRANCH=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
         echo "Pushing $REPO_NAME ($BRANCH) to active platforms..."

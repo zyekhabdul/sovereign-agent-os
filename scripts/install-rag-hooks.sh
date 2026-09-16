@@ -15,7 +15,14 @@ HOOK_CONTENT='#!/usr/bin/env bash
 # Execute synchronously to guarantee git hash parity without race condition (< 50ms)
 {
     REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+    # Boundary Guard: Reject temporary or out-of-boundary directories
+    if [[ "$REPO_DIR" =~ ^/tmp|^/var/tmp ]] || [[ "$REPO_DIR" != "${HOME}"* ]]; then
+        exit 0
+    fi
     REPO_NAME="$(basename "$REPO_DIR")"
+    if [[ "$REPO_NAME" =~ ^tmp\. || "$REPO_NAME" == "tmp" ]]; then
+        exit 0
+    fi
     MEMORY_BASE="${HOME}/Documents/Obsidian Vault/00-AGY-Memory"
     
     # Try exact match, dot-to-dash match, or theme alias

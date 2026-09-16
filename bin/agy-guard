@@ -113,9 +113,15 @@ def get_git_info(cwd=None):
 def resolve_namespace(cwd=None):
     if cwd is None:
         cwd = Path.cwd()
+    cwd = Path(cwd).resolve()
     
     git_root = get_git_root(cwd)
     target = git_root if git_root else cwd
+    
+    # Boundary Guard: Ephemeral / out-of-boundary directories
+    str_target = str(target)
+    if str_target.startswith("/tmp") or str_target.startswith("/var/tmp") or not str_target.startswith(str(HOME)):
+        return None
     
     if target == HOME:
         return "global-workspace"
@@ -286,8 +292,17 @@ def cmd_context(args):
     print("\n====================================")
 
 def cmd_checkpoint(args):
-    cwd = Path.cwd()
+    cwd = Path.cwd().resolve()
+    str_cwd = str(cwd)
+    if str_cwd.startswith("/tmp") or str_cwd.startswith("/var/tmp") or not str_cwd.startswith(str(HOME)):
+        print(f"[ SKIP ] agy-guard checkpoint skipped for out-of-boundary directory: {cwd}")
+        return
+
     ns = args.namespace or resolve_namespace(cwd)
+    if not ns or ns.startswith("tmp.") or ns == "tmp":
+        print(f"[ SKIP ] agy-guard checkpoint skipped for invalid or ephemeral namespace: {ns}")
+        return
+
     msg = args.msg or "Task milestone update"
     status = args.status.upper()
     

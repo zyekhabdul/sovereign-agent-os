@@ -74,14 +74,19 @@ EOF
 EOF
     else
         # Fast non-blocking update of header hash
-        if grep -q "git_commit_hash:" "$MEMORY_FILE" 2>/dev/null; then
-            sed -i "s/git_commit_hash:.*/git_commit_hash: \"$HASH\"/" "$MEMORY_FILE" 2>/dev/null || true
-            sed -i "s/last_updated:.*/last_updated: \"$TIMESTAMP\"/" "$MEMORY_FILE" 2>/dev/null || true
+        if grep -qi "git_commit_hash" "$MEMORY_FILE" 2>/dev/null; then
+            sed -i -E "s/(git_commit_hash:).*/\1 \"$HASH\"/I" "$MEMORY_FILE" 2>/dev/null || true
+            sed -i -E "s/(last_updated:).*/\1 \"$TIMESTAMP\"/I" "$MEMORY_FILE" 2>/dev/null || true
         fi
-        if grep -q "Git Commit:" "$MEMORY_FILE" 2>/dev/null; then
-            sed -i "s/- \*\*Git Commit\*\*:.*/- \*\*Git Commit\*\*: \`$HASH\`/" "$MEMORY_FILE" 2>/dev/null || true
-            sed -i "s/- \*\*Last Checkpoint\*\*:.*/- \*\*Last Checkpoint\*\*: $TIMESTAMP/" "$MEMORY_FILE" 2>/dev/null || true
+        if grep -qi "Git Commit" "$MEMORY_FILE" 2>/dev/null; then
+            sed -i -E "s/(- \*\*Git Commit(\s*Hash)?\*\*:\s*).*/\1\`$HASH\`/I" "$MEMORY_FILE" 2>/dev/null || true
+            sed -i -E "s/(- \*\*Last Checkpoint\*\*:\s*).*/\1$TIMESTAMP/I" "$MEMORY_FILE" 2>/dev/null || true
+            sed -i -E "s/(- \*\*Last Session Timestamp\*\*:\s*).*/\1$TIMESTAMP/I" "$MEMORY_FILE" 2>/dev/null || true
         fi
+    fi
+    if [ -f "${TARGET_DIR}/INDEX.md" ]; then
+        sed -i -E "s/(- \*\*(Latest )?Git Commit Hash\*\*:\s*).*/\1\`$HASH\`/I" "${TARGET_DIR}/INDEX.md" 2>/dev/null || true
+        sed -i -E "s/(- \*\*Last Memory Sync\*\*:\s*).*/\1$TIMESTAMP/I" "${TARGET_DIR}/INDEX.md" 2>/dev/null || true
     fi
 
     # 4. DECISIONS.md

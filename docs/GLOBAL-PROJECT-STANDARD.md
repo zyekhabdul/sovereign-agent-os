@@ -52,7 +52,7 @@ set -euo pipefail
 
 # 1. Block Lazy Truncation Placeholders (Membunuh: // ... existing code ...)
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
-    if git diff --cached -- . ':!*.md' ':!*pre-commit*' | grep -E '^\+[^+]' | grep -Eiq '(existing code|remaining unchanged|TODO: implement|rest of (the|your) code)'; then
+    if git diff --cached -- . ':!*.md' ':!*pre-commit*' ':!*agy-guard*' | grep -E '^\+[^+]' | grep -Eiq '(existing code|remaining unchanged|TODO: implement|rest of (the|your) code)'; then
         echo "[ HARDBLOCK ] Terdeteksi placeholder kode malas/terpotong di staged diff source code!" >&2
         echo "Contoh terlarang: '// ... existing code ...', 'TODO: implement'" >&2
         exit 1

@@ -8,12 +8,16 @@ description: Autonomous Batch Execution & Deterministic Machine-Gated Verificati
 All AI coding tools and agents (AGY Antigravity CLI, Antigravity IDE, Claude Code, Cursor, Codex, OpenCode) MUST adhere to the following Autonomous Execution Standard:
 
 ```
-Goal / Request → AST & Call-Site Pre-Scan → Autonomous Execution → Deterministic Machine Gate (Compiler/Tests/Lint == 0) → Atomic Local Commit → Report Proof
+Ide / Request → PRD / Non-Goals → [RFC/ADR Threshold Gate] → Traceable PLAN.md (Max 10) → Two-Tier Machine Gate → Atomic Local Commit
 ```
 
 ---
 
-## 1. FIVE-STAGE AUTONOMOUS EXECUTION LIFECYCLE
+## 1. SIX-STAGE AUTONOMOUS EXECUTION LIFECYCLE
+
+### Stage 0: Pre-Flight ADR Scan & Traceability Setup
+- Scan the last 10 entries of `DECISIONS.md` to prevent violating existing architectural laws.
+- Every planned chunk MUST link to a specific PRD acceptance criterion ID (e.g. `[Chunk 1] -> [PRD-REQ-01]`). Unlinked chunks are strictly rejected as scope creep.
 
 ### Stage 1: Pre-Scan & Grounding (Inspect Before Apply)
 - Read target files and scan global call-sites/references via AST or grep (`inspect-before-apply.md`).
@@ -23,9 +27,10 @@ Goal / Request → AST & Call-Site Pre-Scan → Autonomous Execution → Determi
 - Write minimal, idiomatic, and clean code to satisfy the goal (`ponytail-yagni.md`).
 - Zero unsolicited bloat, zero unneeded wrappers, zero dead code.
 
-### Stage 3: Deterministic Machine Verification Gate
+### Stage 3: Two-Tier Machine Verification Gate
 - Run terminal verification suites (`tsc --noEmit`, `pytest`, `cargo check`, `npm test`, `shopify theme check`).
-- **Pass Condition**: Exit code 0 with zero compiler/test errors.
+- **Tier 1 (Syntax & Unit Tests)**: Exit code 0 with zero compiler/test errors (`tests_executed > 0`, `failures == 0`).
+- **Tier 2 (Production Execution Audit)**: Audit parameter precision (`stepSize`, `tickSize`), time-stops/timeouts, and unclosed states.
 - **Self-Healing Loop**: If verification fails, parse stack trace and auto-repair (Max 3 iterations before circuit breaker trips).
 
 ### Stage 4: Atomic Local Git Checkpoint
@@ -52,3 +57,9 @@ Pause execution and solicit human confirmation ONLY at:
    - Exactly ONE `PLAN.md` file is allowed in the local repository root.
    - Creating ad-hoc execution dump files (`PLAN-part2.md`, `Session-XX.md`, `task-detail.md`, `scratch-plan.md`) is strictly forbidden.
    - Once an active packet of 10 chunks is verified (exit code 0) and committed, the detail section of `PLAN.md` is overwritten with the next packet.
+
+---
+
+## 4. PRD-TO-PLAN TRACEABILITY & THRESHOLD GATE
+1. **Traceability Invariant**: Every actionable task chunk in `PLAN.md` must cite an explicit acceptance criterion from `PRD.md` (e.g. `[PRD-REQ-XX]`). Unmapped chunks are rejected immediately.
+2. **RFC/ADR Threshold Gate**: RFC is strictly bypassed for routine work. RFC is triggered ONLY when touching new dependencies, DB schemas, breaking public API contracts, or >3 modules blast radius.

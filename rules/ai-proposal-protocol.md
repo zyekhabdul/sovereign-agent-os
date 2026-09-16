@@ -10,14 +10,18 @@ description: Standard Protocol for Architectural Changes, RFCs, and Proactive Pr
 
 ---
 
-## 1. SCOPE OF AUTONOMOUS EXECUTION VS RFC
-1. **Autonomous Execution (Zero RFC Required)**:
-   - Routine bug fixes, requested features, performance tuning, typo corrections, and localized refactoring.
-   - Proceed directly via `Inspect -> Code -> Machine Verify -> Commit`.
-2. **Mandatory RFC Protocol (Human Approval Required)**:
-   - Proposing new third-party external dependencies / packages.
-   - Major database schema overhauls or table deprecations.
-   - Fundamental architectural restructuring altering public API contracts across multiple services.
+## 1. SCOPE OF AUTONOMOUS EXECUTION VS RFC (THRESHOLD GATE)
+1. **Autonomous Execution (Zero RFC/ADR Required — Fast Track)**:
+   - Routine bug fixes, requested features within existing patterns, performance tuning, typo corrections, and localized refactoring.
+   - Proceed directly via: `Ide -> PRD Lite -> PLAN.md -> Exec / QA`.
+2. **Mandatory RFC & ADR Protocol (Human Approval Required)**:
+   Triggered IF AND ONLY IF changes meet at least one of these 4 conditions:
+   - **Condition 1**: Proposing new third-party external dependencies / packages.
+   - **Condition 2**: Major database schema overhauls, structural migrations, or table deprecations.
+   - **Condition 3**: Fundamental architectural restructuring altering public API contracts across multiple services.
+   - **Condition 4**: Multi-module blast radius touching > 3 independent modules/packages simultaneously.
+3. **Pre-Flight ADR Scan Invariant**:
+   - Before drafting any PRD, RFC, or PLAN, AI agents MUST scan the last 10 entries of `DECISIONS.md` to ensure proposed architectures do not violate prior ADRs or resurrect rejected concepts.
 
 ---
 

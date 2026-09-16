@@ -10,20 +10,24 @@ Panduan alur kerja standar yang WAJIB dipatuhi oleh seluruh AI coding agent (AGY
 [HULU: Discovery & Definition]
 Ide Mentah / Kebutuhan Bisnis
   → Triage & Klasifikasi Kompleksitas (T1 Ringan / T2 Menengah / T3 Kompleks)
+  → Pre-Flight ADR Scan (Baca 10 ADR terakhir di DECISIONS.md)
   → Clarify & Problem Boundaries (Falsifiable problem, Non-Goals, Scope Wedge)
-  → Mini-Research / Feasibility Spike (Opsional untuk T1, Wajib untuk T2/T3)
   → PRD.md (Spesifikasi "What & Why" — Track A Lite atau Track B Full Enterprise)
 
+[ARSITEKTUR: Threshold Gate]
+  → Apakah butuh modifikasi arsitektur besar / DB schema / dependensi baru / >3 modul?
+       ├─ YA  → RFC (Eksplorasi Opsi Teknis) → Review → ADR (Kunci di DECISIONS.md)
+       └─ TDK → Bypass Langsung ke Perencanaan
+
 [HILIR: Deterministic Execution]
-  → PLAN.md (Hyper-granular chunks, dibuat agent, pola Sliding Packet max 10 chunks aktif)
+  → PLAN.md (Traceability ID ke PRD-REQ, Sliding Packet max 10 chunks aktif)
   → Upfront Approval (Dev review & approve sekali di awal)
-  → Autonomous Batch Execution (Silent machine verification & commit per chunk)
-  → STOP TOTAL jika ada satu chunk gagal verifikasi / menyentuh area sensitif
-  → Strategic Checkpoints (Re-acknowledge aturan)
-  → Human Review Checkpoint (Sebelum merge/deploy)
+  → Autonomous Batch Execution (Surgical diff, YAGNI minimalism)
+  → Two-Tier QA Gate (Tier 1: Syntax/Tests Exit 0, Tier 2: Real-world Reality Audit)
+  → Atomic Local Checkpoint (Git commit + RAG Sync 50ms, Push remote ditahan)
 ```
 
-Pola ini menggantikan "approve tiap chunk satu-satu" — dipakai untuk eksekusi cepat chunk kecil dan berisiko rendah, dengan syarat pengaman (Hard Stop & Checkpoint) dijalankan ketat.
+Pola ini memisahkan secara tegas antara eksplorasi arsitektur, penguncian keputusan, dan eksekusi deterministik tanpa birokrasi berlebih.
 
 ---
 
@@ -33,10 +37,12 @@ Pola ini menggantikan "approve tiap chunk satu-satu" — dipakai untuk eksekusi 
 |---|---|---|
 | `questions.md` / Brief | Klarifikasi batas masalah, asumsi, dan Non-Goals (fase pra-PRD) | Dev / AI Agent |
 | `PRD.md` | Requirement level "what & why" (falsifiable spec, personas, metrics, non-goals) | Dev / PM / AI Agent |
-| `PLAN.md` | Breakdown teknis & task list, level "how" (hyper-granular chunks) | AI Agent, direview dev |
+| `RFC` (Opsional) | Eksplorasi opsi teknis, trade-offs, dan mitigasi risiko arsitektur | AI Agent / Architect |
+| `DECISIONS.md` (ADR) | Catatan keputusan arsitektur permanen (Architecture Decision Records) | Dev / AI Agent (Append-only) |
+| `PLAN.md` | Breakdown teknis level "how" dengan Traceability ID ke PRD (max 10 chunks aktif) | AI Agent, direview dev |
 | `AGENTS.md` | Aturan permanen alur kerja lokal | Dev, sekali dibuat per repo |
 | `GEMINI.md` | Identitas proyek & binding rules supreme | Dev / System |
-| `/src` (atau source code) | Kode aktual | AI Agent, hanya setelah plan di-approve |
+| `/src` (source code) | Kode aktual hasil mutasi bedah | AI Agent, hanya setelah plan di-approve |
 
 > **Catatan PRD Master**: Semua proyek baru atau existing yang belum memiliki PRD WAJIB dibuatkan PRD terlebih dahulu mengacu pada template `09-Panduan-Projek/PRD-MASTER-TEMPLATE.md` (Dual-Track: Track A Lite untuk task/fitur kecil, Track B Full Enterprise untuk sistem/SaaS).
 
@@ -50,33 +56,47 @@ Ketika menerima ide mentah, problem statement, atau permintaan fitur baru:
    - **T1 (Ringan/Utilitas/Surgical Fix)**: Perbaikan bug spesifik, skrip utilitas mandiri, atau penambahan komponen UI tunggal. Langsung gunakan *Track A (Lite PRD)* tanpa riset panjang.
    - **T2 (Menengah/Fitur Baru/SaaS MVP)**: Integrasi modul baru, perombakan alur data, atau fitur multi-halaman. Wajib melalui tahap klarifikasi tertulis dan riset kompetitor/API.
    - **T3 (Kompleks/Arsitektur/Regulated)**: Platform multi-tenant, e-commerce enterprise, sistem finansial/kripto, atau migrasi backend. Wajib riset mendalam, audit keamanan, dan *Track B (Full Enterprise PRD)*.
-2. **Klarifikasi Batasan & Non-Goals**:
+2. **Pre-Flight ADR Invariant Scan**:
+   - AI Agent WAJIB membaca 10 entri terakhir dari `DECISIONS.md` untuk memastikan solusi tidak melanggar hukum arsitektur yang sudah disepakati sebelumnya atau mengusulkan ulang ide yang pernah ditolak.
+3. **Klarifikasi Batasan & Non-Goals**:
    - Ajukan pertanyaan tajam yang menentukan arah arsitektur (Who, Pain Point, Constraints).
    - Kunci **Non-Goals** (apa yang secara sadar TIDAK akan dibangun pada iterasi ini) untuk mematikan scope creep sejak hulu.
-3. **Anti-Hallucination Entry Gate (Pre-PRD Invariant)**:
+4. **Anti-Hallucination Entry Gate (Pre-PRD Invariant)**:
    - AI Agent DILARANG merumuskan `PRD.md` jika problem statement masih abstrak (*unfalsifiable*) atau batas *Non-Goals* belum disepakati bersama manusia.
 
-### Tahap 1 — Baca PRD, Buat Hyper-Granular `PLAN.md` (Pola Sliding Packet)
-Ketika diberi `PRD.md` atau requirement baru:
-- Baca dan pahami seluruh isi PRD.
-- Tulis rencana teknis ke `PLAN.md`: breakdown task kecil, file target & lokasi eksplisit, urutan dependency, dan Definition of Done (DoD) per chunk.
-- **Pola Sliding Packet (Maksimal 10 Chunks Detail Aktif)**: Jika sebuah fase memiliki banyak chunk (misal 20–30), kelompokkan ke dalam paket-paket kerja (Paket 1: Chunks 1-10, Paket 2: Chunks 11-20, dst.). `PLAN.md` memuat roadmap outline seluruh paket, namun **hanya meng-expand detail spesifikasi DoD untuk maksimal 10 chunks pada paket yang sedang aktif**. Paket berikutnya di-expand setelah paket aktif tuntas.
+### Tahap 1 — RFC & ADR Threshold Gate (Arsitektur vs Bypass)
+Tidak semua tugas membutuhkan RFC. AI Agent mengevaluasi ambang batas secara deterministik:
+1. **Kondisi Wajib RFC & ADR (Pemicu Keputusan Arsitektur)**:
+   - Menambah dependensi / package pihak ketiga baru.
+   - Mengubah skema database (migration / perombakan tabel).
+   - Mengubah kontrak public API yang dikonsumsi oleh service atau client lain.
+   - Blast radius mutasi menyentuh > 3 modul independen sekaligus.
+   *Jika memenuhi kondisi di atas: Tulis dokumen RFC (pilihan opsi teknis & mitigasi risiko), diskusikan, lalu kunci opsi terpilih sebagai ADR di `DECISIONS.md`.*
+2. **Bypass RFC/ADR (Jalur Cepat)**:
+   - Jika perubahan tidak menyentuh 4 kondisi di atas (misal refactoring lokal, bugfix, styling, penambahan endpoint rutin), **Bypass RFC/ADR langsung ke Tahap 2**.
+
+### Tahap 2 — Buat Hyper-Granular `PLAN.md` (Traceability Link & Sliding Packet)
+Ketika menyusun rencana eksekusi:
+- **Mandatory Traceability Invariant**: Setiap task chunk di `PLAN.md` WAJIB menyertakan ID kriteria penerimaan dari PRD (misal `[Chunk 1] -> [PRD-REQ-01]`). Chunk tanpa mapping PRD otomatis DITOLAK karena terindikasi ngide liar/scope creep.
+- **Pola Sliding Packet (Maksimal 10 Chunks Detail Aktif)**: Jika fase memiliki banyak chunk (misal 20–30), kelompokkan ke dalam paket kerja. `PLAN.md` memuat roadmap outline seluruh paket, namun **hanya meng-expand detail spesifikasi DoD untuk maksimal 10 chunks pada paket yang sedang aktif**. Paket berikutnya di-expand setelah paket aktif tuntas.
 - **JANGAN menulis atau mengubah kode apa pun di tahap ini.**
 - Berhenti dan tunggu review dari dev.
 
-### Tahap 2 — Upfront Approval (Sekali di Awal)
+### Tahap 3 — Upfront Approval (Sekali di Awal)
 - Dev review `PLAN.md` secara keseluruhan.
 - Setelah dev beri approval *"plan oke, eksekusi semua"*, agent jalan sendiri mengeksekusi seluruh chunk **tanpa minta approve ulang tiap chunk**.
 - Syarat: Chunk sudah **hyper-granular** (kecil, scope sempit, DoD terukur).
 
-### Tahap 3 — Autonomous Batch Execution (Silent Verification)
-- Kerjakan chunk **berturut-turut** sesuai `PLAN.md`.
-- Tiap chunk selesai, jalankan test/lint/build **secara otomatis dan diam-diam** (silent verification).
+### Tahap 4 — Autonomous Batch Execution & Two-Tier QA Gate
+- Kerjakan chunk **berturut-turut** sesuai `PLAN.md` menggunakan mutasi bedah (`replace_file_content`).
+- Setiap chunk wajib lulus **Two-Tier Verification Gate**:
+  1. **Tier 1 (Syntax & Unit Test)**: Linter, typecheck (`tsc --noEmit`), dan test suite lulus dengan `exit code 0` (`tests_executed > 0`, `failures == 0`).
+  2. **Tier 2 (Production Reality Audit)**: Verifikasi kesesuaian parameter desimal/filter API eksternal, anti-deadlock timeout, dan integritas closed-state data.
 - **Commit per chunk** (`git commit`), pesan commit jelas menyebut chunk/task mana.
 
-### Tahap 3B — Aturan Berhenti Wajib (Hard Stop - Non-Negotiable)
+### Tahap 4B — Aturan Berhenti Wajib (Hard Stop - Non-Negotiable)
 Agent **WAJIB STOP TOTAL** (tidak lanjut ke chunk berikutnya) jika:
-1. Test, lint, atau build **gagal** di chunk mana pun.
+1. Test, lint, atau build **gagal** di chunk mana pun (Circuit Breaker: maksimal 3 kali self-healing).
 2. Chunk berikutnya menyentuh area sensitif: auth, payment, database migration, `.env`/secrets, CI-CD/deployment config.
 3. Chunk butuh keputusan/asumsi di luar yang tertulis di `PLAN.md`.
 4. Perilaku (behavior) tidak sesuai ekspektasi PRD meskipun test lulus.

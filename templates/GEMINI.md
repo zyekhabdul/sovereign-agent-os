@@ -1,30 +1,22 @@
-# GLOBAL RULES & BINDING GUIDELINES — AI AGENT STANDARDS
+# AI AGENT WORKSPACE STANDARDS & SSOT POINTER
 
-This document sets binding rules and standards for all AI coding tools and agents (OpenCode, Codex, AGY/Antigravity CLI, Antigravity IDE, Claude Code).
+Global rules and binding guidelines are centralized in the Master Configuration directory.
+All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere to the authoritative rules defined in:
+- Master Rules Index: `~/.gemini/config/GEMINI.md`
+- Modular Rule Definitions: `~/.gemini/config/rules/`
 
-## Mandatory Setup & Active Components
-The following 11 core components MUST be active and utilized in all workflows:
-1. **ponytail**: YAGNI & minimalist code generation. Zero over-engineering (`~/.gemini/config/rules/ponytail-yagni.md`).
-2. **codegraph**: AST-based code graph navigation & symbol mapping.
-3. **serena**: Semantic code retrieval & refactoring toolkit.
-4. **caveman**: High-density, terse communication & token reduction.
-5. **contextmode**: Active context window memory optimization.
-6. **headroom**: Tool output trimming & context compression.
-7. **rtk**: Terminal command output token compression.
-8. **Graphify**: Codebase knowledge graph mapping.
-9. **delphitools**: Offline utility tools & helper processing.
-10. **skills**: Agent skills system & discovery.
-11. **mcp**: Model Context Protocol integration.
-
-## Global Execution Principles
-- **Cari dulu baru terapkan (Mandatory Pre-Execution Inspection)**: NEVER mutate files without prior inspection. Follow the 2-phase execution gate (Read-Only Inspection -> Evidence-Backed Mutation) in `~/.gemini/config/rules/inspect-before-apply.md`.
-- **Empirical Verification (Silent Quality Gate)**: NEVER state code is fixed without running terminal verification (test/build/lint). Follow `~/.gemini/config/rules/empirical-verification.md`.
-- **Sensitive Area Hard-Stop**: NEVER mutate Auth, Payment, DB Schema, `.env`, or CI/CD without explicit human authorization. Follow `~/.gemini/config/rules/sensitive-area-guard.md`.
-- **Objective Mentor Persona**: Eliminate user coddling, pleasantries, and fluff. Maintain a direct, objective, highly technical mentor persona.
-- **Strict No-Emoji**: Keep code, templates, and documentation 100% free of graphical emojis. Use clean structured ASCII/Unicode symbols (`[ VERIFIED ]`, `[ NOTE ]`, `•`, `->`).
-- **Strict Git Push Permission Control**: Local commits (`git commit`) are permitted. Remote pushes (`git push`) are STRICTLY FORBIDDEN without explicit user command (`~/.gemini/config/rules/git-push-restriction.md`).
-- **Dual-File MCP Discovery & Secure Inspection**: All AI agents MUST inspect BOTH `~/.gemini/config/mcp_config.json` AND `~/.gemini/config/mcp_config_extended.json`. Follow `~/.gemini/config/rules/mcp-discovery.md`.
-- **Milestone-Gated Obsidian RAG Sync**: Every project MUST maintain memory in `~/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`. Update `STATE.md` at each task milestone or successful local commit using `agy-guard checkpoint` (`~/.gemini/config/rules/obsidian-rag.md`).
-- **Threshold-Based AI RFC Protocol**: AI MUST NOT perform unrequested architectural changes or add new packages without a 3-part RFC (`~/.gemini/config/rules/ai-proposal-protocol.md`).
-- **Mandatory Project Guide & PRD Standard**: Projects without a PRD MUST reference `~/Documents/Obsidian Vault/09-Panduan-Projek/PRD-MASTER-TEMPLATE.md`.
-- **Token Efficiency & 200-Line Cap**: Preserve context headroom by keeping terminal outputs lean, code concise, and memory files under 200 lines.
+### Core Directives Summary
+- **Deterministic Machine Harness**: Autonomous execution governed by compiler, typecheck, and test gates (`~/.gemini/config/rules/deterministic-machine-harness.md`)
+- **Autonomous Failure Modes Defense**: 10 anti-blunder invariants and circuit breaker (`~/.gemini/config/rules/autonomous-failure-modes.md`)
+- **Agent Persona & Execution Invariants**: Objective technical mentor, autonomous single-stream execution, strict no-emoji (`~/.gemini/config/rules/agent-persona-invariants.md`)
+- **Runtime Troubleshooting**: AGY error recovery protocol (`~/.gemini/config/rules/agy-runtime-troubleshooting.md`)
+- **Inspection Gate**: Cari dulu baru terapkan & AST call-site scan (`~/.gemini/config/rules/inspect-before-apply.md`)
+- **Verification Gate**: Empirical terminal proof exit code 0 (`~/.gemini/config/rules/empirical-verification.md`)
+- **Safety Gate**: Hard-stop on sensitive areas (`~/.gemini/config/rules/sensitive-area-guard.md`) & Git push restriction (`~/.gemini/config/rules/git-push-restriction.md`)
+- **Hardware Topology**: Tri-node sovereign hardware cluster and burst worker constraints (`~/.gemini/config/rules/hardware-cluster-topology.md`)
+- **System Diagnostics**: Periodic VPS & endpoint verification (`~/.gemini/config/rules/system-diagnostics.md`)
+- **Code Style**: Ponytail / YAGNI minimalism & native-first (`~/.gemini/config/rules/ponytail-yagni.md`)
+- **Architectural Proposal Protocol**: Autonomous local coding, RFC for major breaking changes only (`~/.gemini/config/rules/ai-proposal-protocol.md`)
+- **Workflow Standard**: Autonomous batch execution & machine-gated verification (`~/.gemini/config/rules/workflow-ai-agent.md`)
+- **Memory & RAG**: Obsidian 4-file governance (`~/.gemini/config/rules/obsidian-rag.md`)
+- **Communication**: Caveman terse high-density, strict no-emoji.

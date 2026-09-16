@@ -163,6 +163,11 @@ if [ "$DRY_RUN" = true ]; then
     echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITEA_URL\""
     echo "  git -C \"$REPO_PATH\" remote add gitea \"$GITEA_URL\""
   fi
+  CURRENT_BRANCH=$(git -C "$REPO_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+  if [ -n "$CURRENT_BRANCH" ] && [ "$CURRENT_BRANCH" != "HEAD" ]; then
+    echo "  git -C \"$REPO_PATH\" config branch.$CURRENT_BRANCH.remote github"
+    echo "  git -C \"$REPO_PATH\" config branch.$CURRENT_BRANCH.merge refs/heads/$CURRENT_BRANCH"
+  fi
   exit 0
 fi
 
@@ -199,6 +204,13 @@ if [ "$ENABLE_GITEA" = "true" ]; then
 fi
 
 git -C "$REPO_PATH" remote remove bitbucket 2>/dev/null || true
+
+# Ensure active branch tracks github for deterministic 'git pull' compliance
+CURRENT_BRANCH=$(git -C "$REPO_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ -n "$CURRENT_BRANCH" ] && [ "$CURRENT_BRANCH" != "HEAD" ]; then
+  git -C "$REPO_PATH" config "branch.$CURRENT_BRANCH.remote" "github"
+  git -C "$REPO_PATH" config "branch.$CURRENT_BRANCH.merge" "refs/heads/$CURRENT_BRANCH"
+fi
 
 echo "[ SUCCESS ] Remote 'all' successfully configured: ${PROFILE_DESC}!"
 echo "To push to active platforms simultaneously, run:"

@@ -114,6 +114,7 @@ EOF
 INSTALLED=0
 
 for repo in "${PROJECTS_DIR}"/*; do
+    [ -L "$repo" ] && continue
     if [ -d "${repo}/.git" ]; then
         HOOK_FILE="${repo}/.git/hooks/post-commit"
         echo "$HOOK_CONTENT" > "$HOOK_FILE"

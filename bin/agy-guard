@@ -27,6 +27,7 @@ RULE_FILES = [
     HOME / ".gemini" / "GEMINI.md",
     CONFIG_DIR / "GEMINI.md",
     HOME / ".agents" / "GEMINI.md",
+    HOME / "Projects" / "sovereign-agent-os" / "templates" / "GEMINI.md",
 ]
 
 RULE_DOCS = [

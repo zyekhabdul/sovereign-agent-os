@@ -28,24 +28,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# Create developer user
-RUN useradd -m -s /bin/bash fuckadmin && \
-    echo "fuckadmin ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Create developer user (configurable via build arg)
+ARG DEV_USER=developer
+ARG DEV_UID=1000
 
-USER fuckadmin
-WORKDIR /home/fuckadmin
+RUN useradd -m -s /bin/bash -u ${DEV_UID} ${DEV_USER} 2>/dev/null || useradd -m -s /bin/bash ${DEV_USER} && \
+    echo "${DEV_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER ${DEV_USER}
+WORKDIR /home/${DEV_USER}
 
 # Configure global npm prefix
-RUN mkdir -p /home/fuckadmin/.npm-global /home/fuckadmin/.local/bin /home/fuckadmin/Projects
-ENV PATH="/home/fuckadmin/.local/bin:/home/fuckadmin/.npm-global/bin:${PATH}"
-RUN npm config set prefix '/home/fuckadmin/.npm-global'
+RUN mkdir -p /home/${DEV_USER}/.npm-global /home/${DEV_USER}/.local/bin /home/${DEV_USER}/Projects
+ENV PATH="/home/${DEV_USER}/.local/bin:/home/${DEV_USER}/.npm-global/bin:${PATH}"
+RUN npm config set prefix "/home/${DEV_USER}/.npm-global"
 
 # Install universal AI & dev CLI packages
 RUN npm install -g @modelcontextprotocol/server-filesystem @modelcontextprotocol/server-postgres @amonstack/gitea-mcp || true
 
-COPY --chown=fuckadmin:fuckadmin . /home/fuckadmin/Projects/sovereign-agent-os
+COPY --chown=${DEV_USER}:${DEV_USER} . /home/${DEV_USER}/Projects/sovereign-agent-os
 
 # Auto-run bootstrap within container
-RUN cd /home/fuckadmin/Projects/sovereign-agent-os && bash scripts/bootstrap.sh --no-pkg
+RUN cd /home/${DEV_USER}/Projects/sovereign-agent-os && bash scripts/bootstrap.sh --no-pkg
 
 CMD ["/bin/bash"]

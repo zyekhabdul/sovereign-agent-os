@@ -19,7 +19,7 @@ echo "-> Checking Gate 1: 4-File Core Scaffolding..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
-    [[ "$ns" =~ ^(_|global|system|pgp|Projects|velora-account-backup) ]] && continue
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects) || "$ns" =~ (backup|archive) ]] && continue
     for file in "INDEX.md" "CONTEXT.md" "STATE.md" "DECISIONS.md"; do
         if [ ! -f "${dir}${file}" ]; then
             echo "[ ERROR ] [Gate 1] Missing ${file} in namespace: ${ns}"
@@ -33,7 +33,7 @@ echo "-> Checking Gate 2: Strict 4-File Whitelist (Zero Stale Dumps)..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
-    [[ "$ns" =~ ^(_|global|system|pgp|Projects|velora-account-backup|projects-audit) ]] && continue
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects|projects-audit) || "$ns" =~ (backup|archive) ]] && continue
     for f in "${dir}"*; do
         [ -e "$f" ] || continue
         fname=$(basename "$f")
@@ -73,7 +73,7 @@ echo "-> Checking Gate 6: Active Task Cap in STATE.md (Max 10 tasks)..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
-    [[ "$ns" =~ ^(_|global|system|pgp|Projects|velora-account-backup) ]] && continue
+    [[ "$ns" =~ ^(_|global|system|pgp|Projects) || "$ns" =~ (backup|archive) ]] && continue
     state_file="${dir}STATE.md"
     if [ -f "$state_file" ]; then
         tasks=$(awk '/## Active Milestone/{flag=1} /## Invariant/{flag=0} flag && /^- \[/ {print}' "$state_file" | wc -l)

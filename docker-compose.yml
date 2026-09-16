@@ -5,14 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DEV_USER: ${DEV_USER:-developer}
+        DEV_UID: ${DEV_UID:-1000}
     container_name: sovereign-agent-sandbox
     hostname: sovereign-box
     restart: unless-stopped
     volumes:
-      - ~/Projects:/home/fuckadmin/Projects
-      - ~/Documents/Obsidian Vault:/home/fuckadmin/Documents/Obsidian Vault
-      - ~/.ssh:/home/fuckadmin/.ssh:ro
+      - ~/Projects:/home/${DEV_USER:-developer}/Projects
+      - ~/Documents/Obsidian Vault:/home/${DEV_USER:-developer}/Documents/Obsidian Vault
+      - ~/.ssh:/home/${DEV_USER:-developer}/.ssh:ro
     environment:
-      - TZ=Asia/Jakarta
+      - TZ=${TZ:-UTC}
     stdin_open: true
     tty: true

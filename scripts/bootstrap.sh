@@ -53,12 +53,19 @@ echo "[ 3/3 ] Checking MCP server configurations..."
 mkdir -p "$HOME/.gemini/config"
 if [ ! -f "$HOME/.gemini/config/mcp_config.json" ]; then
   echo "Initializing ~/.gemini/config/mcp_config.json from template..."
-  sed "s|__HOME__|$HOME|g; s|/home/fuckadmin|$HOME|g" "$REPO_ROOT/templates/mcp/mcp_config.template.json" > "$HOME/.gemini/config/mcp_config.json" 2>/dev/null || true
+  sed "s|__HOME__|$HOME|g" "$REPO_ROOT/templates/mcp/mcp_config.template.json" > "$HOME/.gemini/config/mcp_config.json" 2>/dev/null || true
 fi
 
 if [ ! -f "$HOME/.gemini/config/mcp_config_extended.json" ]; then
   echo "Initializing ~/.gemini/config/mcp_config_extended.json from template..."
-  sed "s|__HOME__|$HOME|g; s|/home/fuckadmin|$HOME|g" "$REPO_ROOT/templates/mcp/mcp_config_extended.template.json" > "$HOME/.gemini/config/mcp_config_extended.json" 2>/dev/null || true
+  sed "s|__HOME__|$HOME|g" "$REPO_ROOT/templates/mcp/mcp_config_extended.template.json" > "$HOME/.gemini/config/mcp_config_extended.json" 2>/dev/null || true
+fi
+
+# 4. Secret Vault Notice
+if [ -f "$HOME/vault.kdbx" ] && command -v keepassxc-cli >/dev/null 2>&1; then
+  echo "[ NOTE ] Found KeePass vault at ~/vault.kdbx. Run './scripts/vault.sh kdbx-inject' to inject credentials."
+elif [ -f "$REPO_ROOT/vault.enc" ]; then
+  echo "[ NOTE ] Found encrypted vault.enc. Run './scripts/vault.sh unpack' to restore credentials."
 fi
 
 echo "======================================================"

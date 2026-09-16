@@ -52,3 +52,33 @@ To configure on any repo:
 bash scripts/setup-penta-push.sh /path/to/repo <repo-name>
 # or: bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
 ```
+
+---
+
+## 4. CREDENTIAL & SECRET MANAGEMENT PROTOCOL
+
+**Golden Law: ZERO Plaintext Secrets in Sovereign Git Tree.**
+
+All credentials, tokens, and keys must remain isolated outside version control using one of two sovereign methods:
+
+### Method A: KeePass KDBX Database (Recommended)
+- Store sensitive API keys (GitHub PAT, Tavily, Supabase, Postgres) in an encrypted KeePass database (`~/vault.kdbx`).
+- Inspect status:
+  ```bash
+  bash scripts/vault.sh kdbx-status [path/to/vault.kdbx]
+  ```
+- Inject tokens into active local MCP configs (`~/.gemini/config/mcp_config*.json`) and sync across all agent runtimes:
+  ```bash
+  bash scripts/vault.sh kdbx-inject [path/to/vault.kdbx]
+  ```
+
+### Method B: OpenSSL AES-256 Local Locker
+- Local encrypted credential bundle encrypted with master passphrase:
+  ```bash
+  # Backup local MCP configs into encrypted vault.enc:
+  bash scripts/vault.sh pack
+
+  # Restore credentials on a new device:
+  bash scripts/vault.sh unpack
+  ```
+

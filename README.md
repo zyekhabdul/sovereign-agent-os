@@ -49,7 +49,7 @@ sovereign-agent-os/
     ├── bootstrap.sh               # Complete Machine & Environment Bootstrap
     ├── sync-agents.sh             # Cross-Agent Parity Syncer (AGY, Claude, OpenCode, Codex)
     ├── vault.sh                   # Encrypted Credential Locker (AES-256-CBC)
-    ├── clone-velora.sh            # Instant Velora Workspace & Repo Manager
+    ├── clone-workspace.sh         # Universal Git Org/User Workspace & Repo Manager
     ├── install-mcps.sh            # Global MCP Server Installer
     ├── install-rag-hooks.sh       # Post-Commit Auto-Sync Hook Installer
     ├── rag-lint.sh                # Obsidian RAG Integrity Linter

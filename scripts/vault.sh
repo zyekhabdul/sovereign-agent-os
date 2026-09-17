@@ -56,6 +56,9 @@ if [ "$ACTION" == "unpack" ]; then
   if [ -f "$TMP_DIR/extracted/mcp_config_extended.json" ]; then
     cp -v "$TMP_DIR/extracted/mcp_config_extended.json" "$HOME/.gemini/config/"
   fi
+  if [ -f "$TMP_DIR/extracted/.gitconfig" ]; then
+    cp -v "$TMP_DIR/extracted/.gitconfig" "$HOME/.gitconfig"
+  fi
   
   # Trigger multi-agent sync
   if [ -f "$REPO_ROOT/scripts/sync-agents.sh" ]; then

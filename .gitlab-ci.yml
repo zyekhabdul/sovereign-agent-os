@@ -16,3 +16,5 @@ mirror_to_codeberg_and_github:
   script:
     - git remote add codeberg git@codeberg.org:aomiqaza/$CI_PROJECT_NAME.git || true
     - git push --force codeberg main:main || echo "Codeberg push completed"
+    - git remote add github git@github.com:zyekhabdul/$CI_PROJECT_NAME.git || true
+    - git push --force github main:main || echo "GitHub push completed"

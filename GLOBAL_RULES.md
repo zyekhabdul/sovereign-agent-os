@@ -13,6 +13,7 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **Inspection Gate**: Cari dulu baru terapkan & AST call-site scan (`~/.gemini/config/rules/inspect-before-apply.md`)
 - **Verification Gate**: Empirical terminal proof exit code 0 (`~/.gemini/config/rules/empirical-verification.md`)
 - **Safety Gate**: Hard-stop on sensitive areas (`~/.gemini/config/rules/sensitive-area-guard.md`) & Git push restriction (`~/.gemini/config/rules/git-push-restriction.md`)
+- **Hardware Topology**: Tri-node sovereign hardware cluster and burst worker constraints (`~/.gemini/config/rules/hardware-cluster-topology.md`)
 - **System Diagnostics**: Periodic VPS & endpoint verification (`~/.gemini/config/rules/system-diagnostics.md`)
 - **Code Style**: Ponytail / YAGNI minimalism & native-first (`~/.gemini/config/rules/ponytail-yagni.md`)
 - **Architectural Proposal Protocol**: Autonomous local coding, RFC for major breaking changes only (`~/.gemini/config/rules/ai-proposal-protocol.md`)

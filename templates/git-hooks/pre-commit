@@ -42,10 +42,25 @@ fi
 
 # 5. Check Required Files on projects in execution phase (PLAN.md present)
 if [ -f "PLAN.md" ]; then
-    REQUIRED_FILES=("PRD.md" "PLAN.md" "GEMINI.md" "CHANGELOG.md" "README.md")
+    IS_MAINTENANCE=0
+    if [ "${ALLOW_NO_PRD:-0}" = "1" ] || [ "${ALLOW_MAINTENANCE_TRACK:-0}" = "1" ]; then
+        IS_MAINTENANCE=1
+    elif grep -Eiq '(Track:[[:space:]]*(Maintenance|Bugfix|Chore|Refactor)|Maintenance Track|Bugfix Track|\[BUG-FIX|\[CHORE|\[REFACTOR)' "PLAN.md" 2>/dev/null; then
+        IS_MAINTENANCE=1
+    elif [ "$(git config --get sovereign.track 2>/dev/null || true)" = "maintenance" ]; then
+        IS_MAINTENANCE=1
+    fi
+
+    if [ "$IS_MAINTENANCE" -eq 1 ]; then
+        REQUIRED_FILES=("PLAN.md" "GEMINI.md" "README.md")
+    else
+        REQUIRED_FILES=("PRD.md" "PLAN.md" "GEMINI.md" "CHANGELOG.md" "README.md")
+    fi
+
     for f in "${REQUIRED_FILES[@]}"; do
         if [ ! -f "$f" ]; then
             echo "[ HARDBLOCK ] File standar proyek wajib ada saat fase eksekusi: $f" >&2
+            echo "Untuk proyek Maintenance/Bugfix/Tooling, cantumkan 'Track: Maintenance' di PLAN.md atau jalankan: ALLOW_NO_PRD=1 git commit" >&2
             exit 1
         fi
     done

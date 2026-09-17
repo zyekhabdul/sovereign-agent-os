@@ -17,6 +17,16 @@ Host gitlab.com
     User git
     IdentityFile ~/.ssh/id_ed25519
 
+Host gitea.com
+    HostName gitea.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
+Host bitbucket.org
+    HostName bitbucket.org
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
 # --- Remote Server / VPS Example ---
 # Host vps-main
 #     HostName 192.0.2.1

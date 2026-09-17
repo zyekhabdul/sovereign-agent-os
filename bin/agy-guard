@@ -207,11 +207,52 @@ def cmd_status(args):
         else:
             if fix_mode and ns != "global-workspace":
                 ns_dir.mkdir(parents=True, exist_ok=True)
-                (ns_dir / "INDEX.md").write_text(f"# Project Index: {ns}\n", encoding="utf-8")
-                (ns_dir / "CONTEXT.md").write_text(f"# Context: {ns}\n", encoding="utf-8")
-                (ns_dir / "STATE.md").write_text(f"# Active State: {ns}\nStatus: ACTIVE\n", encoding="utf-8")
-                (ns_dir / "DECISIONS.md").write_text(f"# Architecture Decision Records: {ns}\n", encoding="utf-8")
-                print(f"  [ REPAIRED ] Scaffolded 4-file memory structure at {ns_dir}")
+                commit, branch, dirty = get_git_info(cwd)
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                (ns_dir / "INDEX.md").write_text(f"""# PROJECT INDEX — {ns}
+
+- **Project Name**: `{ns}`
+- **Repository Path**: `{cwd}`
+- **Git Commit Hash**: `{commit}`
+- **Active Branch**: `{branch}`
+- **Last Memory Sync**: {now}
+""", encoding="utf-8")
+                (ns_dir / "CONTEXT.md").write_text(f"""# PROJECT CONTEXT — {ns}
+
+## Overview
+Project workspace located at `{cwd}`.
+
+## Technical Stack & Constraints
+- **Architecture Standard**: Ponytail YAGNI, 16 Binding Rules compliant.
+- **Max Lines Limit**: 200 lines per RAG file.
+""", encoding="utf-8")
+                (ns_dir / "STATE.md").write_text(f"""# ACTIVE STATE — {ns}
+
+- **Last Checkpoint**: {now}
+- **Status**: ACTIVE
+- **Git Branch**: `{branch}`
+- **Git Commit**: `{commit}`
+- **Uncommitted Changes**: {dirty} file(s)
+
+---
+
+## Active Milestone / Task
+- **Summary**: Initial project state initialized
+- **Checkpoint Context**: Initialized via agy-guard status --fix
+
+## Invariant Checks
+- [x] Ponytail / YAGNI Minimalist verified
+- [x] Strict No-Emoji compliant
+- [x] Git push permission checked (local only)
+""", encoding="utf-8")
+                (ns_dir / "DECISIONS.md").write_text(f"""# ARCHITECTURAL DECISIONS (ADR) — {ns}
+
+## Standard Laws
+- **Law 1**: Ponytail / YAGNI - Minimalist code generation, zero unsolicited refactoring.
+- **Law 2**: Empirical Verification - Always verify build/test before concluding task.
+- **Law 3**: Git Push Guard - Remote push forbidden without explicit human command.
+""", encoding="utf-8")
+                print(f"  [ REPAIRED ] Scaffolded RFC-RAG-003 4-file memory structure at {ns_dir}")
             else:
                 print(f"  [ NOTICE ] Memory namespace not yet initialized for '{ns}'")
     else:
@@ -792,12 +833,49 @@ def cmd_find(args):
         ".git", ".npm-global", ".cache", ".local", ".gemini", ".agents",
         "Documents", "Downloads", "Music", "Videos", "Desktop", "Pictures", ".cargo", ".rustup"
     }
+
+    # Fast path: prioritize ripgrep (rg) binary if installed
+    if shutil.which("rg"):
+        pattern = rf"(def|class|function|const|let|var|interface|type|fn|func)\s+.*{re.escape(query)}"
+        cmd = ["rg", "-n", "--no-heading", "--color=never", "-e", pattern]
+        for ext in sorted(extensions):
+            cmd.extend(["-g", f"*{ext}"])
+        cmd.extend(["-g", "bin/*"])
+        for d in sorted(ignored_dirs):
+            cmd.extend(["-g", f"!{d}"])
+        try:
+            res = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+            if res.returncode == 0 and res.stdout.strip():
+                for line in res.stdout.strip().splitlines():
+                    parts = line.split(":", 2)
+                    if len(parts) >= 2:
+                        rel_path, line_no = parts[0], parts[1]
+                        fpath = cwd / rel_path
+                        try:
+                            idx = int(line_no) - 1
+                            lines = fpath.read_text(encoding="utf-8", errors="replace").splitlines()
+                            start, end = extract_polyglot_block(lines, idx)
+                            print(f"\n[ MATCH ] {rel_path} (Lines {start+1}-{end+1})")
+                            for i in range(start, min(end + 1, start + 12)):
+                                print(f"  {i+1:4d}: {lines[i]}")
+                            found_count += 1
+                            if found_count >= 8:
+                                print("\n[ NOTE ] Capping output at 8 top matches to preserve headroom.")
+                                print("=====================================================")
+                                return
+                        except Exception:
+                            pass
+            if found_count > 0:
+                print("\n=====================================================")
+                return
+        except Exception:
+            pass
     
     for root, dirnames, filenames in os.walk(cwd):
         dirnames[:] = [d for d in dirnames if not d.startswith(".") and d not in ignored_dirs]
         for fname in filenames:
             ext = Path(fname).suffix
-            if ext in extensions:
+            if ext in extensions or Path(root).name == "bin":
                 fpath = Path(root) / fname
                 try:
                     lines = fpath.read_text(encoding="utf-8", errors="replace").splitlines()

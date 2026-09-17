@@ -70,7 +70,7 @@ EOF
     cat << EOF > "$MEMORY_DIR/DECISIONS.md"
 # DECISIONS.md — $NAMESPACE
 
-## ADR-001: Project Architecture Initialization
+## ADR-001: [ACTIVE] Project Architecture Initialization
 - **Date**: $(date +"%Y-%m-%d")
 - **Context**: Project namespace memory initialized.
 - **Decision**: Adhere to 4-file memory schema and strict namespace isolation.

@@ -28,7 +28,8 @@ report_err() {
 }
 
 # 1. Check Essential CLI Binaries
-echo "\n--- 1. Essential CLI Tools ---"
+echo ""
+echo "--- 1. Essential CLI Tools ---"
 for bin in git rg jq python3 node npm ssh; do
   if command -v "$bin" >/dev/null 2>&1; then
     report_ok "Command '$bin' is installed ($(command -v "$bin"))"
@@ -38,8 +39,9 @@ for bin in git rg jq python3 node npm ssh; do
 done
 
 # 2. Check Global Rules & Governance across Multi-Agent CLI
-echo "\n--- 2. AI Governance & Multi-Agent Rules ---"
-for rule_file in "$HOME/.gemini/GEMINI.md" "$HOME/.agents/GEMINI.md" "$HOME/.claude/CLAUDE.md" "$HOME/.opencode/OPENCODE.md"; do
+echo ""
+echo "--- 2. AI Governance & Multi-Agent Rules ---"
+for rule_file in "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" "$HOME/.claude/CLAUDE.md" "$HOME/.opencode/OPENCODE.md"; do
   if [ -f "$rule_file" ]; then
     report_ok "Agent rule file active: $rule_file"
   else
@@ -47,7 +49,23 @@ for rule_file in "$HOME/.gemini/GEMINI.md" "$HOME/.agents/GEMINI.md" "$HOME/.cla
   fi
 done
 
-for r in git-push-restriction.md obsidian-rag.md workflow-ai-agent.md ai-proposal-protocol.md mcp-discovery.md; do
+for r in \
+  agent-persona-invariants.md \
+  agy-runtime-troubleshooting.md \
+  ai-proposal-protocol.md \
+  autonomous-failure-modes.md \
+  deterministic-machine-harness.md \
+  empirical-verification.md \
+  environment-topology.md \
+  git-push-restriction.md \
+  hardware-cluster-topology.md \
+  inspect-before-apply.md \
+  mcp-discovery.md \
+  obsidian-rag.md \
+  ponytail-yagni.md \
+  sensitive-area-guard.md \
+  system-diagnostics.md \
+  workflow-ai-agent.md; do
   if [ -f "$HOME/.gemini/config/rules/$r" ]; then
     report_ok "Rule '$r' is active"
   else
@@ -56,7 +74,8 @@ for r in git-push-restriction.md obsidian-rag.md workflow-ai-agent.md ai-proposa
 done
 
 # 3. Check Obsidian RAG Memory Vault
-echo "\n--- 3. Obsidian RAG Memory Vault ---"
+echo ""
+echo "--- 3. Obsidian RAG Memory Vault ---"
 OBSIDIAN_DIR="${OBSIDIAN_VAULT_PATH:-$HOME/Documents/Obsidian Vault}"
 if [ -d "$OBSIDIAN_DIR/00-AGY-Memory" ]; then
   report_ok "Obsidian Vault RAG directory active at: $OBSIDIAN_DIR/00-AGY-Memory"
@@ -65,7 +84,8 @@ else
 fi
 
 # 4. Check Dual-File MCP Configurations & Multi-Agent JSONs
-echo "\n--- 4. Multi-Agent MCP Configuration ---"
+echo ""
+echo "--- 4. Multi-Agent MCP Configuration ---"
 for mcp_file in "$HOME/.gemini/config/mcp_config.json" "$HOME/.gemini/config/mcp_config_extended.json" "$HOME/.claude.json" "$HOME/.opencode/opencode.json"; do
   if [ -f "$mcp_file" ]; then
     if jq empty "$mcp_file" 2>/dev/null; then
@@ -79,7 +99,8 @@ for mcp_file in "$HOME/.gemini/config/mcp_config.json" "$HOME/.gemini/config/mcp
 done
 
 # 5. Check SSH Connectivity & Host Routing
-echo "\n--- 5. SSH Multi-Forge Connectivity ---"
+echo ""
+echo "--- 5. SSH Multi-Forge Connectivity ---"
 if [ -f "$HOME/.ssh/config" ]; then
   report_ok "SSH config exists at ~/.ssh/config"
 else

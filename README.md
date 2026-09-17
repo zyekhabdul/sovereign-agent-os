@@ -20,7 +20,7 @@ sovereign-agent-os/
 │   ├── WORKFLOW-AI-AGENT-STANDARD.md # 6-Phase AI Execution Workflow
 │   ├── USER-OPERATING-STANDARD.md # Human-AI Deterministic Interaction Standard
 │   └── PRD-MASTER-TEMPLATE.md     # Master PRD Blueprint
-├── rules/                         # 15 Modular Binding Directives
+├── rules/                         # 16 Modular Binding Directives
 │   ├── agent-persona-invariants.md # Cognitive Persona & Autonomous Single-Stream
 │   ├── agy-runtime-troubleshooting.md # AGY Error Recovery & Runtime Fixes
 │   ├── ai-proposal-protocol.md    # RFC Standard for Breaking Architectural Changes
@@ -29,6 +29,7 @@ sovereign-agent-os/
 │   ├── empirical-verification.md  # Terminal Verification & Zero-Test Trap Defense
 │   ├── environment-topology.md    # Dual-Mode Topology & Sovereign VPS Discipline
 │   ├── git-push-restriction.md    # Strict Remote Push Authorization
+│   ├── hardware-cluster-topology.md # Tri-Node Hardware Cluster Topology & Headless Constraints
 │   ├── inspect-before-apply.md    # Pre-Execution Inspection & AST Call-Site Scan
 │   ├── mcp-discovery.md           # Dual-File MCP Discovery Protocol
 │   ├── obsidian-rag.md            # 4-File Namespace Schema & RFC-RAG-003

@@ -5,7 +5,7 @@ set -euo pipefail
 # AI AGENT STANDARDS & GOVERNANCE — ONE-SHOT UNIVERSAL INSTALLER
 # ==============================================================================
 # This script configures any Linux/macOS machine to be 100% compliant with
-# the Sovereign AI Agent Governance Standard (agy-guard, 9 formal rules,
+# the Sovereign AI Agent Governance Standard (agy-guard, 16 formal rules,
 # Obsidian RAG, Git Push Interceptor, and Lean Skills Context).
 #
 # Usage:
@@ -39,8 +39,8 @@ mkdir -p "$HOME/Projects"
 mkdir -p "$HOME/Documents/Obsidian Vault/00-AGY-Memory"
 mkdir -p "$HOME/Documents/Obsidian Vault/09-Panduan-Projek"
 
-# 4. Deploy 15 Formal Rule Specifications, Guides & Helper Scripts
-echo "[ 3/7 ] Deploying 15 formal binding rule files, project guides & scripts..."
+# 4. Deploy 16 Formal Rule Specifications, Guides & Helper Scripts
+echo "[ 3/7 ] Deploying 16 formal binding rule files, project guides & scripts..."
 cp -v "$SCRIPT_DIR/rules/"*.md "$HOME/.gemini/config/rules/"
 cp -v "$SCRIPT_DIR/docs/"*.md "$HOME/Documents/Obsidian Vault/09-Panduan-Projek/"
 mkdir -p "$HOME/scripts"

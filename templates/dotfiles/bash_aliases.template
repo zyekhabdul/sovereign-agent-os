@@ -17,5 +17,5 @@ alias agy="agy --dangerously-skip-permissions"
 alias opencode="opencode"
 
 # Git Multi-Forge Push Alias
-alias pushall="git push all main"
-alias pushalltags="git push all --tags"
+alias pushall="ALLOW_GIT_PUSH=1 git push all main"
+alias pushalltags="ALLOW_GIT_PUSH=1 git push all --tags"

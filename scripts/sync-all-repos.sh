@@ -44,7 +44,7 @@ for repo in "$PROJECTS_DIR"/*; do
       if [ "$PUSH_MODE" = true ]; then
         BRANCH=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
         echo "Pushing $REPO_NAME ($BRANCH) to active platforms..."
-        git -C "$repo" push all "$BRANCH" || echo "[ WARN ] Push failed for $REPO_NAME"
+        ALLOW_GIT_PUSH=1 git -C "$repo" push all "$BRANCH" || echo "[ WARN ] Push failed for $REPO_NAME"
       fi
     fi
   fi

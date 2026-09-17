@@ -348,6 +348,15 @@ def cmd_checkpoint(args):
 - **Last Memory Sync**: {now}
 """
         index_file.write_text(index_content.strip() + "\n", encoding="utf-8")
+    else:
+        try:
+            old_idx = index_file.read_text(encoding="utf-8")
+            new_idx = re.sub(r"(- \*\*(?:Latest )?Git Commit Hash\*\*:\s*).*", rf"\g<1>`{commit}`", old_idx, flags=re.IGNORECASE)
+            new_idx = re.sub(r"(- \*\*Last Memory Sync\*\*:\s*).*", rf"\g<1>{now}", new_idx, flags=re.IGNORECASE)
+            if new_idx != old_idx:
+                index_file.write_text(new_idx, encoding="utf-8")
+        except Exception:
+            pass
 
     ctx_file = target_dir / "CONTEXT.md"
     if not ctx_file.exists():
@@ -357,7 +366,7 @@ def cmd_checkpoint(args):
 Project workspace located at `{cwd}`.
 
 ## Technical Stack & Constraints
-- **Architecture Standard**: Ponytail YAGNI, 15 Binding Rules compliant.
+- **Architecture Standard**: Ponytail YAGNI, 16 Binding Rules compliant.
 - **Max Lines Limit**: 200 lines per RAG file.
 """
         ctx_file.write_text(ctx_content.strip() + "\n", encoding="utf-8")
@@ -939,7 +948,7 @@ def cmd_scaffold_all_projects(args):
     
     for p in target_dir.iterdir():
         if p.is_dir() and not p.name.startswith("."):
-            ns = p.name.replace(".", "-")
+            ns = p.name
             ns_dir = MEMORY_DIR / ns
             ns_dir.mkdir(parents=True, exist_ok=True)
             
@@ -1061,6 +1070,8 @@ def cmd_verify(args):
         cmd = ["pytest"]
     elif "theme" in cwd.name.lower() or (cwd / "config.yml").exists() or (cwd / "sections").exists():
         cmd = ["shopify", "theme", "check"]
+    elif (cwd / "bin" / "agy-guard").exists() or list(cwd.glob("scripts/*.sh")) or list(cwd.glob("*.sh")):
+        cmd = ["bash", "-c", 'set -e; for f in $(find . -maxdepth 2 -type f -name "*.sh"); do bash -n "$f"; done; if [ -f bin/agy-guard ]; then python3 -m py_compile bin/agy-guard; fi; for f in $(find . -maxdepth 2 -type f -name "*.py" ! -path "*/__pycache__/*"); do python3 -m py_compile "$f"; done; echo "[ PASS ] Internal scripts & tooling syntax verified."']
         
     if not cmd:
         if (cwd / ".git").exists():

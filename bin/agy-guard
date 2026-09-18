@@ -12,6 +12,7 @@ import re
 import shutil
 import argparse
 import subprocess
+import time
 from pathlib import Path
 from datetime import datetime
 
@@ -1394,6 +1395,66 @@ def cmd_push(args):
         print(f"[ ERROR ] Failed to execute push: {e}")
         sys.exit(1)
 
+def cmd_commit(args):
+    """Executes deterministic agentic git commit without GPG deadlock."""
+    cwd = Path.cwd()
+    env = os.environ.copy()
+    
+    if getattr(args, "large", False):
+        env["ALLOW_LARGE_DIFF"] = "1"
+    if getattr(args, "allow_test", False):
+        env["ALLOW_TEST_MUTATION"] = "1"
+        
+    commit_cmd = ["git", "commit", "-m", args.msg]
+    
+    # By default, disable GPG signing for agentic autonomous commits to avoid passphrase hang
+    if not getattr(args, "gpg_sign", False):
+        commit_cmd.append("--no-gpg-sign")
+        
+    if args.git_args:
+        commit_cmd.extend(args.git_args)
+        
+    print(f"=== [ AGENTIC COMMIT: {' '.join(commit_cmd)} ] ===")
+    try:
+        res = subprocess.run(commit_cmd, cwd=cwd, env=env, text=True)
+        if res.returncode == 0:
+            print("[ SUCCESS ] Agentic commit created cleanly.")
+        else:
+            print(f"[ ERROR ] Git commit failed with exit code {res.returncode}")
+            sys.exit(res.returncode)
+    except Exception as e:
+        print(f"[ ERROR ] Failed to execute commit: {e}")
+        sys.exit(1)
+
+def cmd_tdd(args):
+    """Executes test harness loop for Agentic TDD (Track A)."""
+    cwd = Path.cwd()
+    test_cmd = args.command
+    print(f"=== [ AGENTIC TDD HARNESS: {test_cmd} ] ===")
+    start_time = time.time()
+    try:
+        res = subprocess.run(test_cmd, shell=True, cwd=cwd, text=True, capture_output=True)
+        duration = time.time() - start_time
+        stdout = res.stdout.strip()
+        stderr = res.stderr.strip()
+        
+        if res.returncode == 0:
+            print(f"[ PASS ] Harness verified in {duration:.2f}s (Exit code 0)")
+            if stdout:
+                lines = stdout.splitlines()
+                for line in lines[-10:]:
+                    print(f"  {line}")
+        else:
+            print(f"[ FAIL ] Harness failed in {duration:.2f}s (Exit code {res.returncode})")
+            err_output = stderr if stderr else stdout
+            lines = err_output.splitlines()
+            for line in lines[-15:]:
+                print(f"  [TRACE] {line}")
+            sys.exit(res.returncode)
+    except Exception as e:
+        print(f"[ ERROR ] Failed to execute TDD command: {e}")
+        sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(
         description="agy-guard v5.1: Deterministic Guardrails & Governance for AI Agents"
@@ -1424,6 +1485,20 @@ def main():
     sub_push = subparsers.add_parser("push", help="Execute safe human-authorized git push")
     sub_push.add_argument("git_args", nargs="*", help="Arguments to pass to git push")
     sub_push.set_defaults(func=cmd_push)
+    
+    # commit
+    sub_commit = subparsers.add_parser("commit", help="Execute safe agentic git commit without GPG deadlock")
+    sub_commit.add_argument("-m", "--msg", required=True, help="Commit message")
+    sub_commit.add_argument("--large", action="store_true", help="Allow large diff (>150 lines)")
+    sub_commit.add_argument("--allow-test", action="store_true", help="Allow test file modification")
+    sub_commit.add_argument("--gpg-sign", action="store_true", help="Enable GPG signing (requires interactive PIN prompt)")
+    sub_commit.add_argument("git_args", nargs="*", help="Additional arguments to pass to git commit")
+    sub_commit.set_defaults(func=cmd_commit)
+
+    # tdd
+    sub_tdd = subparsers.add_parser("tdd", help="Run test command as Agentic TDD harness (Track A)")
+    sub_tdd.add_argument("command", help="Test command to run (e.g. 'pytest', 'npm test')")
+    sub_tdd.set_defaults(func=cmd_tdd)
     
     # checkpoint
     sub_cp = subparsers.add_parser("checkpoint", help="Log deterministic state checkpoint to Obsidian RAG")

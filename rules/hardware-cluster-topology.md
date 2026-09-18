@@ -103,11 +103,11 @@ Cold Backup Storage Vault      -> thinkpad-arch      1TB SATA drive + Rclone mul
   - `thinkpad-arch` -> `servv`: Key `~/.ssh/id_ed25519_thinkpad_pass`.
 - **Key Backups**:
   - TUF's private & public keys are safely backed up on ThinkPad at:
-    [`/home/fuckadmin/.ssh/tuf_backup/id_ed25519_tuf_gaming`](file:///home/fuckadmin/.ssh/tuf_backup/id_ed25519_tuf_gaming)
+    `~/.ssh/tuf_backup/id_ed25519_tuf_gaming`
 - **AI Agent Identity on TUF**:
-  - `agy` version `1.1.27` is installed at `/home/aomiqaza/.local/bin/agy`.
+  - `agy` version `1.1.27` is installed at `~/.local/bin/agy`.
   - Active OAuth token and multi-account configurations are synced from ThinkPad master.
-  - 1.908 modular agent skills are synced to `/home/aomiqaza/.gemini/config/skills/`.
+  - 1.908 modular agent skills are synced to `~/.gemini/config/skills/`.
 
 ---
 

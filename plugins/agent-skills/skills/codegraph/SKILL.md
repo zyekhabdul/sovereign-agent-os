@@ -1,6 +1,6 @@
 ---
 name: codegraph
-description: "AST-based Code Knowledge Graph & Symbol Navigation skill. Provides structural graph mapping of functions, classes, interfaces, dependencies, and call chains for precise code navigation."
+description: "AST-based Code Knowledge Graph & Symbol Navigation skill. Use when mapping code structures, tracing caller-callee chains, and deterministically navigating cross-file dependencies."
 ---
 
 # CodeGraph — Deterministic Code Knowledge Graph

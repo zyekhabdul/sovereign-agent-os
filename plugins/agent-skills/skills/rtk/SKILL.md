@@ -1,6 +1,6 @@
 ---
 name: rtk
-description: "Terminal Command Output Proxy & Token Compression skill (RTK). Intercepts and filters noisy bash command outputs to save up to 90% of input tokens."
+description: "Terminal Command Output Proxy & Token Compression skill (RTK). Use when executing verbose CLI commands to strip terminal noise, ANSI codes, and compress tool outputs."
 ---
 
 # RTK — Runtime Terminal Token Compressor

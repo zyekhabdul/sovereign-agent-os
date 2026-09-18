@@ -1,6 +1,6 @@
 ---
 name: caveman
-description: "Terse, High-Density Output & Token Reduction skill. Strips conversational fluff, pleasantries, and verbose explanations. Delivers direct, high-signal technical answers with maximum token efficiency."
+description: "Terse, High-Density Output & Token Reduction skill. Use when generating responses to maximize token efficiency, strip conversational fluff, and deliver high-signal technical answers."
 ---
 
 # Caveman — High-Density Output & Token Reduction

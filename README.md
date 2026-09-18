@@ -41,7 +41,7 @@ sovereign-agent-os/
 │   └── agent-skills/              # Core Agent Skills, Checklists, & Commands
 ├── templates/
 │   ├── dotfiles/                  # SSH, Git, & Shell Aliases Templates
-│   ├── git-hooks/                 # Pre-commit Hook & Emoji Guard
+│   ├── git-hooks/                 # Pre-commit, Post-commit, & Pre-push Hooks
 │   ├── mcp/                       # Sanitized Zero-Secret MCP Templates
 │   └── rag/                       # ADR & Memory Schemas
 └── scripts/

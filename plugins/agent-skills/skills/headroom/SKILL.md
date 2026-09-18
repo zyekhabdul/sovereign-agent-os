@@ -1,6 +1,6 @@
 ---
 name: headroom
-description: "Tool Output Trimming & Context Compression skill. Collapses long terminal logs, tool payloads, and RAG chunks before model ingestion to save context headroom."
+description: "Tool Output Trimming & Context Compression skill. Use when processing verbose terminal logs, large test suites, or bulky command payloads to save context headroom."
 ---
 
 # Headroom — Tool Output Trimming & Context Compression

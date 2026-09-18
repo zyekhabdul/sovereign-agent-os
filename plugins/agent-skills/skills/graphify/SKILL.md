@@ -1,6 +1,6 @@
 ---
 name: graphify
-description: "Codebase & Artifact Knowledge Graph Mapping skill. Maps entire repositories, docs, and assets into queryable knowledge graphs using AST parsing."
+description: "Codebase & Artifact Knowledge Graph Mapping skill. Use when analyzing repositories, documentation, and data schemas into structural queryable knowledge graphs."
 ---
 
 # Graphify — Knowledge Graph Codebase Mapper

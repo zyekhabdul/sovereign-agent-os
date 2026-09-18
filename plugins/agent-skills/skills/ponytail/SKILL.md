@@ -1,6 +1,6 @@
 ---
 name: ponytail
-description: "Senior YAGNI & Minimalist Code Generation skill. Enforces the principle that the best code is the code you never wrote. Eliminates over-engineering, avoids bloat, prefers native platform features and standard libraries over unneeded third-party dependencies."
+description: "Senior YAGNI & Minimalist Code Generation skill. Use when authoring or reviewing code to eliminate over-engineering, prevent bloat, and prefer native standard libraries."
 ---
 
 # Ponytail — Minimalist & YAGNI Code Generation

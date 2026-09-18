@@ -414,8 +414,9 @@ function materializeWorkspace(ev) {
   execFileSync('git', ['config', 'core.autocrlf', 'false'], { cwd: workspace });
   execFileSync('git', ['config', 'user.name', 'Skill Eval'], { cwd: workspace });
   execFileSync('git', ['config', 'user.email', 'skill-eval@example.invalid'], { cwd: workspace });
+  execFileSync('git', ['config', 'commit.gpgsign', 'false'], { cwd: workspace });
   execFileSync('git', ['add', '--all'], { cwd: workspace });
-  execFileSync('git', ['commit', '--quiet', '-m', 'fixture baseline'], { cwd: workspace });
+  execFileSync('git', ['commit', '--quiet', '--no-gpg-sign', '-m', 'fixture baseline'], { cwd: workspace });
   for (const workingTreePatch of workingTreePatches) {
     execFileSync('git', ['apply', '--whitespace=nowarn', '-'], {
       cwd: workspace,

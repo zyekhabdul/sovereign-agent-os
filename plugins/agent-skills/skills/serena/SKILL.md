@@ -1,6 +1,6 @@
 ---
 name: serena
-description: "Semantic Code Retrieval, Refactoring & Symbol Navigation skill. Enables IDE-grade symbol resolution, refactoring, atomic symbol editing, and semantic code search."
+description: "Semantic Code Retrieval, Refactoring & Symbol Navigation skill. Use when performing IDE-grade symbol resolution, atomic refactoring, and multi-file code search."
 ---
 
 # Serena — Semantic Code Retrieval & Refactoring Toolkit

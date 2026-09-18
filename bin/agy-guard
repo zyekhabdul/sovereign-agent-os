@@ -1167,7 +1167,7 @@ def cmd_verify(args):
     elif "theme" in cwd.name.lower() or (cwd / "config.yml").exists() or (cwd / "sections").exists():
         cmd = ["shopify", "theme", "check"]
     elif (cwd / "bin" / "agy-guard").exists() or list(cwd.glob("scripts/*.sh")) or list(cwd.glob("*.sh")):
-        cmd = ["bash", "-c", 'set -e; for f in $(find . -maxdepth 2 -type f -name "*.sh"); do bash -n "$f"; done; if [ -f bin/agy-guard ]; then python3 -m py_compile bin/agy-guard; fi; for f in $(find . -maxdepth 2 -type f -name "*.py" ! -path "*/__pycache__/*"); do python3 -m py_compile "$f"; done; echo "[ PASS ] Internal scripts & tooling syntax verified."']
+        cmd = ["bash", "-c", 'set -e; for f in $(find . -maxdepth 2 -type f -name "*.sh"); do bash -n "$f"; done; if [ -f bin/agy-guard ]; then python3 -m py_compile bin/agy-guard; fi; for f in $(find . -maxdepth 2 -type f -name "*.py" ! -path "*/__pycache__/*"); do python3 -m py_compile "$f"; done; if [ -f plugins/agent-skills/scripts/validate-skills.js ]; then node plugins/agent-skills/scripts/validate-skills.js >/dev/null && node plugins/agent-skills/scripts/validate-commands.js >/dev/null; fi; echo "[ PASS ] Internal scripts & tooling syntax verified."']
         
     if not cmd:
         if (cwd / ".git").exists():

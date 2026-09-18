@@ -57,6 +57,15 @@ const REQUIRED_SECTIONS = [
 const SECTION_EXEMPT_SKILLS = {
   'using-agent-skills': 'Meta-skill — orchestrates other skills; When-to-Use and Verification are not applicable to a routing document.',
   'idea-refine':        'Legacy structure predating skill-anatomy.md — uses How-It-Works/Usage/Anti-patterns instead of standard headings. Tracked for conformance in https://github.com/addyosmani/agent-skills/issues',
+  'caveman':            'Sovereign concise behavioral directive for high-density token reduction.',
+  'codegraph':          'Sovereign AST knowledge graph specification for code navigation.',
+  'contextmode':        'Sovereign context window memory management and token budget optimizer.',
+  'delphitools':        'Sovereign offline data transformation and local developer toolkit.',
+  'graphify':           'Sovereign knowledge graph mapper for repositories and architectural ASTs.',
+  'headroom':           'Sovereign terminal output trimmer and context headroom preserver.',
+  'ponytail':           'Sovereign coding standard enforcing minimalist YAGNI code generation.',
+  'rtk':                'Sovereign terminal token compressor and noise filter proxy.',
+  'serena':             'Sovereign semantic refactoring and symbol resolution engine.',
 };
 
 // Regex patterns that indicate an explicit cross-skill reference.

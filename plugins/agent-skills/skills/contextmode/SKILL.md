@@ -1,6 +1,6 @@
 ---
 name: contextmode
-description: "Context Window Management & Memory Optimization skill. Optimizes token budgets, prunes stale/redundant history, and prevents context window saturation."
+description: "Context Window Management & Memory Optimization skill. Use when managing session history to optimize token budgets, prune redundant traces, and prevent context saturation."
 ---
 
 # ContextMode — Context Window Management & Optimization

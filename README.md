@@ -16,8 +16,8 @@ sovereign-agent-os/
 ├── .github/workflows/             # Server-Side Tri-Forge Mirroring (GitHub -> GitLab + Codeberg)
 ├── .gitlab-ci.yml                 # GitLab CI Mirroring Pipeline
 ├── docs/                          # Master Tata Kelola Proyek
-│   ├── GLOBAL-PROJECT-STANDARD.md # 7 Inti + 2 Wajib File Standards
-│   ├── WORKFLOW-AI-AGENT-STANDARD.md # 6-Phase AI Execution Workflow
+│   ├── GLOBAL-PROJECT-STANDARD.md # Universal Minimal + Conditional Spec File Standards
+│   ├── WORKFLOW-AI-AGENT-STANDARD.md # Dual-Track Agentic Engineering & Verification Harness
 │   ├── USER-OPERATING-STANDARD.md # Human-AI Deterministic Interaction Standard
 │   └── PRD-MASTER-TEMPLATE.md     # Master PRD Blueprint
 ├── rules/                         # 16 Modular Binding Directives
@@ -36,7 +36,7 @@ sovereign-agent-os/
 │   ├── ponytail-yagni.md          # Minimalist Code Generation & Zero Bloat
 │   ├── sensitive-area-guard.md    # Hard-Stop on Sensitive Surfaces
 │   ├── system-diagnostics.md      # OS Diagnostics & Resource Invariants
-│   └── workflow-ai-agent.md       # 5-Stage Autonomous Machine-Gated Workflow
+│   └── workflow-ai-agent.md       # Modern Dual-Track Agentic Workflow & Machine Gate
 ├── plugins/
 │   └── agent-skills/              # Core Agent Skills, Checklists, & Commands
 ├── templates/

@@ -30,19 +30,20 @@ jobs:
       - name: Push to GitLab
         run: |
           git remote add gitlab git@gitlab.com:aomiqaza/${{ github.event.repository.name }}.git || true
-          git push --force gitlab main:main || echo "GitLab mirror failed or up-to-date"
+          git push --force gitlab "refs/heads/*:refs/heads/*" --tags || echo "GitLab mirror failed or up-to-date"
 
       - name: Push to Codeberg
         run: |
           git remote add codeberg git@codeberg.org:aomiqaza/${{ github.event.repository.name }}.git || true
-          git push --force codeberg main:main || echo "Codeberg mirror failed or up-to-date"
+          git push --force codeberg "refs/heads/*:refs/heads/*" --tags || echo "Codeberg mirror failed or up-to-date"
 
       - name: Push to Gitea
         run: |
           git remote add gitea git@gitea.com:aomiqaza/${{ github.event.repository.name }}.git || true
-          git push --force gitea main:main || echo "Gitea mirror failed or up-to-date"
+          git push --force gitea "refs/heads/*:refs/heads/*" --tags || echo "Gitea mirror failed or up-to-date"
 
       - name: Push to Bitbucket
         run: |
           git remote add bitbucket git@bitbucket.org:aomiqaza/${{ github.event.repository.name }}.git || true
-          git push --force bitbucket main:main || echo "Bitbucket mirror failed or up-to-date"
+          git push --force bitbucket "refs/heads/*:refs/heads/*" --tags || echo "Bitbucket mirror failed or up-to-date"
+

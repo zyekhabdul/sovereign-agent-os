@@ -38,11 +38,11 @@ Sistem tata kelola AI (16 binding rules, `agy-guard`, pre-commit hook) mengunci 
 - **Terlarang**: *"Benerin error yang tadi muncul."* atau *"Coba refactor bagian yang lemot."*
 - **Benar**: *"Periksa kegagalan fungsi `TokenValidator` di `src/middleware/auth.ts:45`. Error log: `TokenExpiredError: jwt expired`."*
 
-### Hukum 4: Inspection Before Approval (Inspeksi Sebelum Melanjutkan)
+### Hukum 4: Verification Before Approval (Review Diff & Machine Proof)
 - **Aturan**: Dilarang mengetik *"lanjut"*, *"oke"*, *"gas"* tanpa memvalidasi 3 indikator empiris:
-  1. Apakah pengujian berhasil dengan kode keluar 0 (`exit code 0`)?
-  2. Apakah berkas yang dimodifikasi sesuai scope (`git status --short`)?
-  3. Apakah task checklist aktif di `STATE.md` tidak melebihi 10 item?
+  1. Apakah pengujian berhasil dengan kode keluar 0 (`exit code 0`) pada test suite non-kosong?
+  2. Apakah berkas yang dimodifikasi sesuai scope (`git status --short` atau `git diff`)?
+  3. Apakah AI tidak mengubah file tes eksisting untuk memaksakan lolos palsu?
 - Jika agen melaporkan hasil tanpa menyertakan bukti terminal: Pengguna wajib menolak dan meminta verifikasi empiris.
 
 ### Hukum 5: Explicit Mutation & Push Flagging (Protokol Izin Eksplisit)

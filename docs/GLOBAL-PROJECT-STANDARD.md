@@ -22,31 +22,27 @@ Sebelum menulis referensi path di `PLAN.md`, `AGENTS.md`, atau `GEMINI.md` manap
 
 ## 2. Daftar File Standar per Repositori Lokal (Klasifikasi Wajib vs Kondisional)
 
-Untuk mencegah pemaksaan file yang tidak relevan ("ngide liar"), file repositori distandarkan dengan batas kebutuhan nyata:
-
 ### A. File Wajib Universal (Semua Repositori)
 | Nama File | Fungsi | Wajib Untuk |
 |---|---|---|
 | `README.md` | Entry point manusia: deskripsi proyek, cara install/run, tech stack ringkas | Semua proyek |
 | `.env.example` | Template variabel lingkungan tanpa secret asli | Semua proyek yang menggunakan env |
 
-### B. File Wajib Proyek Terstruktur / Feature Track (Saat Ada PRD & Eksekusi PLAN)
+### B. File Wajib Universal Pengembangan AI
 | Nama File | Fungsi | Wajib Untuk |
 |---|---|---|
-| `PRD.md` | Requirement level "what & why" dan batasan Non-Goals | Proyek berbasis fitur/SaaS/aplikasi |
-| `PLAN.md` | Rencana kerja teknis bertahap dengan DoD terukur (fase eksekusi) | Proyek dengan PRD aktif |
-| `GEMINI.md` | Identitas proyek & binding rules supreme lokal | Proyek yang dikerjakan AI agent |
-| `CHANGELOG.md` | Riwayat rilis perubahan user-facing (format standar) | Proyek dengan rilis/milestone |
+| `AGENTS.md` / `GEMINI.md` | Single Root Instruction SSOT: build, test, lint commands, invariants, rules (<150 baris) | Semua repositori |
+| Test Suite (`tests/`, `*_test.*`) | Kontrak kebenaran empiris (Harness mesin) | Semua repositori dengan logika bisnis |
 
-### C. File Kondisional & Opsional (Sesuai Kebutuhan Nyata)
+### C. File Kondisional & Spesifikasi Khusus
 | Nama File | Fungsi | Status |
 |---|---|---|
-| `DESIGN_SYSTEM.md` | Token warna, tipografi, komponen UI, rules styling | **Kondisional**: Wajib untuk Frontend/UI/Theme (N/A untuk Backend/CLI/Service) |
-| `DEPLOYMENT.md` | Cara deploy, environment staging/production, rollback procedure | **Kondisional**: Wajib untuk proyek production/staging |
-| `AGENTS.md` | Aturan alur kerja spesifik lokal di luar standar global | **Opsional**: Hanya jika repo butuh aturan agen khusus tingkat lokal |
-| `DEVELOPMENT.md` | Catatan naratif kerja manusia & handoff manual developer | **Opsional**: Dev log manual developer manusia |
-| `DEVELOPMENT-ARCHIVE.md` | Arsip task lama dari `DEVELOPMENT.md` | Proyek berjalan lama jika `DEVELOPMENT.md` melebihi batas |
-| `CHANGELOG-ARCHIVE.md` | Arsip entri lama dari `CHANGELOG.md` | Proyek berjalan lama jika `CHANGELOG.md` melebihi batas |
+| `SPEC.md` / `PRD.md` | Spesifikasi "what & why", skema tipe, dan Non-Goals | **Kondisional**: Hanya untuk Track B (Arsitektur/Modul Baru/SaaS) |
+| `PLAN.md` | Checklist batch kerja terisolasi (maksimal 10 chunk aktif) | **Kondisional**: Hanya untuk Track B multi-step |
+| `DESIGN_SYSTEM.md` | Token warna, tipografi, komponen UI, rules styling | **Kondisional**: Wajib untuk Frontend/UI/Theme |
+| `DEPLOYMENT.md` | Cara deploy, staging/production, rollback procedure | **Kondisional**: Wajib untuk proyek production |
+| `CHANGELOG.md` | Riwayat rilis perubahan user-facing | **Kondisional**: Proyek dengan milestone rilis |
+| `DEVELOPMENT.md` | Catatan naratif kerja manusia & handoff manual | **Opsional**: Dev log manual developer |
 
 ---
 

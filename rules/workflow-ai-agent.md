@@ -1,68 +1,63 @@
 ---
 trigger: always_on
-description: Autonomous Batch Execution & Deterministic Machine-Gated Verification Workflow
+description: Modern Agentic Engineering & Dual-Track Verification Harness Workflow
 ---
 
 # MANDATORY GLOBAL RULE: AUTONOMOUS WORKFLOW & MACHINE-GATED VERIFICATION
 
-All AI coding tools and agents (AGY Antigravity CLI, Antigravity IDE, Claude Code, Cursor, Codex, OpenCode) MUST adhere to the following Autonomous Execution Standard:
+All AI coding tools and agents (AGY Antigravity CLI, Antigravity IDE, Claude Code, Cursor, Codex, OpenCode) MUST adhere to the following Dual-Track Autonomous Execution Standard:
 
 ```
-Ide / Request → PRD / Non-Goals → [RFC/ADR Threshold Gate] → Traceable PLAN.md (Max 10) → Two-Tier Machine Gate → Atomic Local Commit
+[Track A: Fast-Track / Agentic TDD (80%)]
+  Prompt/Issue → Inspect AST/Grep → Red (Test/Harness) → Green (Minimal Edit) → Machine Gate (Exit 0) → Local Commit → Dev Reviews Diff
+
+[Track B: Spec-Driven Development (20%)]
+  Complex Request → Pre-Flight ADR Scan → SPEC.md (Types/Invariants) → [RFC/ADR Gate] → Sliding PLAN.md (Max 10) → Two-Tier Gate → PR Review
 ```
 
 ---
 
-## 1. SIX-STAGE AUTONOMOUS EXECUTION LIFECYCLE
+## 1. DUAL-TRACK EXECUTION LIFECYCLE
 
-### Stage 0: Pre-Flight ADR Scan & Traceability Setup
-- Scan the last 10 entries of project ADRs (`00-AGY-Memory/<project-namespace>/DECISIONS.md`) to prevent violating existing architectural laws.
-- **Traceability Link Mandate**:
-  - **Feature Track (with PRD)**: Every planned chunk MUST link to a specific PRD acceptance criterion ID (e.g. `[Chunk 1] -> [PRD-REQ-01]`).
-  - **Maintenance / Bugfix Track (ad-hoc / non-PRD task)**: Chunks link to user prompt criteria or defect ID (e.g. `[Chunk 1] -> [BUG-FIX-01]`, `[CHORE-01]`, `[REFACTOR-01]`). Never generate unrequested PRD files for routine bugfixes or chores.
-  - Unmapped chunks outside the task boundary are strictly rejected as scope creep.
+### Track A: Fast-Track / Agentic TDD (Default 80%)
+Applies to: Bug fixes, localized features, chores, refactoring, performance improvements, and single components.
+1. **Inspection**: Scan target files and call-sites via AST or grep (`inspect-before-apply.md`).
+2. **Test/Harness First (Red)**: Write a failing reproduction test or ensure targeted test coverage exists.
+3. **Surgical Implementation (Green)**: Implement minimal, clean code (*Ponytail / YAGNI*).
+4. **Machine Verification Gate**: Compiler, linter, and test runner MUST exit code 0 (`tests_executed > 0`, `failures == 0`).
+5. **Atomic Checkpoint & Review**: Commit locally; human reviews the change via `git diff` / PR.
+*Strict Invariant: Zero PRD or multi-chunk PLAN overhead for Track A tasks.*
 
-### Stage 1: Pre-Scan & Grounding (Inspect Before Apply)
-- Read target files and scan global call-sites/references via AST or grep (`inspect-before-apply.md`).
-- Identify blast radius across consumers before making changes.
-
-### Stage 2: Autonomous Implementation (Ponytail / YAGNI)
-- Write minimal, idiomatic, and clean code to satisfy the goal (`ponytail-yagni.md`).
-- Zero unsolicited bloat, zero unneeded wrappers, zero dead code.
-
-### Stage 3: Two-Tier Machine Verification Gate
-- Run terminal verification suites (`tsc --noEmit`, `pytest`, `cargo check`, `npm test`, `shopify theme check`).
-- **Tier 1 (Syntax & Unit Tests)**: Exit code 0 with zero compiler/test errors (`tests_executed > 0`, `failures == 0`).
-- **Tier 2 (Production Execution Audit)**: Audit parameter precision (`stepSize`, `tickSize`), time-stops/timeouts, and unclosed states.
-- **Self-Healing Loop**: If verification fails, parse stack trace and auto-repair (Max 3 iterations before circuit breaker trips).
-
-### Stage 4: Atomic Local Git Checkpoint
-- Commit changes to local feature branch with terse, structured commit messages (`git-push-restriction.md`).
-
-### Stage 5: Proof-Based Final Reporting
-- Report task completion to user with empirical terminal proof (`[ VERIFIED ]`, test pass counts, zero error status).
+### Track B: Spec-Driven Development / SDD (Complex 20%)
+Applies to: New system architectures, database migrations, public API changes, or blast radius > 3 modules.
+1. **Pre-Flight ADR Scan**: Scan the last 10 ADRs (`00-AGY-Memory/<ns>/DECISIONS.md`).
+2. **Lightweight SPEC.md**: Define data contracts, typed schemas, behavioral invariants, and explicit Non-Goals.
+3. **RFC / ADR Threshold Gate**: Mandatory RFC only if introducing new third-party dependencies, breaking API contracts, or altering database schemas.
+4. **Sliding Packet PLAN.md**: Expand granular DoD for a maximum of 10 chunks at any time.
+5. **Two-Tier Verification Gate**:
+   - **Tier 1 (Syntax & Tests)**: Exit code 0 on compiler, linter, and test suite.
+   - **Tier 2 (Production Reality Audit)**: Decimal precision (`stepSize`, `tickSize`), timeout guards, settled-state integrity.
 
 ---
 
 ## 2. STRATEGIC HARD-STOP CHECKPOINTS
 Pause execution and solicit human confirmation ONLY at:
-1. Irreversible destructive database operations.
-2. Remote `git push` operations.
+1. Irreversible destructive database operations (Drop/Truncate).
+2. Remote `git push` operations (`git-push-restriction.md`).
 3. Production server deployments.
 4. Circuit breaker trip (after 3 failed self-healing attempts).
+
 ---
 
 ## 3. SLIDING PACKET WINDOW & EPHEMERAL PLAN INVARIANT
 1. **10-Chunk Active Packet Invariant**:
-   - `PLAN.md` may contain a high-level roadmap outline of all phase packets, but MUST ONLY expand granular step-by-step DoD for a maximum of 10 chunks (1 active work packet) at any time.
-   - Future chunks remain in the roadmap outline; they are expanded only when the active packet is completed.
+   - For Track B, `PLAN.md` may outline future milestones, but MUST ONLY expand granular DoD for a maximum of 10 chunks (1 active work packet) at any time.
 2. **Ephemeral Single-Plan Invariant**:
-   - Exactly ONE `PLAN.md` file is allowed in the local repository root.
-   - Creating ad-hoc execution dump files (`PLAN-part2.md`, `Session-XX.md`, `task-detail.md`, `scratch-plan.md`) is strictly forbidden.
-   - Once an active packet of 10 chunks is verified (exit code 0) and committed, the detail section of `PLAN.md` is overwritten with the next packet.
+   - Exactly ONE `PLAN.md` file is allowed in the repository root. Ad-hoc split plan files are strictly forbidden.
+   - Once an active packet is verified (exit code 0) and committed, the active packet is marked complete or overwritten with the next packet.
 
 ---
 
-## 4. PRD-TO-PLAN TRACEABILITY & THRESHOLD GATE
-1. **Traceability Invariant**: Actionable task chunks in `PLAN.md` must cite an explicit acceptance criterion from `PRD.md` (`[PRD-REQ-XX]`) on Feature Track, or user-prompt/defect criteria (`[BUG-FIX-XX]`, `[CHORE-XX]`) on Maintenance Track. Unmapped chunks outside the task boundary are rejected immediately.
-2. **RFC/ADR Threshold Gate**: RFC is strictly bypassed for routine work. RFC is triggered ONLY when touching new dependencies, DB schemas, breaking public API contracts, or >3 modules blast radius.
+## 4. RFC/ADR THRESHOLD GATE
+- RFC is strictly bypassed for routine work and Track A tasks.
+- RFC is triggered ONLY when touching new dependencies, DB schemas, breaking public API contracts, or >3 modules blast radius.

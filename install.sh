@@ -24,7 +24,7 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# 2. Install agy-guard CLI Tool (v5.0)
+# 2. Install agy-guard CLI Tool (v5.1)
 echo "[ 1/7 ] Installing agy-guard CLI to ~/.local/bin/agy-guard..."
 cp "$SCRIPT_DIR/bin/agy-guard" "$HOME/.local/bin/agy-guard"
 chmod +x "$HOME/.local/bin/agy-guard"
@@ -54,12 +54,10 @@ cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/config/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.agents/GEMINI.md"
 
-# Adapt absolute paths to current user home directory if different
-if [ "$HOME" != "/home/fuckadmin" ]; then
-    echo "  -> Normalizing absolute paths for local host environment ($HOME)..."
-    find "$HOME/.gemini/config/rules" -type f -name "*.md" -exec sed -i "s|/home/fuckadmin|$HOME|g" {} + 2>/dev/null || true
-    sed -i "s|/home/fuckadmin|$HOME|g" "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" 2>/dev/null || true
-fi
+# Adapt absolute paths to current user home directory dynamically
+echo "  -> Normalizing absolute paths for local host environment ($HOME)..."
+find "$HOME/.gemini/config/rules" -type f -name "*.md" -exec sed -i -E "s|/home/(fuckadmin|aomiqaza)|$HOME|g" {} + 2>/dev/null || true
+sed -i -E "s|/home/(fuckadmin|aomiqaza)|$HOME|g" "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" 2>/dev/null || true
 
 # Cross-agent configuration parity (Claude Code, OpenCode, Codex)
 bash "$SCRIPT_DIR/scripts/sync-agents.sh" || true

@@ -1,6 +1,6 @@
 # SOVEREIGN AGENT OS (`sovereign-agent-os`)
 > **The Sovereign Multi-Agent & Developer Runtime Environment**  
-> *Universal Bootstrap, Cross-Agent Parity (AGY, Claude Code, OpenCode, Codex), 11 Core Components, Tri-Forge Mirroring, & Encrypted Secret Vault.*
+> *Universal Bootstrap, Cross-Agent Parity (AGY, Claude Code, OpenCode, Codex), 16 Core Components, Multi-Forge Mirroring, & Encrypted Secret Vault.*
 
 ---
 
@@ -9,7 +9,7 @@
 ```
 sovereign-agent-os/
 ├── AI_BOOTSTRAP_GUIDE.md          # Autonomous Onboarding Guide for AI Agents
-├── GLOBAL_RULES.md                # 11 Core Components & Binding Governance Rules
+├── GLOBAL_RULES.md                # 16 Core Components & Binding Governance Rules
 ├── Dockerfile                     # Universal Containerized Linux Sandbox
 ├── docker-compose.yml             # Sandbox Compose Service Definition
 ├── .devcontainer/                 # VS Code & Cursor Devcontainer Integration
@@ -56,7 +56,7 @@ sovereign-agent-os/
     ├── setup-rag.sh               # 4-File Obsidian Memory Scaffolder
     ├── setup-tri-push.sh          # Git Multi-Push Remote Setup (3 Platforms)
     ├── sync-all-repos.sh          # Batch Git Multi-Push Mirroring
-    └── verify-env.sh              # 17-Point Host Health Diagnostic
+    └── verify-env.sh              # 35-Point Host Health Diagnostic
 ```
 
 ---
@@ -92,11 +92,14 @@ bash scripts/sync-agents.sh
 
 ### 5. Multi-Platform Remote Push (GitHub + GitLab + Codeberg + Gitea + Bitbucket)
 ```bash
-# Setup remote 'all' di repositori aktif
-./scripts/setup-penta-push.sh
+# Setup remote 'all' di repositori aktif (Default Lean Tri-Push):
+./scripts/setup-tri-push.sh
 
-# Push ke 5 platform sekaligus
-git push all main
+# Atau bind langsung seluruh 5 platform secara lokal:
+./scripts/setup-tri-push.sh --penta
+
+# Push ke platform aktif (mengikuti protokol proteksi push):
+ALLOW_GIT_PUSH=1 git push all main
 ```
 
 ---

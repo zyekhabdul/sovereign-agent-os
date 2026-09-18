@@ -17,7 +17,7 @@ This autonomously and deterministically handles:
 2. **Directory Architecture**: Sets up `~/.gemini/config/rules/`, `~/.gemini/config/plugins/`, `~/.agents/skills/`, and `~/Documents/Obsidian Vault/00-AGY-Memory/`.
 3. **16 Binding Rule Specs**: Deploys all 16 formal rules (`inspect-before-apply.md`, `empirical-verification.md`, `ponytail-yagni.md`, `sensitive-area-guard.md`, `ai-proposal-protocol.md`, `git-push-restriction.md`, `mcp-discovery.md`, `obsidian-rag.md`, `workflow-ai-agent.md`, `agent-persona-invariants.md`, `agy-runtime-troubleshooting.md`, `autonomous-failure-modes.md`, `deterministic-machine-harness.md`, `environment-topology.md`, `hardware-cluster-topology.md`, `system-diagnostics.md`).
 4. **4-File GEMINI.md Parity & Cross-Agent Sync**: Synchronizes `~/GEMINI.md`, `~/.gemini/GEMINI.md`, `~/.gemini/config/GEMINI.md`, and `~/.agents/GEMINI.md` byte-for-byte, plus auto-configures Claude Code, OpenCode, and Codex.
-5. **12 Active Plugins**: Deploys `caveman`, `ponytail`, `codegraph`, `serena`, `contextmode`, `headroom`, `rtk`, `skills`, `mcp`, `graphify`, `delphitools`, and `agent-skills`.
+5. **Active Plugins & Skills**: Deploys the production-grade engineering plugin `agent-skills` into `~/.gemini/config/plugins/` and syncs modular agent skills.
 6. **Global Git Templates & Anti-Blunder Hooks**: Configures `~/.git-templates` with `pre-commit` (anti-blunder, anti-lazy truncation, anti-emoji, test guard), `post-commit` (auto-checkpoint), and `pre-push` (push interceptor) hooks.
 7. **Empirical Status Verification**: Runs `agy-guard status` to confirm 100% compliance.
 
@@ -38,19 +38,28 @@ Once installed, AI agents must utilize `agy-guard` subcommands during normal wor
 
 ---
 
-## 3. PENTA-FORGE (5 PLATFORMS) MULTI-REMOTE REPOSITORY PROTOCOL
+## 3. MULTI-FORGE REPOSITORY PROTOCOL (TRI-PUSH & PENTA-MIRROR)
 
-Every project repository is synchronized to a 5-way multi-remote `all`:
-- **GitHub**: `git@github.com:zyekhabdul/<repo-name>.git`
+Every project repository is synchronized to multi-remote endpoints:
+- **GitHub**: `git@github.com:zyekhabdul/<repo-name>.git` (Primary)
 - **GitLab**: `git@gitlab.com:aomiqaza/<repo-name>.git`
 - **Codeberg**: `git@codeberg.org:aomiqaza/<repo-name>.git`
 - **Gitea**: `git@gitea.com:aomiqaza/<repo-name>.git`
 - **Bitbucket**: `git@bitbucket.org:aomiqaza/<repo-name>.git`
 
+**Sovereign Architecture**:
+- **Local Lean Tri-Push (Default)**: `all` routes to GitHub + GitLab (+ Codeberg for FOSS) for high speed and zero developer latency.
+- **Server-Side Penta-Mirroring**: GitHub Actions (`.github/workflows/tri-mirror.yml`) automatically mirrors commits to all 5 platforms asynchronously upon push.
+- **Direct Local Penta-Push (Optional)**: To bind all 5 platforms directly into local `all`, pass `--penta`.
+
 To configure on any repo:
 ```bash
-bash scripts/setup-penta-push.sh /path/to/repo <repo-name>
-# or: bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
+# Default Lean Tri-Push:
+bash scripts/setup-tri-push.sh /path/to/repo <repo-name>
+
+# Direct 5-Platform Penta-Push:
+bash scripts/setup-tri-push.sh --penta /path/to/repo <repo-name>
+# (or symlink: bash scripts/setup-penta-push.sh --penta /path/to/repo <repo-name>)
 ```
 
 ---

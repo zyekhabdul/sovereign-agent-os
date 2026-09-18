@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-agy-guard - Deterministic Guardrail & Governance Tool for AI Agents (v3.0 Enterprise)
+agy-guard - Deterministic Guardrail & Governance Tool for AI Agents (v5.1 Enterprise)
 Provides rules synchronization, milestone-gated Obsidian RAG sync, instant project context briefing,
 on-demand skill management, polyglot symbol finder, secure env inspector, and git push protection.
 """
@@ -16,7 +16,8 @@ from pathlib import Path
 from datetime import datetime
 
 HOME = Path.home()
-VAULT_PATH = HOME / "Documents" / "Obsidian Vault"
+_vault_env = os.environ.get("OBSIDIAN_VAULT_PATH") or os.environ.get("VAULT_DIR")
+VAULT_PATH = Path(_vault_env).resolve() if _vault_env else (HOME / "Documents" / "Obsidian Vault")
 MEMORY_DIR = VAULT_PATH / "00-AGY-Memory"
 CONFIG_DIR = HOME / ".gemini" / "config"
 SKILLS_DIR = HOME / ".agents" / "skills"
@@ -57,7 +58,7 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - Master Rules Index: `~/.gemini/config/GEMINI.md`
 - Modular Rule Definitions: `~/.gemini/config/rules/`
 
-### Core Directives Summary
+### Core Directives Summary (16 Modular Binding Rules)
 - **Deterministic Machine Harness**: Autonomous execution governed by compiler, typecheck, and test gates (`~/.gemini/config/rules/deterministic-machine-harness.md`)
 - **Autonomous Failure Modes Defense**: 10 anti-blunder invariants and circuit breaker (`~/.gemini/config/rules/autonomous-failure-modes.md`)
 - **Agent Persona & Execution Invariants**: Objective technical mentor, autonomous single-stream execution, strict no-emoji (`~/.gemini/config/rules/agent-persona-invariants.md`)
@@ -65,12 +66,14 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **Inspection Gate**: Cari dulu baru terapkan & AST call-site scan (`~/.gemini/config/rules/inspect-before-apply.md`)
 - **Verification Gate**: Empirical terminal proof exit code 0 (`~/.gemini/config/rules/empirical-verification.md`)
 - **Safety Gate**: Hard-stop on sensitive areas (`~/.gemini/config/rules/sensitive-area-guard.md`) & Git push restriction (`~/.gemini/config/rules/git-push-restriction.md`)
+- **Environment Topology**: Dual-mode laptop vs VPS decoupling & sovereign host discipline (`~/.gemini/config/rules/environment-topology.md`)
 - **Hardware Topology**: Tri-node sovereign hardware cluster and burst worker constraints (`~/.gemini/config/rules/hardware-cluster-topology.md`)
 - **System Diagnostics**: Periodic VPS & endpoint verification (`~/.gemini/config/rules/system-diagnostics.md`)
 - **Code Style**: Ponytail / YAGNI minimalism & native-first (`~/.gemini/config/rules/ponytail-yagni.md`)
 - **Architectural Proposal Protocol**: Autonomous local coding, RFC for major breaking changes only (`~/.gemini/config/rules/ai-proposal-protocol.md`)
 - **Workflow Standard**: Autonomous batch execution & machine-gated verification (`~/.gemini/config/rules/workflow-ai-agent.md`)
 - **Memory & RAG**: Obsidian 4-file governance (`~/.gemini/config/rules/obsidian-rag.md`)
+- **MCP Discovery**: On-demand dual-file configuration protocol (`~/.gemini/config/rules/mcp-discovery.md`)
 - **Communication**: Caveman terse high-density, strict no-emoji.
 """
 
@@ -1378,7 +1381,7 @@ def cmd_push(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="agy-guard v5.0: Deterministic Guardrails & Governance for AI Agents"
+        description="agy-guard v5.1: Deterministic Guardrails & Governance for AI Agents"
     )
     subparsers = parser.add_subparsers(dest="subcommand", required=True)
     

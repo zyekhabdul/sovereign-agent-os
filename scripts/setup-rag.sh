@@ -5,7 +5,7 @@ set -euo pipefail
 # Usage: ./setup-rag.sh <project-namespace> [repo-path]
 #        ./setup-rag.sh --all
 
-OBSIDIAN_VAULT="${OBSIDIAN_VAULT_PATH:-$HOME/Documents/Obsidian Vault}"
+OBSIDIAN_VAULT="${OBSIDIAN_VAULT_PATH:-${VAULT_DIR:-$HOME/Documents/Obsidian Vault}}"
 MEMORY_BASE="$OBSIDIAN_VAULT/00-AGY-Memory"
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Projects}"
 

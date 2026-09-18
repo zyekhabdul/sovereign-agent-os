@@ -76,7 +76,7 @@ done
 # 3. Check Obsidian RAG Memory Vault
 echo ""
 echo "--- 3. Obsidian RAG Memory Vault ---"
-OBSIDIAN_DIR="${OBSIDIAN_VAULT_PATH:-$HOME/Documents/Obsidian Vault}"
+OBSIDIAN_DIR="${OBSIDIAN_VAULT_PATH:-${VAULT_DIR:-$HOME/Documents/Obsidian Vault}}"
 if [ -d "$OBSIDIAN_DIR/00-AGY-Memory" ]; then
   report_ok "Obsidian Vault RAG directory active at: $OBSIDIAN_DIR/00-AGY-Memory"
 else

@@ -25,15 +25,20 @@ while [[ $# -gt 0 ]]; do
       EXPLICIT_PROFILE="web"
       shift
       ;;
+    --penta|--all-forges)
+      ENABLE_PENTA=true
+      shift
+      ;;
     --set-profile)
       SET_PROFILE="$2"
       shift 2
       ;;
     -h|--help)
-      echo "Usage: $0 [--dry-run] [--foss|--web] [--set-profile foss|web] [REPO_PATH] [REPO_NAME]"
+      echo "Usage: $0 [--dry-run] [--foss|--web|--penta] [--set-profile foss|web] [REPO_PATH] [REPO_NAME]"
       echo "Deterministic Multi-Forge Git Remote Setup:"
       echo "  --foss          : Route to GitHub + GitLab + Codeberg (FOSS Tools)"
       echo "  --web           : Route to GitHub + GitLab only (Web/Commercial apps)"
+      echo "  --penta         : Route to all 5 platforms (GitHub + GitLab + Codeberg + Gitea + Bitbucket)"
       echo "  --set-profile X : Persistently save git config sovereign.profile = X (foss|web)"
       echo "  --dry-run       : Display execution plan without applying"
       exit 0
@@ -121,20 +126,30 @@ GITLAB_USER="${GITLAB_USER:-aomiqaza}"
 CODEBERG_USER="${CODEBERG_USER:-aomiqaza}"
 GITEA_HOST="${GITEA_HOST:-gitea.com}"
 GITEA_USER="${GITEA_USER:-aomiqaza}"
+BITBUCKET_USER="${BITBUCKET_USER:-aomiqaza}"
 
 GITHUB_URL="git@github.com:${GITHUB_USER}/${REPO_NAME}.git"
 GITLAB_URL="git@gitlab.com:${GITLAB_USER}/${REPO_NAME}.git"
 CODEBERG_URL="git@codeberg.org:${CODEBERG_USER}/${REPO_NAME}.git"
 GITEA_URL="git@${GITEA_HOST}:${GITEA_USER}/${REPO_NAME}.git"
+BITBUCKET_URL="git@bitbucket.org:${BITBUCKET_USER}/${REPO_NAME}.git"
 
-if [ "$PROFILE" = "foss" ]; then
+ENABLE_PENTA="${ENABLE_PENTA:-false}"
+ENABLE_GITEA="${ENABLE_GITEA:-false}"
+ENABLE_BITBUCKET="${ENABLE_BITBUCKET:-false}"
+
+if [ "$ENABLE_PENTA" = "true" ]; then
   ENABLE_CODEBERG=true
-  PROFILE_DESC="FOSS Tool (GitHub + GitLab + Codeberg)"
+  ENABLE_GITEA=true
+  ENABLE_BITBUCKET=true
+  PROFILE_DESC="Penta-Forge (GitHub + GitLab + Codeberg + Gitea + Bitbucket)"
+elif [ "$PROFILE" = "foss" ]; then
+  ENABLE_CODEBERG=true
+  PROFILE_DESC="FOSS Tri-Forge (GitHub + GitLab + Codeberg)"
 else
   ENABLE_CODEBERG=false
   PROFILE_DESC="Web/Restricted App (GitHub + GitLab only — Codeberg Excluded)"
 fi
-ENABLE_GITEA="${ENABLE_GITEA:-false}"
 
 echo "=== Deterministic Multi-Forge Git Remote Setup ==="
 echo "Repository Path  : $REPO_PATH"
@@ -144,7 +159,8 @@ echo "Profile Class    : [ $PROFILE_DESC ]"
 echo "GitHub (Active)  : $GITHUB_URL"
 echo "GitLab (Active)  : $GITLAB_URL"
 echo "Codeberg (FOSS)  : $CODEBERG_URL (In 'all': $ENABLE_CODEBERG)"
-echo "Gitea (Freeze)   : $GITEA_URL"
+echo "Gitea            : $GITEA_URL (In 'all': $ENABLE_GITEA)"
+echo "Bitbucket        : $BITBUCKET_URL (In 'all': $ENABLE_BITBUCKET)"
 echo "=================================================="
 
 if [ "$DRY_RUN" = true ]; then
@@ -157,11 +173,15 @@ if [ "$DRY_RUN" = true ]; then
     echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$CODEBERG_URL\""
     echo "  git -C \"$REPO_PATH\" remote add codeberg \"$CODEBERG_URL\""
   else
-    echo "  git -C \"$REPO_PATH\" remote remove codeberg (Isolation enforced: Codeberg blocked)"
+    echo "  git -C \"$REPO_PATH\" remote remove codeberg 2>/dev/null || true"
   fi
   if [ "$ENABLE_GITEA" = "true" ]; then
     echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$GITEA_URL\""
     echo "  git -C \"$REPO_PATH\" remote add gitea \"$GITEA_URL\""
+  fi
+  if [ "$ENABLE_BITBUCKET" = "true" ]; then
+    echo "  git -C \"$REPO_PATH\" remote set-url --add --push all \"$BITBUCKET_URL\""
+    echo "  git -C \"$REPO_PATH\" remote add bitbucket \"$BITBUCKET_URL\""
   fi
   CURRENT_BRANCH=$(git -C "$REPO_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
   if [ -n "$CURRENT_BRANCH" ] && [ "$CURRENT_BRANCH" != "HEAD" ]; then
@@ -183,6 +203,9 @@ fi
 if [ "$ENABLE_GITEA" = "true" ]; then
   git -C "$REPO_PATH" remote set-url --add --push all "$GITEA_URL"
 fi
+if [ "$ENABLE_BITBUCKET" = "true" ]; then
+  git -C "$REPO_PATH" remote set-url --add --push all "$BITBUCKET_URL"
+fi
 
 # Also ensure standalone remotes exist for selective individual pushes
 git -C "$REPO_PATH" remote remove github 2>/dev/null || true
@@ -191,7 +214,7 @@ git -C "$REPO_PATH" remote add github "$GITHUB_URL" 2>/dev/null || true
 git -C "$REPO_PATH" remote remove gitlab 2>/dev/null || true
 git -C "$REPO_PATH" remote add gitlab "$GITLAB_URL" 2>/dev/null || true
 
-# Codeberg standalone remote: ONLY present if repo is FOSS compliant
+# Codeberg standalone remote: ONLY present if repo is FOSS compliant or Penta enabled
 git -C "$REPO_PATH" remote remove codeberg 2>/dev/null || true
 if [ "$ENABLE_CODEBERG" = "true" ]; then
   git -C "$REPO_PATH" remote add codeberg "$CODEBERG_URL" 2>/dev/null || true
@@ -203,7 +226,11 @@ if [ "$ENABLE_GITEA" = "true" ]; then
   git -C "$REPO_PATH" remote add gitea "$GITEA_URL" 2>/dev/null || true
 fi
 
+# Bitbucket standalone remote: ONLY present if explicitly enabled
 git -C "$REPO_PATH" remote remove bitbucket 2>/dev/null || true
+if [ "$ENABLE_BITBUCKET" = "true" ]; then
+  git -C "$REPO_PATH" remote add bitbucket "$BITBUCKET_URL" 2>/dev/null || true
+fi
 
 # Ensure active branch tracks github for deterministic 'git pull' compliance
 CURRENT_BRANCH=$(git -C "$REPO_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")

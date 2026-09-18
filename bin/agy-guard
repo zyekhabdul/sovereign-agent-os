@@ -250,6 +250,11 @@ Project workspace located at `{cwd}`.
 """, encoding="utf-8")
                 (ns_dir / "DECISIONS.md").write_text(f"""# ARCHITECTURAL DECISIONS (ADR) — {ns}
 
+## ADR-001: [ACTIVE] Project Architecture Initialization
+- **Date**: {now[:10]}
+- **Context**: Project namespace memory initialized.
+- **Decision**: Adhere to 4-file memory schema and strict namespace isolation.
+
 ## Standard Laws
 - **Law 1**: Ponytail / YAGNI - Minimalist code generation, zero unsolicited refactoring.
 - **Law 2**: Empirical Verification - Always verify build/test before concluding task.
@@ -418,6 +423,11 @@ Project workspace located at `{cwd}`.
     dec_file = target_dir / "DECISIONS.md"
     if not dec_file.exists():
         dec_content = f"""# ARCHITECTURAL DECISIONS (ADR) — {ns}
+
+## ADR-001: [ACTIVE] Project Architecture Initialization
+- **Date**: {now[:10]}
+- **Context**: Project namespace memory initialized.
+- **Decision**: Adhere to 4-file memory schema and strict namespace isolation.
 
 ## Standard Laws
 - **Law 1**: Ponytail / YAGNI - Minimalist code generation, zero unsolicited refactoring.
@@ -1073,7 +1083,7 @@ Project workspace located at `{p}`.
 
 ## Technical Stack & Constraints
 - **Primary Stack**: {tech}
-- **Architecture Standard**: Ponytail YAGNI, 9 Binding Rules compliant.
+- **Architecture Standard**: Ponytail YAGNI, 16 Binding Rules compliant.
 - **Max Lines Limit**: 200 lines per RAG file.
 """
                 ctx_file.write_text(ctx_content.strip() + "\n", encoding="utf-8")
@@ -1105,6 +1115,11 @@ Project workspace located at `{p}`.
             dec_file = ns_dir / "DECISIONS.md"
             if not dec_file.exists():
                 dec_content = f"""# ARCHITECTURAL DECISIONS (ADR) — {ns}
+
+## ADR-001: [ACTIVE] Project Architecture Initialization
+- **Date**: {now[:10]}
+- **Context**: Project namespace memory initialized.
+- **Decision**: Adhere to 4-file memory schema and strict namespace isolation.
 
 ## Standard Laws
 - **Law 1**: Ponytail / YAGNI - Minimalist code generation, zero unsolicited refactoring.

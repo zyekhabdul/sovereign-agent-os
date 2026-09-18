@@ -4,6 +4,7 @@
 
 [init]
 	defaultBranch = main
+	templateDir = ~/.git-templates
 
 [core]
 	editor = nano

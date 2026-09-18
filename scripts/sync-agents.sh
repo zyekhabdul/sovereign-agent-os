@@ -84,7 +84,7 @@ if all_servers:
 EOF
 
 # 5. Sync Agent Skills
-echo "[ 4/4 ] Synchronizing Agent Skills & 11 Core Components..."
+echo "[ 4/4 ] Synchronizing Agent Skills & 16 Core Components & Binding Rules..."
 if [ -d "$REPO_ROOT/plugins/agent-skills/skills" ]; then
   cp -r "$REPO_ROOT/plugins/agent-skills/skills/"* "$AGENTS_DIR/skills/" 2>/dev/null || true
   cp -r "$REPO_ROOT/plugins/agent-skills/skills/"* "$OPENCODE_DIR/skills/" 2>/dev/null || true

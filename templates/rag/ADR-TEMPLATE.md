@@ -1,8 +1,8 @@
 # ARCHITECTURE DECISION RECORD (ADR) TEMPLATE
 
-## ADR-[NUMBER]: [TITLE OF DECISION]
+## ADR-[NUMBER]: [ACTIVE] [TITLE OF DECISION]
 
-- **Status**: [Proposed | Accepted | Superseded | Deprecated]
+- **Status**: [ACTIVE | SUPERSEDED by ADR-XXX | DEPRECATED]
 - **Date**: YYYY-MM-DD
 - **Decision Makers**: [User, AI Mentor/Architect]
 - **Relevant Issues / PRD**: [Link or reference]

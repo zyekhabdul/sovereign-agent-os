@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Hard Push Guard Interceptor by agy-guard
+if [ "${ALLOW_GIT_PUSH:-0}" != "1" ]; then
+    echo "[ HARD GUARD BLOCKED ] 'git push' is forbidden by default AI Agent policy." >&2
+    echo "To push with explicit human intent, run: ALLOW_GIT_PUSH=1 git push" >&2
+    exit 1
+fi

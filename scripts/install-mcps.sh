@@ -18,6 +18,9 @@ MCP_PACKAGES=(
   "@modelcontextprotocol/server-memory"
   "@modelcontextprotocol/server-sequential-thinking"
   "@amonstack/gitea-mcp"
+  "@upstash/context7-mcp"
+  "mcp-obsidian"
+  "tavily-mcp"
 )
 
 for pkg in "${MCP_PACKAGES[@]}"; do

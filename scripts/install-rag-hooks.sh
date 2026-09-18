@@ -5,7 +5,7 @@
 # ==============================================================================
 set -euo pipefail
 
-VAULT_MEMORY="${VAULT_MEMORY:-$HOME/Documents/Obsidian Vault/00-AGY-Memory}"
+VAULT_MEMORY="${VAULT_MEMORY:-${OBSIDIAN_VAULT_PATH:-${VAULT_DIR:-$HOME/Documents/Obsidian Vault}}/00-AGY-Memory}"
 PROJECTS_DIR="${PROJECTS_DIR:-$HOME/Projects}"
 
 echo "[ RAG-HOOKS ] Installing post-commit auto-sync hooks with namespace resolution..."
@@ -23,7 +23,7 @@ HOOK_CONTENT='#!/usr/bin/env bash
     if [[ "$REPO_NAME" =~ ^tmp\. || "$REPO_NAME" == "tmp" ]]; then
         exit 0
     fi
-    MEMORY_BASE="${HOME}/Documents/Obsidian Vault/00-AGY-Memory"
+    MEMORY_BASE="${OBSIDIAN_VAULT_PATH:-${VAULT_DIR:-$HOME/Documents/Obsidian Vault}}/00-AGY-Memory"
     
     # Try exact match, dot-to-dash match, or theme alias
     TARGET_DIR="${MEMORY_BASE}/${REPO_NAME}"
@@ -101,6 +101,11 @@ EOF
     if [ ! -f "${TARGET_DIR}/DECISIONS.md" ]; then
         cat << EOF > "${TARGET_DIR}/DECISIONS.md"
 # ARCHITECTURAL DECISIONS (ADR) — ${REPO_NAME}
+
+## ADR-001: [ACTIVE] Project Architecture Initialization
+- **Date**: $(date +"%Y-%m-%d")
+- **Context**: Project namespace memory initialized.
+- **Decision**: Adhere to 4-file memory schema and strict namespace isolation.
 
 ## Standard Laws
 - **Law 1**: Ponytail / YAGNI - Minimalist code generation, zero unsolicited refactoring.

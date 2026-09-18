@@ -7,12 +7,14 @@ set -euo pipefail
 PROJECTS_DIR="$HOME/Projects"
 PUSH_MODE=false
 DRY_RUN=false
+PENTA_MODE=false
 POSITIONAL=()
 
 for arg in "$@"; do
   case "$arg" in
     --push) PUSH_MODE=true ;;
     --dry-run) DRY_RUN=true ;;
+    --penta|--all-forges) PENTA_MODE=true ;;
     *) POSITIONAL+=("$arg") ;;
   esac
 done
@@ -28,6 +30,7 @@ echo "      MULTI-FORGE REPOSITORY SYNCER (ACTIVE FORGES)   "
 echo "======================================================"
 echo "Projects Directory : $PROJECTS_DIR"
 echo "Push Mode Enabled  : $PUSH_MODE"
+echo "Penta Mode Enabled : $PENTA_MODE"
 echo "Dry Run Mode       : $DRY_RUN"
 echo "======================================================"
 
@@ -37,15 +40,16 @@ for repo in "$PROJECTS_DIR"/*; do
     REPO_NAME=$(basename "$repo")
     echo -e "\n>>> Processing: $REPO_NAME"
     
-    if [ "$DRY_RUN" = true ]; then
-      "$SCRIPT_DIR/setup-tri-push.sh" --dry-run "$repo"
-    else
-      "$SCRIPT_DIR/setup-tri-push.sh" "$repo"
-      if [ "$PUSH_MODE" = true ]; then
-        BRANCH=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
-        echo "Pushing $REPO_NAME ($BRANCH) to active platforms..."
-        ALLOW_GIT_PUSH=1 git -C "$repo" push all "$BRANCH" || echo "[ WARN ] Push failed for $REPO_NAME"
-      fi
+    SETUP_ARGS=()
+    [ "$DRY_RUN" = true ] && SETUP_ARGS+=("--dry-run")
+    [ "$PENTA_MODE" = true ] && SETUP_ARGS+=("--penta")
+    SETUP_ARGS+=("$repo")
+    
+    "$SCRIPT_DIR/setup-tri-push.sh" "${SETUP_ARGS[@]}"
+    if [ "$PUSH_MODE" = true ] && [ "$DRY_RUN" = false ]; then
+      BRANCH=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+      echo "Pushing $REPO_NAME ($BRANCH) to active platforms..."
+      ALLOW_GIT_PUSH=1 git -C "$repo" push all "$BRANCH" || echo "[ WARN ] Push failed for $REPO_NAME"
     fi
   fi
 done

@@ -15,7 +15,7 @@ Kegagalan AI dalam coding (halusinasi, perombakan liar/unsolicited refactor, loo
 2. Instruksi mencampuradukkan beberapa domain dalam satu tarikan napas.
 3. Manusia memberikan persetujuan buta (*blind approval*) tanpa menginspeksi diff terminal.
 
-Sistem tata kelola AI (15 binding rules, `agy-guard`, pre-commit hook) mengunci perilaku mesin. Standar ini mengunci disiplin manusia sebagai komandan sistem.
+Sistem tata kelola AI (16 binding rules, `agy-guard`, pre-commit hook) mengunci perilaku mesin. Standar ini mengunci disiplin manusia sebagai komandan sistem.
 
 ---
 

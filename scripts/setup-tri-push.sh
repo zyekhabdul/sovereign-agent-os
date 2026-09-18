@@ -237,6 +237,8 @@ CURRENT_BRANCH=$(git -C "$REPO_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null || 
 if [ -n "$CURRENT_BRANCH" ] && [ "$CURRENT_BRANCH" != "HEAD" ]; then
   git -C "$REPO_PATH" config "branch.$CURRENT_BRANCH.remote" "github"
   git -C "$REPO_PATH" config "branch.$CURRENT_BRANCH.merge" "refs/heads/$CURRENT_BRANCH"
+  # Fetch github ref to populate refs/remotes/github/ and ensure healthy upstream tracking
+  git -C "$REPO_PATH" fetch --quiet github 2>/dev/null || true
 fi
 
 echo "[ SUCCESS ] Remote 'all' successfully configured: ${PROFILE_DESC}!"

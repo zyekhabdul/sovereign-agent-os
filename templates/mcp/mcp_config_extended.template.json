@@ -273,6 +273,13 @@
         "GITEA_TOKEN": "${GITEA_TOKEN}",
         "GITEA_DEFAULT_OWNER": "${GITEA_DEFAULT_OWNER}"
       }
+    },
+    "tailscale": {
+      "command": "__HOME__/.gemini/antigravity-cli/mcp_tailscale_server.py",
+      "env": {
+        "TAILSCALE_API_KEY": "${TAILSCALE_API_KEY}",
+        "TAILSCALE_TAILNET": "${TAILSCALE_TAILNET}"
+      }
     }
   }
 }

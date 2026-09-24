@@ -148,9 +148,12 @@ if [ "$ACTION" == "kdbx-inject" ]; then
 
   GH_TOKEN=$(extract_secret "Tokens/GitHub")
   [ -z "$GH_TOKEN" ] && GH_TOKEN=$(extract_secret "GitHub")
+  [ -z "$GH_TOKEN" ] && GH_TOKEN=$(extract_secret "MCP/Services/MCP: github")
+  [ -z "$GH_TOKEN" ] && GH_TOKEN=$(extract_secret "MCP/Git Tokens/GitHub Master PAT (zyekhabdul)")
 
   TAVILY_KEY=$(extract_secret "Tokens/Tavily")
   [ -z "$TAVILY_KEY" ] && TAVILY_KEY=$(extract_secret "Tavily")
+  [ -z "$TAVILY_KEY" ] && TAVILY_KEY=$(extract_secret "MCP/Services/MCP: search-tavily")
 
   TARGET_CONF="$HOME/.gemini/config/mcp_config.json"
   if [ -f "$TARGET_CONF" ]; then

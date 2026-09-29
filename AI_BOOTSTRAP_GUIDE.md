@@ -89,6 +89,9 @@ bash scripts/sync-agents.sh --dry-run   # print plan, change nothing
 bash scripts/sync-agents.sh             # snapshots live configs to ~/.config/sovereign-backup/<ts>/ first
 ```
 
+### Data Safety Law (non-repo paths)
+Destructive ops (`>`, `rm`, overwrite) outside the repo REQUIRE: existence check first, snapshot before mutate, never delete what you did not create this session. Tests must run under fake HOME with trap cleanup — never ad-hoc against live `~/Documents/Obsidian Vault`.
+
 ### Verification Harness (Sovereign CI)
 Every push runs `.github/workflows/sovereign-ci.yml` (hygiene, tier matrix,
 codex blackbox, windows lint, docker build). Same suite locally:

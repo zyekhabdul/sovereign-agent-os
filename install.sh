@@ -34,7 +34,8 @@ echo "[ 2/8 ] Initializing AI agent directory structure..."
 mkdir -p "$HOME/.gemini/config/rules"
 mkdir -p "$HOME/.gemini/config/plugins"
 mkdir -p "$HOME/.agents/skills"
-mkdir -p "$HOME/.agents/skills_archive"
+mkdir -p "$HOME/.agents/skills-archive"
+mkdir -p "$HOME/.agents/skills-manifest"
 mkdir -p "$HOME/Projects"
 mkdir -p "$HOME/Documents/Obsidian Vault/00-AGY-Memory"
 mkdir -p "$HOME/Documents/Obsidian Vault/09-Panduan-Projek"
@@ -46,10 +47,6 @@ cp -v "$SCRIPT_DIR/docs/"*.md "$HOME/Documents/Obsidian Vault/09-Panduan-Projek/
 mkdir -p "$HOME/scripts"
 cp -v "$SCRIPT_DIR/scripts/"*.sh "$HOME/scripts/" 2>/dev/null || true
 chmod +x "$HOME/scripts/"*.sh 2>/dev/null || true
-if [ -d "$SCRIPT_DIR/scripts/lib" ]; then
-  mkdir -p "$HOME/scripts/lib"
-  cp -v "$SCRIPT_DIR/scripts/lib/"*.py "$HOME/scripts/lib/" 2>/dev/null || true
-fi
 if [ -d "$SCRIPT_DIR/scripts/lib" ]; then
   mkdir -p "$HOME/scripts/lib"
   cp -v "$SCRIPT_DIR/scripts/lib/"*.py "$HOME/scripts/lib/" 2>/dev/null || true

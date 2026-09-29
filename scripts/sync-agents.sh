@@ -76,12 +76,65 @@ if all_servers:
     os.chmod(claude_cfg, 0o600)
     print(f"  [ PASS ] Updated ~/.claude.json with {len(all_servers)} MCP servers.")
 
-# 2. Update ~/.opencode/opencode.json
-    opencode_data = {"mcp": all_servers}
-    with open(opencode_cfg, "w") as fp:
-        json.dump(opencode_data, fp, indent=2)
-    os.chmod(opencode_cfg, 0o600)
-    print(f"  [ PASS ] Updated ~/.opencode/opencode.json with {len(all_servers)} MCP servers.")
+# 2. Update ~/.opencode/opencode.json & ~/.config/opencode/opencode.json
+    opencode_mcp = {}
+    for name, srv in all_servers.items():
+        cmd = srv.get("command", "")
+        args = srv.get("args", [])
+        if isinstance(cmd, list):
+            full_cmd = cmd
+        elif isinstance(args, list) and args:
+            full_cmd = [cmd] + args
+        elif cmd:
+            full_cmd = [cmd]
+        else:
+            full_cmd = []
+
+        env = srv.get("env", {})
+        if not isinstance(env, dict):
+            env = {}
+
+        entry = {
+            "type": "local",
+            "command": full_cmd,
+            "enabled": False
+        }
+        if env:
+            entry["environment"] = env
+        opencode_mcp[name] = entry
+
+    home_dir = os.path.expanduser("~")
+    opencode_data = {
+        "$schema": "https://opencode.ai/config.json",
+        "mcp": opencode_mcp,
+        "instructions": [
+            os.path.join(home_dir, ".opencode/OPENCODE.md"),
+            os.path.join(home_dir, ".gemini/config/rules/agent-persona-invariants.md"),
+            os.path.join(home_dir, ".gemini/config/rules/ponytail-yagni.md"),
+            os.path.join(home_dir, ".gemini/config/rules/deterministic-machine-harness.md")
+        ],
+        "skills": {
+            "paths": [
+                os.path.join(home_dir, ".opencode/skills"),
+                os.path.join(home_dir, ".config/opencode/skills")
+            ]
+        },
+        "tool_output": {
+            "max_lines": 200,
+            "max_bytes": 16384
+        },
+        "compaction": {
+            "auto": True,
+            "tail_turns": 15
+        }
+    }
+
+    for target_path in [opencode_cfg, os.path.expanduser("~/.config/opencode/opencode.json")]:
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        with open(target_path, "w") as fp:
+            json.dump(opencode_data, fp, indent=2)
+        os.chmod(target_path, 0o600)
+        print(f"  [ PASS ] Updated {target_path} (OpenCode Effect schema, Hybrid MVO: all disabled by default).")
 
 # 3. Update ~/.config/antigravity/mcp_config.json
     antigravity_cfg = os.path.expanduser("~/.config/antigravity/mcp_config.json")

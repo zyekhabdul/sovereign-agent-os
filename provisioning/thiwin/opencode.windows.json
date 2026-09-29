@@ -10,7 +10,7 @@
       ],
       "enabled": false,
       "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     },
     "context7": {
@@ -31,7 +31,7 @@
       ],
       "enabled": false,
       "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       }
     },
     "memory": {
@@ -92,7 +92,7 @@
       ],
       "enabled": false,
       "environment": {
-        "SUPABASE_ACCESS_TOKEN": "sbp_a2386855b390c9c4b676365044b902649695f96f"
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
       }
     },
     "vercel": {
@@ -152,7 +152,7 @@
       ],
       "enabled": false,
       "environment": {
-        "SLACK_BOT_TOKEN": "xoxb-11730427531636-11726757835794-8X4sKylfcI4JQLJzEwLo741z"
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
       }
     },
     "linear": {

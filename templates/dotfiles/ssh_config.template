@@ -34,3 +34,24 @@ Host bitbucket.org
 #     Port 22
 #     IdentityFile ~/.ssh/id_ed25519
 #     ForwardAgent no
+
+# --- Sovereign VPS Host (Mode B: Direct Sovereign Host) ---
+# Use this when running AI agents directly on the VPS host.
+# See rules/environment-topology.md for Mode B operational guardrails.
+Host vps-sovereign
+    HostName 192.0.2.1
+    User deploy
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519
+    ForwardAgent no
+    IdentitiesOnly yes
+
+# --- Development VPS (Ephemeral Ports) ---
+# Use isolated dev ports per environment-topology.md Port Collision Guard
+Host vps-dev
+    HostName 192.0.2.1
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519_dev
+    ForwardAgent no
+    IdentitiesOnly yes

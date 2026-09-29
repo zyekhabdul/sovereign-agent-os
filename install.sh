@@ -25,12 +25,12 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 fi
 
 # 2. Install agy-guard CLI Tool (v5.2)
-echo "[ 1/8 ] Installing agy-guard CLI to ~/.local/bin/agy-guard..."
+echo "[ 1/9 ] Installing agy-guard CLI to ~/.local/bin/agy-guard..."
 cp "$SCRIPT_DIR/bin/agy-guard" "$HOME/.local/bin/agy-guard"
 chmod +x "$HOME/.local/bin/agy-guard"
 
 # 3. Create Core AI Directory Trees
-echo "[ 2/8 ] Initializing AI agent directory structure..."
+echo "[ 2/9 ] Initializing AI agent directory structure..."
 mkdir -p "$HOME/.gemini/config/rules"
 mkdir -p "$HOME/.gemini/config/plugins"
 mkdir -p "$HOME/.agents/skills"
@@ -41,7 +41,7 @@ mkdir -p "$HOME/Documents/Obsidian Vault/00-AGY-Memory"
 mkdir -p "$HOME/Documents/Obsidian Vault/09-Panduan-Projek"
 
 # 4. Deploy 16 Formal Rule Specifications, Guides & Helper Scripts
-echo "[ 3/8 ] Deploying 16 formal binding rule files, project guides & scripts..."
+echo "[ 3/9 ] Deploying 16 formal binding rule files, project guides & scripts..."
 cp -v "$SCRIPT_DIR/rules/"*.md "$HOME/.gemini/config/rules/"
 cp -v "$SCRIPT_DIR/docs/"*.md "$HOME/Documents/Obsidian Vault/09-Panduan-Projek/"
 mkdir -p "$HOME/scripts"
@@ -53,7 +53,7 @@ if [ -d "$SCRIPT_DIR/scripts/lib" ]; then
 fi
 
 # 5. Synchronize All 4 Physical GEMINI.md Files Byte-for-Byte
-echo "[ 4/8 ] Synchronizing GEMINI.md rules across all active endpoints..."
+echo "[ 4/9 ] Synchronizing GEMINI.md rules across all active endpoints..."
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/config/GEMINI.md"
@@ -68,18 +68,46 @@ sed -i -E "s|/home/[A-Za-z0-9_.-]+|$HOME|g" "$HOME/GEMINI.md" "$HOME/.gemini/GEM
 bash "$SCRIPT_DIR/scripts/sync-agents.sh" || true
 
 # 6. Deploy Plugins & Config
-echo "[ 5/8 ] Deploying plugins to ~/.gemini/config/plugins/..."
+echo "[ 5/9 ] Deploying plugins to ~/.gemini/config/plugins/..."
 cp -r "$SCRIPT_DIR/plugins/"* "$HOME/.gemini/config/plugins/" 2>/dev/null || true
 
 # 7. Configure Global Git Templates & Install Hooks Across Projects
-echo "[ 6/8 ] Configuring global Git hook templates & batch installing guards..."
+echo "[ 6/9 ] Configuring global Git hook templates & batch installing guards..."
 agy-guard set-global-git-templates
 agy-guard install-hooks-all || true
-echo "[ 7/8 ] Scaffolding Obsidian RAG memory namespaces..."
+echo "[ 7/9 ] Scaffolding Obsidian RAG memory namespaces..."
 agy-guard scaffold-all-projects || true
 
-# 8. Run Verification Audit
-echo "[ 8/8 ] Running empirical system status audit..."
+# 8. Safely Deploy Sovereign SSH Config Template
+echo "[ 8/9 ] Deploying Sovereign SSH config routing to ~/.ssh/config..."
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh" 2>/dev/null || true
+SSH_CONFIG="$HOME/.ssh/config"
+SSH_TEMPLATE="$SCRIPT_DIR/templates/dotfiles/ssh_config.template"
+
+if [ -f "$SSH_TEMPLATE" ]; then
+    if [ ! -f "$SSH_CONFIG" ]; then
+        sed "s|__HOME__|$HOME|g" "$SSH_TEMPLATE" > "$SSH_CONFIG" 2>/dev/null || cp "$SSH_TEMPLATE" "$SSH_CONFIG"
+        chmod 600 "$SSH_CONFIG" 2>/dev/null || true
+        echo "  -> Sovereign SSH config deployed. Hosts available: github.com, codeberg.org, gitlab.com, gitea.com, bitbucket.org, vps-sovereign, vps-dev"
+    elif ! grep -q "Host vps-sovereign" "$SSH_CONFIG" 2>/dev/null; then
+        BACKUP_SSH="$SSH_CONFIG.bak.$(date +%s)"
+        cp "$SSH_CONFIG" "$BACKUP_SSH" 2>/dev/null || true
+        echo "  -> Existing ~/.ssh/config backed up to $BACKUP_SSH"
+        {
+            printf "\n# >>> SOVEREIGN SSH ROUTING >>>\n"
+            sed "s|__HOME__|$HOME|g" "$SSH_TEMPLATE" 2>/dev/null || cat "$SSH_TEMPLATE"
+            printf "\n# <<< SOVEREIGN SSH ROUTING <<<\n"
+        } >> "$SSH_CONFIG"
+        chmod 600 "$SSH_CONFIG" 2>/dev/null || true
+        echo "  -> Safely appended Sovereign SSH routing to ~/.ssh/config."
+    else
+        echo "  -> Sovereign SSH routing already configured in ~/.ssh/config."
+    fi
+fi
+
+# 9. Run Verification Audit
+echo "[ 9/9 ] Running empirical system status audit..."
 agy-guard status
 
 echo "======================================================"

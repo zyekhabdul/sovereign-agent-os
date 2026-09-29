@@ -34,11 +34,12 @@ Write-Host "[ INFO ] Target Home Directory: $HomeDir" -ForegroundColor Gray
 # ------------------------------------------------------------------------------
 # 1. Ensure Directory Trees
 # ------------------------------------------------------------------------------
-Write-Host "[ 1/9 ] Initializing AI agent directory structure..." -ForegroundColor Yellow
+Write-Host "[ 1/10 ] Initializing AI agent directory structure..." -ForegroundColor Yellow
 
 $DirsToCreate = @(
     (Join-Path $HomeDir "bin"),
     (Join-Path $HomeDir ".local\bin"),
+    (Join-Path $HomeDir ".ssh"),
     (Join-Path $HomeDir ".gemini\config\rules"),
     (Join-Path $HomeDir ".gemini\config\plugins"),
     (Join-Path $HomeDir ".agents\skills"),
@@ -64,7 +65,7 @@ Write-Host "  [ PASS ] Directories verified." -ForegroundColor Green
 # ------------------------------------------------------------------------------
 # 2. Configure Persistent User PATH
 # ------------------------------------------------------------------------------
-Write-Host "[ 2/9 ] Configuring persistent User PATH..." -ForegroundColor Yellow
+Write-Host "[ 2/10 ] Configuring persistent User PATH..." -ForegroundColor Yellow
 $UserPath = [Environment]::GetEnvironmentVariable("PATH", "User")
 $BinPath = Join-Path $HomeDir "bin"
 $LocalBinPath = Join-Path $HomeDir ".local\bin"
@@ -89,7 +90,7 @@ if ($UpdatedPath) {
 # ------------------------------------------------------------------------------
 # 3. Deploy 16 Formal Rule Specifications
 # ------------------------------------------------------------------------------
-Write-Host "[ 3/9 ] Deploying 16 formal binding rule specifications..." -ForegroundColor Yellow
+Write-Host "[ 3/10 ] Deploying 16 formal binding rule specifications..." -ForegroundColor Yellow
 
 $RulesSourceDir = Join-Path $ScriptDir "rules"
 $RulesTargetDir = Join-Path $HomeDir ".gemini\config\rules"
@@ -110,7 +111,7 @@ if (Test-Path $RulesSourceDir) {
 # ------------------------------------------------------------------------------
 # 4. Synchronize All 4 Physical GEMINI.md Files Byte-for-Byte
 # ------------------------------------------------------------------------------
-Write-Host "[ 4/9 ] Synchronizing GEMINI.md rules across all active agent endpoints..." -ForegroundColor Yellow
+Write-Host "[ 4/10 ] Synchronizing GEMINI.md rules across all active agent endpoints..." -ForegroundColor Yellow
 
 $GlobalRulesFile = Join-Path $ScriptDir "GLOBAL_RULES.md"
 if (-not (Test-Path $GlobalRulesFile)) {
@@ -143,7 +144,7 @@ if (Test-Path $GlobalRulesFile) {
 # ------------------------------------------------------------------------------
 # 5. Deploy agy-guard CLI & Wrapper
 # ------------------------------------------------------------------------------
-Write-Host "[ 5/9 ] Deploying agy-guard CLI and batch wrapper..." -ForegroundColor Yellow
+Write-Host "[ 5/10 ] Deploying agy-guard CLI and batch wrapper..." -ForegroundColor Yellow
 $AgyGuardSrc = Join-Path $ScriptDir "bin\agy-guard.py"
 if (-not (Test-Path $AgyGuardSrc)) {
     $AgyGuardSrc = Join-Path $ScriptDir "bin\agy-guard"
@@ -179,7 +180,7 @@ exit /b 1
 # ------------------------------------------------------------------------------
 # 6. Deploy Core Agent Skills
 # ------------------------------------------------------------------------------
-Write-Host "[ 6/9 ] Deploying core sovereign agent skills..." -ForegroundColor Yellow
+Write-Host "[ 6/10 ] Deploying core sovereign agent skills..." -ForegroundColor Yellow
 $SkillsSrc = Join-Path $ScriptDir "plugins\agent-skills\skills"
 if (-not (Test-Path $SkillsSrc)) {
     $SkillsSrc = Join-Path $ScriptDir "skills"
@@ -203,7 +204,7 @@ if (Test-Path $SkillsSrc) {
 # ------------------------------------------------------------------------------
 # 7. Configure Global Git Templates & Anti-Blunder Hooks
 # ------------------------------------------------------------------------------
-Write-Host "[ 7/9 ] Deploying Global Git templates and pre-commit guardrails..." -ForegroundColor Yellow
+Write-Host "[ 7/10 ] Deploying Global Git templates and pre-commit guardrails..." -ForegroundColor Yellow
 $GitHooksSrc = Join-Path $ScriptDir "templates\git-hooks"
 if (-not (Test-Path $GitHooksSrc)) {
     $GitHooksSrc = Join-Path $ScriptDir "git-hooks"
@@ -245,9 +246,45 @@ if (Test-Path $GitHooksSrc) {
 }
 
 # ------------------------------------------------------------------------------
-# 8. Configure OpenCode with Valid Schema & Hybrid MVO
+# 8. Safely Deploy Sovereign SSH Routing Configuration
 # ------------------------------------------------------------------------------
-Write-Host "[ 8/9 ] Configuring OpenCode with valid schema and Hybrid MVO default..." -ForegroundColor Yellow
+Write-Host "[ 8/10 ] Deploying Sovereign SSH routing template..." -ForegroundColor Yellow
+$SshDir = Join-Path $HomeDir ".ssh"
+if (-not (Test-Path $SshDir)) {
+    New-Item -ItemType Directory -Path $SshDir -Force | Out-Null
+}
+
+$SshConfigPath = Join-Path $SshDir "config"
+$SshTemplatePath = Join-Path $ScriptDir "templates\dotfiles\ssh_config.template"
+
+if (Test-Path $SshTemplatePath) {
+    $TemplateContent = [System.IO.File]::ReadAllText($SshTemplatePath, [System.Text.Encoding]::UTF8)
+    if (-not (Test-Path $SshConfigPath)) {
+        [System.IO.File]::WriteAllText($SshConfigPath, $TemplateContent, [System.Text.Encoding]::UTF8)
+        Write-Host "  [ PASS ] Deployed Sovereign SSH config to $SshConfigPath." -ForegroundColor Green
+    } else {
+        $ExistingContent = [System.IO.File]::ReadAllText($SshConfigPath, [System.Text.Encoding]::UTF8)
+        if ($ExistingContent -notlike "*Host vps-sovereign*") {
+            $Timestamp = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+            $BackupPath = "$SshConfigPath.bak.$Timestamp"
+            Copy-Item -Path $SshConfigPath -Destination $BackupPath -Force
+            Write-Host "  [ BACKUP ] Existing SSH config backed up to $BackupPath" -ForegroundColor DarkGray
+
+            $AppendBlock = "`r`n# >>> SOVEREIGN SSH ROUTING >>>`r`n" + $TemplateContent + "`r`n# <<< SOVEREIGN SSH ROUTING <<<`r`n"
+            [System.IO.File]::AppendAllText($SshConfigPath, $AppendBlock, [System.Text.Encoding]::UTF8)
+            Write-Host "  [ PASS ] Safely appended Sovereign SSH routing to $SshConfigPath." -ForegroundColor Green
+        } else {
+            Write-Host "  [ PASS ] Sovereign SSH routing already configured in $SshConfigPath." -ForegroundColor Green
+        }
+    }
+} else {
+    Write-Host "  [ WARN ] SSH config template not found at $SshTemplatePath." -ForegroundColor Yellow
+}
+
+# ------------------------------------------------------------------------------
+# 9. Configure OpenCode with Valid Schema & Hybrid MVO
+# ------------------------------------------------------------------------------
+Write-Host "[ 9/10 ] Configuring OpenCode with valid schema and Hybrid MVO default..." -ForegroundColor Yellow
 
 $NormalizedHome = $HomeDir.Replace('\', '/')
 $OpenCodeJson = @{
@@ -311,9 +348,9 @@ exit /b %ERRORLEVEL%
 Write-Host "  [ PASS ] Generated OpenCode configs with Hybrid MVO and proxy wrapper." -ForegroundColor Green
 
 # ------------------------------------------------------------------------------
-# 9. Verification Audit
+# 10. Verification Audit
 # ------------------------------------------------------------------------------
-Write-Host "[ 9/9 ] Running system verification audit..." -ForegroundColor Yellow
+Write-Host "[ 10/10 ] Running system verification audit..." -ForegroundColor Yellow
 
 $AllPass = $true
 $Checks = @(
@@ -325,7 +362,8 @@ $Checks = @(
     (Join-Path $HomeDir ".opencode\opencode.json"),
     $OpencodeCmdPath,
     (Join-Path $HomeDir "bin\agy-guard.cmd"),
-    (Join-Path $HomeDir ".git-templates\hooks\pre-commit")
+    (Join-Path $HomeDir ".git-templates\hooks\pre-commit"),
+    (Join-Path $HomeDir ".ssh\config")
 )
 
 foreach ($chk in $Checks) {

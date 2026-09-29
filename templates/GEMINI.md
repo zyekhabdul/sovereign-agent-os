@@ -22,3 +22,5 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **Memory & RAG**: Obsidian 4-file governance (`~/.gemini/config/rules/obsidian-rag.md`)
 - **MCP Discovery**: On-demand dual-file configuration protocol (`~/.gemini/config/rules/mcp-discovery.md`)
 - **Communication**: Caveman terse high-density, strict no-emoji.
+
+> [ NOTE ] Fresh clone without `~/.gemini` yet: authoritative fallback is `rules/` + `docs/` in this repo. Run `bash install.sh` to materialize `~/.gemini/config/`.

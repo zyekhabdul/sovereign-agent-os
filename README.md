@@ -13,8 +13,15 @@ sovereign-agent-os/
 ├── Dockerfile                     # Universal Containerized Linux Sandbox
 ├── docker-compose.yml             # Sandbox Compose Service Definition
 ├── .devcontainer/                 # VS Code & Cursor Devcontainer Integration
-├── .github/workflows/             # Server-Side Tri-Forge Mirroring (GitHub -> GitLab + Codeberg)
+├── .github/workflows/             # Sovereign CI (syntax/parity/tiers/codex/docker) + Penta-Forge Mirroring
+│   ├── sovereign-ci.yml           # Automated Verification Harness (5 jobs)
+│   └── tri-mirror.yml             # Server-Side Mirroring (GitHub -> GitLab + Codeberg + Gitea + Bitbucket)
 ├── .gitlab-ci.yml                 # GitLab CI Mirroring Pipeline
+├── tests/                         # Black-Box Verification Suite (fake-HOME isolated)
+│   ├── test_hook_parity.py        # SSOT Hook Parity (template vs embedded)
+│   ├── test_vault_inject.py       # Hostile-Token Injection Round-Trip
+│   ├── test_tier_matrix.sh        # strict / standard / passthrough Matrix
+│   └── test_codex_blackbox.sh     # Codex TOML Sync (edge cases, idempotency, dry-run)
 ├── docs/                          # Master Tata Kelola Proyek
 │   ├── GLOBAL-PROJECT-STANDARD.md # Universal Minimal + Conditional Spec File Standards
 │   ├── WORKFLOW-AI-AGENT-STANDARD.md # Dual-Track Agentic Engineering & Verification Harness
@@ -42,21 +49,21 @@ sovereign-agent-os/
 ├── templates/
 │   ├── dotfiles/                  # SSH, Git, & Shell Aliases Templates
 │   ├── git-hooks/                 # Pre-commit, Post-commit, & Pre-push Hooks
-│   ├── mcp/                       # Sanitized Zero-Secret MCP Templates
-│   └── rag/                       # ADR & Memory Schemas
+│   └── mcp/                       # Sanitized Zero-Secret MCP Templates
 └── scripts/
+    ├── lib/vault_inject.py        # JSON-Safe Secret Injector (stdlib only, CI-tested)
     ├── agy-recover.sh             # Automated AI Runtime & Network Recovery
     ├── bootstrap.sh               # Complete Machine & Environment Bootstrap
-    ├── sync-agents.sh             # Cross-Agent Parity Syncer (AGY, Claude, OpenCode, Codex)
+    ├── sync-agents.sh             # Cross-Agent Parity Syncer (--dry-run, auto-backup, Codex TOML)
     ├── vault.sh                   # Encrypted Credential Locker (AES-256-CBC & KeePass KDBX)
     ├── install-mcps.sh            # Global MCP Server Installer
-    ├── install-rag-hooks.sh       # Post-Commit Auto-Sync Hook Installer
+    ├── install-rag-hooks.sh       # Hook Dispatcher (thin wrapper -> agy-guard install-hook)
     ├── rag-lint.sh                # Obsidian RAG Integrity Linter
     ├── setup-penta-push.sh        # Git Multi-Push Remote Setup (5 Platforms)
-    ├── setup-rag.sh               # 4-File Obsidian Memory Scaffolder
+    ├── setup-rag.sh               # Scaffold Dispatcher (thin wrapper -> agy-guard checkpoint/scaffold)
     ├── setup-tri-push.sh          # Git Multi-Push Remote Setup (3 Platforms)
     ├── sync-all-repos.sh          # Batch Git Multi-Push Mirroring
-    └── verify-env.sh              # 35-Point Host Health Diagnostic
+    └── verify-env.sh              # 37-Point Host Health Diagnostic
 ```
 
 ---

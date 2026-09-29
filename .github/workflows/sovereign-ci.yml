@@ -1,0 +1,89 @@
+name: Sovereign CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  hygiene:
+    name: Syntax + Hook Parity + Vault Inject
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shell syntax (all scripts + installer)
+        run: |
+          for f in scripts/*.sh install.sh tests/*.sh; do
+            bash -n "$f" || exit 1
+          done
+          echo "SH_OK"
+
+      - name: Python compile (agy-guard + lib)
+        run: |
+          python3 -m py_compile bin/agy-guard scripts/lib/*.py tests/test_hook_parity.py tests/test_vault_inject.py
+          echo "PY_OK"
+
+      - name: Hook parity (SSOT template vs embedded)
+        run: python3 tests/test_hook_parity.py
+
+      - name: Vault inject (hostile tokens)
+        run: python3 tests/test_vault_inject.py
+
+  tier-matrix:
+    name: Pre-commit Tier Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: strict / standard / passthrough
+        run: bash tests/test_tier_matrix.sh
+      - name: RAG wrapper dispatchers
+        run: bash tests/test_rag_wrappers.sh
+
+  codex-blackbox:
+    name: Codex TOML Sync (fake HOME)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Edge cases + idempotency + dry-run
+        run: bash tests/test_codex_blackbox.sh
+
+  windows-lint:
+    name: PowerShell Syntax (thiwin)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tokenize PS1 scripts
+        shell: pwsh
+        run: |
+          $err = 0
+          foreach ($f in @('install.ps1', 'provisioning/thiwin/setup-sovereign-thiwin.ps1')) {
+            if (Test-Path $f) {
+              $tokens = $null; $parseErr = $null
+              [void][System.Management.Automation.Language.Parser]::ParseFile($f, [ref]$tokens, [ref]$parseErr)
+              if ($parseErr.Count -gt 0) { $err = 1; Write-Host "::error file=$f::PowerShell syntax errors: $($parseErr.Count)" }
+              else { Write-Host "[ PASS ] $f tokenizes clean" }
+            }
+          }
+          if ($err -ne 0) { exit 1 }
+      - name: Validate Windows JSON configs
+        shell: pwsh
+        run: |
+          foreach ($f in @('provisioning/thiwin/opencode.windows.json')) {
+            if (Test-Path $f) {
+              try { Get-Content $f -Raw | ConvertFrom-Json | Out-Null; Write-Host "[ PASS ] $f valid JSON" }
+              catch { Write-Host "::error file=$f::invalid JSON"; exit 1 }
+            }
+          }
+
+  docker-sandbox:
+    name: Docker Sandbox Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate compose config
+        run: docker compose config --quiet && echo "COMPOSE_OK"
+      - name: Build sandbox image
+        run: docker build -t sovereign-agent-sandbox:ci .

@@ -208,6 +208,26 @@ if (Test-Path $GitHooksSrc) {
     } catch {
         Write-Host "  [ WARN ] Could not configure git globals: $_" -ForegroundColor DarkGray
     }
+
+    # Auto-heal Git for Windows environment (ensure bash.exe exists in Git usr\bin)
+    $GitLocations = @(
+        "C:\tools\git\usr\bin",
+        "C:\Program Files\Git\usr\bin",
+        "C:\Program Files (x86)\Git\usr\bin",
+        (Join-Path $HomeDir "AppData\Local\Programs\Git\usr\bin")
+    )
+    foreach ($loc in $GitLocations) {
+        if (Test-Path $loc) {
+            $sh = Join-Path $loc "sh.exe"
+            $bash = Join-Path $loc "bash.exe"
+            if ((Test-Path $sh) -and (-not (Test-Path $bash))) {
+                try {
+                    Copy-Item -Path $sh -Destination $bash -Force
+                    Write-Host "  [ HEAL ] Auto-healed Git for Windows: copied sh.exe to bash.exe in $loc" -ForegroundColor Green
+                } catch {}
+            }
+        }
+    }
 }
 
 # ------------------------------------------------------------------------------

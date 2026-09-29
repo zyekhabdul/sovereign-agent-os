@@ -1,0 +1,413 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "github-sec": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+      ],
+      "enabled": false,
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "context7": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@upstash/context7-mcp/dist/index.js"
+      ],
+      "enabled": false
+    },
+    "github": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-github/dist/index.js"
+      ],
+      "enabled": false,
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "memory": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-memory/dist/index.js"
+      ],
+      "enabled": false
+    },
+    "obsidian": {
+      "type": "local",
+      "command": [
+        "node",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/mcp-obsidian/dist/index.js",
+        "C:/Users/sysdevadmin/Documents/Obsidian Vault"
+      ],
+      "enabled": false
+    },
+    "postgres": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-postgres/dist/index.js",
+        "postgresql://localhost/mydb"
+      ],
+      "enabled": false
+    },
+    "search-tavily": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/tavily-mcp/build/index.js"
+      ],
+      "enabled": false,
+      "environment": {
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+      }
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-sequential-thinking/dist/index.js"
+      ],
+      "enabled": false
+    },
+    "supabase": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase"
+      ],
+      "enabled": false,
+      "environment": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    },
+    "vercel": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-vercel"
+      ],
+      "enabled": false,
+      "environment": {
+        "VERCEL_TOKEN": "${VERCEL_TOKEN}"
+      }
+    },
+    "cloudflare": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-cloudflare"
+      ],
+      "enabled": false,
+      "environment": {
+        "CLOUDFLARE_API_TOKEN": "${CLOUDFLARE_API_TOKEN}"
+      }
+    },
+    "gitlab": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-gitlab/dist/index.js"
+      ],
+      "enabled": false,
+      "environment": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "${GITLAB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "sentry": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sentry"
+      ],
+      "enabled": false,
+      "environment": {
+        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}"
+      }
+    },
+    "slack": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "enabled": false,
+      "environment": {
+        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}"
+      }
+    },
+    "linear": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-linear"
+      ],
+      "enabled": false,
+      "environment": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      }
+    },
+    "notion": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-notion"
+      ],
+      "enabled": false,
+      "environment": {
+        "NOTION_API_KEY": "${NOTION_API_KEY}"
+      }
+    },
+    "gdrive": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-gdrive"
+      ],
+      "enabled": false,
+      "environment": {
+        "GDRIVE_OAUTH_PATH": "C:/Users/sysdevadmin/Downloads/client_secret_11128345820-7k9gfdhtimd9ttc2qveu9pt91mbqpijp.apps.googleusercontent.com.json",
+        "GDRIVE_CREDENTIALS_PATH": "C:/Users/sysdevadmin/.gemini/config/gdrive_credentials.json"
+      }
+    },
+    "virustotal": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-virustotal"
+      ],
+      "enabled": false,
+      "environment": {
+        "VIRUSTOTAL_API_KEY": "${VIRUSTOTAL_API_KEY}"
+      }
+    },
+    "shodan": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-shodan"
+      ],
+      "enabled": false,
+      "environment": {
+        "SHODAN_API_KEY": "${SHODAN_API_KEY}"
+      }
+    },
+    "discord": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-discord"
+      ],
+      "enabled": false,
+      "environment": {
+        "DISCORD_BOT_TOKEN": "${DISCORD_BOT_TOKEN}"
+      }
+    },
+    "telegram": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-telegram"
+      ],
+      "enabled": false,
+      "environment": {
+        "TELEGRAM_BOT_TOKEN": "${TELEGRAM_BOT_TOKEN}"
+      }
+    },
+    "figma": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-figma"
+      ],
+      "enabled": false,
+      "environment": {
+        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
+      }
+    },
+    "openai": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-openai"
+      ],
+      "enabled": false,
+      "environment": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    },
+    "filesystem": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js",
+        "C:/Users/sysdevadmin"
+      ],
+      "enabled": false
+    },
+    "puppeteer": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@modelcontextprotocol/server-puppeteer/dist/index.js"
+      ],
+      "enabled": false
+    },
+    "docker": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-server-docker"
+      ],
+      "enabled": false
+    },
+    "bluesky": {
+      "type": "local",
+      "command": [
+        "C:/Users/sysdevadmin/.gemini/antigravity-cli/mcp_bluesky_server.py"
+      ],
+      "enabled": false,
+      "environment": {
+        "BLUESKY_HANDLE": "aomiqaza.zyekh.com",
+        "BLUESKY_APP_PASSWORD": "${BLUESKY_APP_PASSWORD}"
+      }
+    },
+    "mega": {
+      "type": "local",
+      "command": [
+        "C:/Users/sysdevadmin/.gemini/antigravity-cli/mcp_mega_server.py"
+      ],
+      "enabled": false,
+      "environment": {
+        "MEGA_EMAIL": "aqz220309@gmail.com",
+        "MEGA_PASSWORD": "${MEGA_PASSWORD}"
+      }
+    },
+    "social_media": {
+      "type": "local",
+      "command": [
+        "C:/Users/sysdevadmin/.gemini/antigravity-cli/mcp_social_media.py"
+      ],
+      "enabled": false,
+      "environment": {
+        "INSTAGRAM_API_KEY": "${INSTAGRAM_API_KEY}",
+        "TIKTOK_API_KEY": "${TIKTOK_API_KEY}",
+        "YOUTUBE_API_KEY": "${YOUTUBE_API_KEY}",
+        "TWITTER_API_KEY": "${TWITTER_API_KEY}",
+        "LINKEDIN_API_KEY": "${LINKEDIN_API_KEY}",
+        "TIKTOK_CLIENT_KEY": "${TIKTOK_CLIENT_KEY}",
+        "TIKTOK_CLIENT_SECRET": "${TIKTOK_CLIENT_SECRET}",
+        "TWITTER_CONSUMER_KEY": "${TWITTER_CONSUMER_KEY}",
+        "TWITTER_CONSUMER_SECRET": "${TWITTER_CONSUMER_SECRET}",
+        "TWITTER_BEARER_TOKEN": "${TWITTER_BEARER_TOKEN}",
+        "TWITTER_CLIENT_ID": "${TWITTER_CLIENT_ID}",
+        "TWITTER_CLIENT_SECRET": "${TWITTER_CLIENT_SECRET}",
+        "LINKEDIN_CLIENT_ID": "${LINKEDIN_CLIENT_ID}",
+        "LINKEDIN_CLIENT_SECRET": "${LINKEDIN_CLIENT_SECRET}"
+      }
+    },
+    "codeberg": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@amonstack/gitea-mcp/dist/index.js"
+      ],
+      "enabled": false,
+      "environment": {
+        "GITEA_BASE_URL": "https://codeberg.org",
+        "GITEA_TOKEN": "${GITEA_TOKEN}",
+        "GITEA_DEFAULT_OWNER": "aomiqaza"
+      }
+    },
+    "gitea": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256",
+        "C:/Users/sysdevadmin/.npm-global/lib/node_modules/@amonstack/gitea-mcp/dist/index.js"
+      ],
+      "enabled": false,
+      "environment": {
+        "GITEA_BASE_URL": "https://gitea.com",
+        "GITEA_TOKEN": "${GITEA_TOKEN}",
+        "GITEA_DEFAULT_OWNER": "aomiqaza"
+      }
+    },
+    "gravatar": {
+      "type": "local",
+      "command": [
+        "node",
+        "--max-old-space-size=256"
+      ],
+      "enabled": false,
+      "environment": {
+        "GRAVATAR_API_KEY": "${GRAVATAR_API_KEY}",
+        "GRAVATAR_USERNAME": "aqz220309",
+        "GRAVATAR_PROFILE_URL": "https://aomiqaza.pro"
+      }
+    },
+    "tailscale": {
+      "type": "local",
+      "command": [
+        "C:/Users/sysdevadmin/.gemini/antigravity-cli/mcp_tailscale_server.py"
+      ],
+      "enabled": false,
+      "environment": {
+        "TAILSCALE_API_KEY": "${TAILSCALE_API_KEY}",
+        "TAILSCALE_TAILNET": "tail8976d0.ts.net"
+      }
+    }
+  },
+  "instructions": [
+    "C:/Users/sysdevadmin/.opencode/OPENCODE.md",
+    "C:/Users/sysdevadmin/.gemini/config/rules/agent-persona-invariants.md",
+    "C:/Users/sysdevadmin/.gemini/config/rules/ponytail-yagni.md",
+    "C:/Users/sysdevadmin/.gemini/config/rules/deterministic-machine-harness.md"
+  ],
+  "skills": {
+    "paths": [
+      "C:/Users/sysdevadmin/.opencode/skills",
+      "C:/Users/sysdevadmin/.config/opencode/skills"
+    ]
+  },
+  "tool_output": {
+    "max_lines": 200,
+    "max_bytes": 16384
+  },
+  "compaction": {
+    "auto": true,
+    "tail_turns": 15
+  }
+}

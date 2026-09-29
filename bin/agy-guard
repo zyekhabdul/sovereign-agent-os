@@ -22,7 +22,7 @@ VAULT_PATH = Path(_vault_env).resolve() if _vault_env else (HOME / "Documents" /
 MEMORY_DIR = VAULT_PATH / "00-AGY-Memory"
 CONFIG_DIR = HOME / ".gemini" / "config"
 SKILLS_DIR = HOME / ".agents" / "skills"
-SKILLS_ARCHIVE = HOME / ".agents" / "skills_archive"
+SKILLS_ARCHIVE = (HOME / ".agents" / "skills-archive") if (HOME / ".agents" / "skills-archive").exists() else (HOME / ".agents" / "skills_archive")
 
 def get_sovereign_repo_root():
     try:

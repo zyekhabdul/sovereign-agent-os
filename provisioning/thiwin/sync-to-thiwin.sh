@@ -32,9 +32,9 @@ fi
 
 echo "[ INFO ] Dispatching setup bundle to thiwin..."
 if [ "$ONLINE" -eq 1 ]; then
-    scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no -r "$SOURCE_DIR" "sysdevadmin@$TARGET_TAILSCALE_IP:C:/setup-sovereign-thiwin"
+    scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no -r "$SOURCE_DIR"/* "sysdevadmin@$TARGET_TAILSCALE_IP:C:/setup-sovereign-thiwin/"
 elif [ "$ONLINE" -eq 2 ]; then
-    scp -o ProxyCommand="/usr/local/bin/mesh-ssh --stdio %h" -o StrictHostKeyChecking=no -r "$SOURCE_DIR" "sysdevadmin@$TARGET_NODE:C:/setup-sovereign-thiwin"
+    scp -o ProxyCommand="/usr/local/bin/mesh-ssh --stdio %h" -o StrictHostKeyChecking=no -r "$SOURCE_DIR"/* "sysdevadmin@$TARGET_NODE:C:/setup-sovereign-thiwin/"
 fi
 
 echo "[ PASS ] Transfer complete. Destination: C:/setup-sovereign-thiwin"

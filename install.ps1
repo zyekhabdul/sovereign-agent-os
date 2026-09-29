@@ -1,11 +1,12 @@
 # ==============================================================================
-# SOVEREIGN AI AGENT GOVERNANCE — WINDOWS SYSTEM INSTALLER
+# SOVEREIGN AI AGENT GOVERNANCE — WINDOWS SYSTEM INSTALLER (v2.0)
 # ==============================================================================
 # Standard: Sovereign Hardware Cluster & Agent OS Specification
 # Target  : Windows 10 / Windows 11 / Windows Server (PowerShell 5.1+)
 # Function: Installs 16 formal binding rules, 4-file GEMINI.md parity,
 #           valid OpenCode Effect/Zod schema with Hybrid MVO, proxy wrapper,
-#           and cross-project SSOT governance on Windows nodes.
+#           agy-guard CLI, core skills, global git templates, and cross-project
+#           SSOT governance on Windows nodes.
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File .\install.ps1
@@ -33,7 +34,7 @@ Write-Host "[ INFO ] Target Home Directory: $HomeDir" -ForegroundColor Gray
 # ------------------------------------------------------------------------------
 # 1. Ensure Directory Trees
 # ------------------------------------------------------------------------------
-Write-Host "[ 1/7 ] Initializing AI agent directory structure..." -ForegroundColor Yellow
+Write-Host "[ 1/9 ] Initializing AI agent directory structure..." -ForegroundColor Yellow
 
 $DirsToCreate = @(
     (Join-Path $HomeDir "bin"),
@@ -47,6 +48,7 @@ $DirsToCreate = @(
     (Join-Path $HomeDir ".opencode\skills"),
     (Join-Path $HomeDir ".config\opencode\skills"),
     (Join-Path $HomeDir ".codex"),
+    (Join-Path $HomeDir ".git-templates\hooks"),
     (Join-Path $HomeDir "Projects"),
     (Join-Path $HomeDir "Documents\Obsidian Vault\00-AGY-Memory"),
     (Join-Path $HomeDir "Documents\Obsidian Vault\09-Panduan-Projek")
@@ -60,9 +62,34 @@ foreach ($dir in $DirsToCreate) {
 Write-Host "  [ PASS ] Directories verified." -ForegroundColor Green
 
 # ------------------------------------------------------------------------------
-# 2. Deploy 16 Formal Rule Specifications
+# 2. Configure Persistent User PATH
 # ------------------------------------------------------------------------------
-Write-Host "[ 2/7 ] Deploying 16 formal binding rule specifications..." -ForegroundColor Yellow
+Write-Host "[ 2/9 ] Configuring persistent User PATH..." -ForegroundColor Yellow
+$UserPath = [Environment]::GetEnvironmentVariable("PATH", "User")
+$BinPath = Join-Path $HomeDir "bin"
+$LocalBinPath = Join-Path $HomeDir ".local\bin"
+$UpdatedPath = $false
+
+foreach ($p in @($BinPath, $LocalBinPath)) {
+    if ($UserPath -notlike "*$p*") {
+        $UserPath = "$p;$UserPath"
+        $UpdatedPath = $true
+    }
+    if ($env:PATH -notlike "*$p*") {
+        $env:PATH = "$p;$env:PATH"
+    }
+}
+if ($UpdatedPath) {
+    [Environment]::SetEnvironmentVariable("PATH", $UserPath, "User")
+    Write-Host "  [ PASS ] Added $BinPath and $LocalBinPath to User PATH." -ForegroundColor Green
+} else {
+    Write-Host "  [ PASS ] User PATH already contains bin directories." -ForegroundColor Green
+}
+
+# ------------------------------------------------------------------------------
+# 3. Deploy 16 Formal Rule Specifications
+# ------------------------------------------------------------------------------
+Write-Host "[ 3/9 ] Deploying 16 formal binding rule specifications..." -ForegroundColor Yellow
 
 $RulesSourceDir = Join-Path $ScriptDir "rules"
 $RulesTargetDir = Join-Path $HomeDir ".gemini\config\rules"
@@ -71,7 +98,6 @@ if (Test-Path $RulesSourceDir) {
     $RuleFiles = Get-ChildItem -Path $RulesSourceDir -Filter "*.md"
     foreach ($rule in $RuleFiles) {
         $content = Get-Content -Path $rule.FullName -Raw -Encoding UTF8
-        # Normalize Linux paths to generic user paths if necessary
         $content = $content -replace '/home/(fuckadmin|aomiqaza)', $HomeDir.Replace('\', '/')
         $targetFile = Join-Path $RulesTargetDir $rule.Name
         [System.IO.File]::WriteAllText($targetFile, $content, [System.Text.Encoding]::UTF8)
@@ -82,9 +108,9 @@ if (Test-Path $RulesSourceDir) {
 }
 
 # ------------------------------------------------------------------------------
-# 3. Synchronize All 4 Physical GEMINI.md Files Byte-for-Byte
+# 4. Synchronize All 4 Physical GEMINI.md Files Byte-for-Byte
 # ------------------------------------------------------------------------------
-Write-Host "[ 3/7 ] Synchronizing GEMINI.md rules across all active agent endpoints..." -ForegroundColor Yellow
+Write-Host "[ 4/9 ] Synchronizing GEMINI.md rules across all active agent endpoints..." -ForegroundColor Yellow
 
 $GlobalRulesFile = Join-Path $ScriptDir "GLOBAL_RULES.md"
 if (-not (Test-Path $GlobalRulesFile)) {
@@ -115,9 +141,93 @@ if (Test-Path $GlobalRulesFile) {
 }
 
 # ------------------------------------------------------------------------------
-# 4. Configure OpenCode with Valid Schema & Hybrid MVO
+# 5. Deploy agy-guard CLI & Wrapper
 # ------------------------------------------------------------------------------
-Write-Host "[ 4/7 ] Configuring OpenCode with valid schema and Hybrid MVO default..." -ForegroundColor Yellow
+Write-Host "[ 5/9 ] Deploying agy-guard CLI and batch wrapper..." -ForegroundColor Yellow
+$AgyGuardSrc = Join-Path $ScriptDir "bin\agy-guard.py"
+if (-not (Test-Path $AgyGuardSrc)) {
+    $AgyGuardSrc = Join-Path $ScriptDir "bin\agy-guard"
+}
+
+if (Test-Path $AgyGuardSrc) {
+    $AgyDestPy = Join-Path $HomeDir "bin\agy-guard.py"
+    Copy-Item -Path $AgyGuardSrc -Destination $AgyDestPy -Force
+
+    $AgyCmdDest = Join-Path $HomeDir "bin\agy-guard.cmd"
+    $AgyCmdContent = @"
+@echo off
+setlocal
+where python.exe >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    python "%~dp0agy-guard.py" %*
+    exit /b %ERRORLEVEL%
+)
+where py.exe >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    py "%~dp0agy-guard.py" %*
+    exit /b %ERRORLEVEL%
+)
+echo [ ERROR ] Python 3 is required to run agy-guard.
+exit /b 1
+"@
+    [System.IO.File]::WriteAllText($AgyCmdDest, $AgyCmdContent, [System.Text.Encoding]::ASCII)
+    Write-Host "  [ PASS ] Deployed agy-guard.py and agy-guard.cmd to $BinPath" -ForegroundColor Green
+} else {
+    Write-Host "  [ WARN ] agy-guard source not found. Skipping CLI deployment." -ForegroundColor Yellow
+}
+
+# ------------------------------------------------------------------------------
+# 6. Deploy Core Agent Skills
+# ------------------------------------------------------------------------------
+Write-Host "[ 6/9 ] Deploying core sovereign agent skills..." -ForegroundColor Yellow
+$SkillsSrc = Join-Path $ScriptDir "plugins\agent-skills\skills"
+if (-not (Test-Path $SkillsSrc)) {
+    $SkillsSrc = Join-Path $ScriptDir "skills"
+}
+if (Test-Path $SkillsSrc) {
+    $SkillDirs = Get-ChildItem -Path $SkillsSrc -Directory
+    $AgentSkillsDest = Join-Path $HomeDir ".agents\skills"
+    $OpenCodeSkillsDest = Join-Path $HomeDir ".opencode\skills"
+    $ConfigSkillsDest = Join-Path $HomeDir ".config\opencode\skills"
+
+    foreach ($sd in $SkillDirs) {
+        Copy-Item -Path $sd.FullName -Destination (Join-Path $AgentSkillsDest $sd.Name) -Recurse -Force
+        Copy-Item -Path $sd.FullName -Destination (Join-Path $OpenCodeSkillsDest $sd.Name) -Recurse -Force
+        Copy-Item -Path $sd.FullName -Destination (Join-Path $ConfigSkillsDest $sd.Name) -Recurse -Force
+    }
+    Write-Host "  [ PASS ] Deployed $($SkillDirs.Count) sovereign skills to agent skill vaults." -ForegroundColor Green
+} else {
+    Write-Host "  [ WARN ] Skills source not found. Skipping skills deployment." -ForegroundColor Yellow
+}
+
+# ------------------------------------------------------------------------------
+# 7. Configure Global Git Templates & Anti-Blunder Hooks
+# ------------------------------------------------------------------------------
+Write-Host "[ 7/9 ] Deploying Global Git templates and pre-commit guardrails..." -ForegroundColor Yellow
+$GitHooksSrc = Join-Path $ScriptDir "templates\git-hooks"
+if (-not (Test-Path $GitHooksSrc)) {
+    $GitHooksSrc = Join-Path $ScriptDir "git-hooks"
+}
+$TargetHooksDir = Join-Path $HomeDir ".git-templates\hooks"
+
+if (Test-Path $GitHooksSrc) {
+    $HookFiles = Get-ChildItem -Path $GitHooksSrc -File
+    foreach ($hf in $HookFiles) {
+        Copy-Item -Path $hf.FullName -Destination (Join-Path $TargetHooksDir $hf.Name) -Force
+    }
+    try {
+        git config --global init.templateDir "$HomeDir\.git-templates"
+        git config --global core.hooksPath "$HomeDir\.git-templates\hooks"
+        Write-Host "  [ PASS ] Configured global Git templateDir and core.hooksPath." -ForegroundColor Green
+    } catch {
+        Write-Host "  [ WARN ] Could not configure git globals: $_" -ForegroundColor DarkGray
+    }
+}
+
+# ------------------------------------------------------------------------------
+# 8. Configure OpenCode with Valid Schema & Hybrid MVO
+# ------------------------------------------------------------------------------
+Write-Host "[ 8/9 ] Configuring OpenCode with valid schema and Hybrid MVO default..." -ForegroundColor Yellow
 
 $NormalizedHome = $HomeDir.Replace('\', '/')
 $OpenCodeJson = @{
@@ -145,35 +255,6 @@ $OpenCodeJson = @{
     }
 }
 
-# Check if existing MCP servers exist in ~/.gemini/config/mcp_config.json
-$GeminiMcpFile = Join-Path $HomeDir ".gemini\config\mcp_config.json"
-if (Test-Path $GeminiMcpFile) {
-    try {
-        $mcpRaw = Get-Content -Path $GeminiMcpFile -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($mcpRaw.mcpServers) {
-            foreach ($prop in $mcpRaw.mcpServers.PSObject.Properties) {
-                $serverName = $prop.Name
-                $srv = $prop.Value
-                $cmdList = @()
-                if ($srv.command) { $cmdList += $srv.command }
-                if ($srv.args) { $cmdList += $srv.args }
-
-                $serverEntry = [ordered]@{
-                    "type" = "local"
-                    "command" = $cmdList
-                    "enabled" = $false
-                }
-                if ($srv.env) {
-                    $serverEntry["environment"] = $srv.env
-                }
-                $OpenCodeJson.mcp[$serverName] = $serverEntry
-            }
-        }
-    } catch {
-        Write-Host "  [ NOTE ] Could not parse mcp_config.json: $_" -ForegroundColor DarkGray
-    }
-}
-
 $OpenCodeJsonString = $OpenCodeJson | ConvertTo-Json -Depth 10
 
 $OpenCodeConfigs = @(
@@ -186,94 +267,33 @@ foreach ($cfg in $OpenCodeConfigs) {
     if (-not (Test-Path $cfgDir)) { New-Item -ItemType Directory -Path $cfgDir -Force | Out-Null }
     [System.IO.File]::WriteAllText($cfg, $OpenCodeJsonString, [System.Text.Encoding]::UTF8)
 }
-Write-Host "  [ PASS ] Generated OpenCode configs with Hybrid MVO (all MCPs disabled by default)." -ForegroundColor Green
 
-# ------------------------------------------------------------------------------
-# 5. OpenCode Proxy Sanitizer Wrapper for Windows
-# ------------------------------------------------------------------------------
-Write-Host "[ 5/7 ] Installing OpenCode proxy sanitizer wrapper for Windows..." -ForegroundColor Yellow
-
+# OpenCode Proxy Sanitizer Wrapper
 $OpencodeCmdPath = Join-Path $HomeDir "bin\opencode.cmd"
 $OpencodeCmdContent = @"
 @echo off
-rem ============================================================================
-rem OpenCode Proxy Sanitizer Wrapper for Windows
-rem Solves Bun fetch UnsupportedProxyProtocol by rewriting socks5:// -> http://
-rem ============================================================================
-
 setlocal enabledelayedexpansion
-
-set "TARGET_HTTP=%HTTP_PROXY%"
-set "TARGET_HTTPS=%HTTPS_PROXY%"
-
 if defined HTTP_PROXY (
-    if "!HTTP_PROXY:~0,9!"=="socks5://" (
-        set "HTTP_PROXY=http://!HTTP_PROXY:~9!"
-    )
+    if "!HTTP_PROXY:~0,9!"=="socks5://" set "HTTP_PROXY=http://!HTTP_PROXY:~9!"
 )
-
 if defined HTTPS_PROXY (
-    if "!HTTPS_PROXY:~0,9!"=="socks5://" (
-        set "HTTPS_PROXY=http://!HTTPS_PROXY:~9!"
-    )
+    if "!HTTPS_PROXY:~0,9!"=="socks5://" set "HTTPS_PROXY=http://!HTTPS_PROXY:~9!"
 )
-
 set "ALL_PROXY="
-
-rem Locate real opencode binary
 where opencode.exe >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    opencode.exe %*
-    exit /b %ERRORLEVEL%
-)
-
+if %ERRORLEVEL% equ 0 ( opencode.exe %* & exit /b %ERRORLEVEL% )
 where bun.exe >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    bunx opencode %*
-    exit /b %ERRORLEVEL%
-)
-
+if %ERRORLEVEL% equ 0 ( bunx opencode %* & exit /b %ERRORLEVEL% )
 npx -y opencode %*
 exit /b %ERRORLEVEL%
 "@
-
 [System.IO.File]::WriteAllText($OpencodeCmdPath, $OpencodeCmdContent, [System.Text.Encoding]::ASCII)
-Write-Host "  [ PASS ] Installed proxy wrapper at $OpencodeCmdPath" -ForegroundColor Green
+Write-Host "  [ PASS ] Generated OpenCode configs with Hybrid MVO and proxy wrapper." -ForegroundColor Green
 
 # ------------------------------------------------------------------------------
-# 6. Cross-Project SSOT Symlink / Copy across Projects
+# 9. Verification Audit
 # ------------------------------------------------------------------------------
-Write-Host "[ 6/7 ] Scaffolding AGENTS.md cross-agent SSOT in active projects..." -ForegroundColor Yellow
-
-$ProjectsDir = Join-Path $HomeDir "Projects"
-if (Test-Path $ProjectsDir) {
-    $SubDirs = Get-ChildItem -Path $ProjectsDir -Directory
-    $scaffoldCount = 0
-    foreach ($sub in $SubDirs) {
-        $geminiFile = Join-Path $sub.FullName "GEMINI.md"
-        $agentsFile = Join-Path $sub.FullName "AGENTS.md"
-
-        if (Test-Path $geminiFile) {
-            if (-not (Test-Path $agentsFile)) {
-                try {
-                    # Try creating symbolic link first
-                    New-Item -ItemType SymbolicLink -Path $agentsFile -Target "GEMINI.md" -Force -ErrorAction Stop | Out-Null
-                    $scaffoldCount++
-                } catch {
-                    # Fallback to copy if developer mode / privileges disallow symlinks
-                    Copy-Item -Path $geminiFile -Destination $agentsFile -Force
-                    $scaffoldCount++
-                }
-            }
-        }
-    }
-    Write-Host "  [ PASS ] Scaffolding complete across $scaffoldCount repositories in $ProjectsDir." -ForegroundColor Green
-}
-
-# ------------------------------------------------------------------------------
-# 7. Verification Audit
-# ------------------------------------------------------------------------------
-Write-Host "[ 7/7 ] Running system verification audit..." -ForegroundColor Yellow
+Write-Host "[ 9/9 ] Running system verification audit..." -ForegroundColor Yellow
 
 $AllPass = $true
 $Checks = @(
@@ -283,7 +303,9 @@ $Checks = @(
     (Join-Path $HomeDir ".gemini\GEMINI.md"),
     (Join-Path $HomeDir ".opencode\OPENCODE.md"),
     (Join-Path $HomeDir ".opencode\opencode.json"),
-    $OpencodeCmdPath
+    $OpencodeCmdPath,
+    (Join-Path $HomeDir "bin\agy-guard.cmd"),
+    (Join-Path $HomeDir ".git-templates\hooks\pre-commit")
 )
 
 foreach ($chk in $Checks) {
@@ -295,8 +317,14 @@ foreach ($chk in $Checks) {
     }
 }
 
+$RuleCount = (Get-ChildItem (Join-Path $HomeDir ".gemini\config\rules") -Filter "*.md").Count
+$SkillCount = (Get-ChildItem (Join-Path $HomeDir ".agents\skills") -Directory).Count
+
+Write-Host "  [ STAT ] Formal Rules: $RuleCount / 16" -ForegroundColor Cyan
+Write-Host "  [ STAT ] Agent Skills: $SkillCount / 33" -ForegroundColor Cyan
+
 Write-Host "======================================================" -ForegroundColor Cyan
-if ($AllPass) {
+if ($AllPass -and $RuleCount -ge 16 -and $SkillCount -ge 30) {
     Write-Host "[ SUCCESS ] Windows Sovereign AI Agent Governance Fully Installed!" -ForegroundColor Green
     Write-Host "Node is now 100% compliant with sovereign cluster standards." -ForegroundColor Green
 } else {

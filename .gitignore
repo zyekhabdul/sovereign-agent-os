@@ -6,6 +6,7 @@
 *.pem
 *.token
 *_live.json
+vault.enc
 !*.template.json
 
 # OS & Editor

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   agent-os:
     build:
@@ -12,9 +10,9 @@ services:
     hostname: sovereign-box
     restart: unless-stopped
     volumes:
-      - ~/Projects:/home/${DEV_USER:-developer}/Projects
-      - ~/Documents/Obsidian Vault:/home/${DEV_USER:-developer}/Documents/Obsidian Vault
-      - ~/.ssh:/home/${DEV_USER:-developer}/.ssh:ro
+      - "~/Projects:/home/${DEV_USER:-developer}/Projects"
+      - "~/Documents/Obsidian Vault:/home/${DEV_USER:-developer}/Documents/Obsidian Vault"
+      - "~/.ssh:/home/${DEV_USER:-developer}/.ssh:ro"
     environment:
       - TZ=${TZ:-UTC}
     stdin_open: true

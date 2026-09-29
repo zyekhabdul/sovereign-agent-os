@@ -43,8 +43,8 @@ RUN mkdir -p /home/${DEV_USER}/.npm-global /home/${DEV_USER}/.local/bin /home/${
 ENV PATH="/home/${DEV_USER}/.local/bin:/home/${DEV_USER}/.npm-global/bin:${PATH}"
 RUN npm config set prefix "/home/${DEV_USER}/.npm-global"
 
-# Install universal AI & dev CLI packages
-RUN npm install -g @modelcontextprotocol/server-filesystem @modelcontextprotocol/server-postgres @amonstack/gitea-mcp || true
+# Install universal AI & dev CLI packages (fail visibly so broken sandbox never ships silent)
+RUN npm install -g @modelcontextprotocol/server-filesystem @modelcontextprotocol/server-postgres @amonstack/gitea-mcp
 
 COPY --chown=${DEV_USER}:${DEV_USER} . /home/${DEV_USER}/Projects/sovereign-agent-os
 

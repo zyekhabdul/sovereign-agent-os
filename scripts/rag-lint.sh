@@ -68,17 +68,17 @@ find "${MEMORY_DIR}" -type f -name "*.md" ! -path "*/_archive/*" -print0 | while
     fi
 done
 
-# --- GATE 6: Active Task Cap in STATE.md (Max 10 tasks) ---
-echo "-> Checking Gate 6: Active Task Cap in STATE.md (Max 10 tasks)..."
+# --- GATE 6: Active Task Cap in STATE.md (Max 10 open tasks, schema-agnostic) ---
+echo "-> Checking Gate 6: Active Task Cap in STATE.md (Max 10 open tasks)..."
 for dir in "${MEMORY_DIR}"/*/; do
     [ -d "$dir" ] || continue
     ns=$(basename "$dir")
     [[ "$ns" =~ ^(_|global|system|pgp|Projects|projects-audit) || "$ns" =~ (^backup|_backup|backup$|_archive) ]] && continue
     state_file="${dir}STATE.md"
     if [ -f "$state_file" ]; then
-        tasks=$(awk '/## Active Milestone/{flag=1} /## Invariant/{flag=0} flag && /^- \[/ {print}' "$state_file" | wc -l)
+        tasks=$(awk ' /^## /{invar=($0 ~ /Invariant/)} !invar && /^- \[ \]/{c++} END{print c+0}' "$state_file")
         if [ "$tasks" -gt 10 ]; then
-            echo "[ ERROR ] [Gate 6] Active tasks in ${ns}/STATE.md exceeds 10 (${tasks} tasks found)"
+            echo "[ ERROR ] [Gate 6] Open tasks in ${ns}/STATE.md exceeds 10 (${tasks} tasks found)"
             ERRORS=$((ERRORS + 1))
         fi
     fi

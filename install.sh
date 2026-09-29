@@ -24,13 +24,13 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# 2. Install agy-guard CLI Tool (v5.1)
-echo "[ 1/7 ] Installing agy-guard CLI to ~/.local/bin/agy-guard..."
+# 2. Install agy-guard CLI Tool (v5.2)
+echo "[ 1/8 ] Installing agy-guard CLI to ~/.local/bin/agy-guard..."
 cp "$SCRIPT_DIR/bin/agy-guard" "$HOME/.local/bin/agy-guard"
 chmod +x "$HOME/.local/bin/agy-guard"
 
 # 3. Create Core AI Directory Trees
-echo "[ 2/7 ] Initializing AI agent directory structure..."
+echo "[ 2/8 ] Initializing AI agent directory structure..."
 mkdir -p "$HOME/.gemini/config/rules"
 mkdir -p "$HOME/.gemini/config/plugins"
 mkdir -p "$HOME/.agents/skills"
@@ -40,15 +40,23 @@ mkdir -p "$HOME/Documents/Obsidian Vault/00-AGY-Memory"
 mkdir -p "$HOME/Documents/Obsidian Vault/09-Panduan-Projek"
 
 # 4. Deploy 16 Formal Rule Specifications, Guides & Helper Scripts
-echo "[ 3/7 ] Deploying 16 formal binding rule files, project guides & scripts..."
+echo "[ 3/8 ] Deploying 16 formal binding rule files, project guides & scripts..."
 cp -v "$SCRIPT_DIR/rules/"*.md "$HOME/.gemini/config/rules/"
 cp -v "$SCRIPT_DIR/docs/"*.md "$HOME/Documents/Obsidian Vault/09-Panduan-Projek/"
 mkdir -p "$HOME/scripts"
 cp -v "$SCRIPT_DIR/scripts/"*.sh "$HOME/scripts/" 2>/dev/null || true
 chmod +x "$HOME/scripts/"*.sh 2>/dev/null || true
+if [ -d "$SCRIPT_DIR/scripts/lib" ]; then
+  mkdir -p "$HOME/scripts/lib"
+  cp -v "$SCRIPT_DIR/scripts/lib/"*.py "$HOME/scripts/lib/" 2>/dev/null || true
+fi
+if [ -d "$SCRIPT_DIR/scripts/lib" ]; then
+  mkdir -p "$HOME/scripts/lib"
+  cp -v "$SCRIPT_DIR/scripts/lib/"*.py "$HOME/scripts/lib/" 2>/dev/null || true
+fi
 
 # 5. Synchronize All 4 Physical GEMINI.md Files Byte-for-Byte
-echo "[ 4/7 ] Synchronizing GEMINI.md rules across all active endpoints..."
+echo "[ 4/8 ] Synchronizing GEMINI.md rules across all active endpoints..."
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/GEMINI.md"
 cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.gemini/config/GEMINI.md"
@@ -56,24 +64,25 @@ cp -v "$SCRIPT_DIR/GLOBAL_RULES.md" "$HOME/.agents/GEMINI.md"
 
 # Adapt absolute paths to current user home directory dynamically
 echo "  -> Normalizing absolute paths for local host environment ($HOME)..."
-find "$HOME/.gemini/config/rules" -type f -name "*.md" -exec sed -i -E "s|/home/(fuckadmin|aomiqaza)|$HOME|g" {} + 2>/dev/null || true
-sed -i -E "s|/home/(fuckadmin|aomiqaza)|$HOME|g" "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" 2>/dev/null || true
+find "$HOME/.gemini/config/rules" -type f -name "*.md" -exec sed -i -E "s|/home/[A-Za-z0-9_.-]+|$HOME|g" {} + 2>/dev/null || true
+sed -i -E "s|/home/[A-Za-z0-9_.-]+|$HOME|g" "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" 2>/dev/null || true
 
 # Cross-agent configuration parity (Claude Code, OpenCode, Codex)
 bash "$SCRIPT_DIR/scripts/sync-agents.sh" || true
 
 # 6. Deploy Plugins & Config
-echo "[ 5/7 ] Deploying plugins to ~/.gemini/config/plugins/..."
+echo "[ 5/8 ] Deploying plugins to ~/.gemini/config/plugins/..."
 cp -r "$SCRIPT_DIR/plugins/"* "$HOME/.gemini/config/plugins/" 2>/dev/null || true
 
 # 7. Configure Global Git Templates & Install Hooks Across Projects
-echo "[ 6/7 ] Configuring global Git hook templates & batch installing guards..."
+echo "[ 6/8 ] Configuring global Git hook templates & batch installing guards..."
 agy-guard set-global-git-templates
 agy-guard install-hooks-all || true
+echo "[ 7/8 ] Scaffolding Obsidian RAG memory namespaces..."
 agy-guard scaffold-all-projects || true
 
 # 8. Run Verification Audit
-echo "[ 7/7 ] Running empirical system status audit..."
+echo "[ 8/8 ] Running empirical system status audit..."
 agy-guard status
 
 echo "======================================================"

@@ -41,7 +41,7 @@ done
 # 2. Check Global Rules & Governance across Multi-Agent CLI
 echo ""
 echo "--- 2. AI Governance & Multi-Agent Rules ---"
-for rule_file in "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" "$HOME/.claude/CLAUDE.md" "$HOME/.opencode/OPENCODE.md"; do
+for rule_file in "$HOME/GEMINI.md" "$HOME/.gemini/GEMINI.md" "$HOME/.gemini/config/GEMINI.md" "$HOME/.agents/GEMINI.md" "$HOME/.claude/CLAUDE.md" "$HOME/.opencode/OPENCODE.md" "$HOME/.codex/CODEX.md"; do
   if [ -f "$rule_file" ]; then
     report_ok "Agent rule file active: $rule_file"
   else
@@ -97,6 +97,24 @@ for mcp_file in "$HOME/.gemini/config/mcp_config.json" "$HOME/.gemini/config/mcp
     report_warn "MCP config missing: $(basename "$mcp_file")"
   fi
 done
+
+# 4b. Check Codex MCP Configuration (first-class parity, TOML)
+echo ""
+echo "--- 4b. Codex MCP Configuration ---"
+CODEX_CFG="$HOME/.codex/config.toml"
+if [ -f "$CODEX_CFG" ]; then
+  if python3 -c "import tomllib" 2>/dev/null; then
+    if python3 -c "import tomllib; tomllib.load(open('$CODEX_CFG','rb'))" 2>/dev/null; then
+      report_ok "Valid Codex TOML: config.toml"
+    else
+      report_err "Corrupted Codex TOML: config.toml"
+    fi
+  else
+    report_ok "Codex config present: config.toml (TOML parse check skipped, no tomllib)"
+  fi
+else
+  report_warn "Codex MCP config missing: config.toml (run scripts/sync-agents.sh)"
+fi
 
 # 5. Check SSH Connectivity & Host Routing
 echo ""

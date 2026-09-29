@@ -4,7 +4,12 @@ set -euo pipefail
 # vault.sh — Sovereign Encrypted Credential Locker
 # Uses standard OpenSSL AES-256-CBC with PBKDF2 to encrypt/decrypt sensitive credentials without vendor lock-in.
 
-REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+SCRIPT_DIR_VAULT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+REPO_ROOT=""
+for _cand in "$SCRIPT_DIR_VAULT/.." "$HOME/Projects/sovereign-agent-os"; do
+  if [ -f "$_cand/GLOBAL_RULES.md" ]; then REPO_ROOT=$(cd "$_cand" && pwd); break; fi
+done
+[ -z "$REPO_ROOT" ] && REPO_ROOT=$(cd "$SCRIPT_DIR_VAULT/.." && pwd)
 VAULT_FILE="$REPO_ROOT/vault.enc"
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
@@ -155,28 +160,34 @@ if [ "$ACTION" == "kdbx-inject" ]; then
   [ -z "$TAVILY_KEY" ] && TAVILY_KEY=$(extract_secret "Tavily")
   [ -z "$TAVILY_KEY" ] && TAVILY_KEY=$(extract_secret "MCP/Services/MCP: search-tavily")
 
-  TARGET_CONF="$HOME/.gemini/config/mcp_config.json"
-  if [ -f "$TARGET_CONF" ]; then
-    if [ -n "$GH_TOKEN" ]; then
-      sed -i "s|\${GITHUB_PERSONAL_ACCESS_TOKEN}|$GH_TOKEN|g" "$TARGET_CONF"
-      echo "[ INJECTED ] GitHub token injected into $TARGET_CONF"
+  inject_placeholders_json() {
+    local target_file="$1"
+    local gh_token="$2"
+    local tavily_key="$3"
+    [ -f "$target_file" ] || return 0
+    local lib_cand=""
+    for _lib in "$REPO_ROOT/scripts/lib/vault_inject.py" "$HOME/Projects/sovereign-agent-os/scripts/lib/vault_inject.py"; do
+      if [ -f "$_lib" ]; then lib_cand="$_lib"; break; fi
+    done
+    if [ -z "$lib_cand" ]; then
+      echo "[ ERROR ] vault_inject.py not found; injection skipped for $target_file" >&2
+      return 1
     fi
-    if [ -n "$TAVILY_KEY" ]; then
-      sed -i "s|\${TAVILY_API_KEY}|$TAVILY_KEY|g" "$TARGET_CONF"
-      echo "[ INJECTED ] Tavily API key injected into $TARGET_CONF"
-    fi
+    GH_TOKEN_ENV="$gh_token" TAVILY_KEY_ENV="$tavily_key" TARGET_FILE_ENV="$target_file" python3 "$lib_cand" || return 1
+    echo "[ INJECTED ] Placeholders replaced (JSON-safe) in $target_file"
+  }
+
+  if [ -z "$GH_TOKEN" ] && [ -z "$TAVILY_KEY" ]; then
+    echo "[ WARN ] No secrets extracted (wrong master password or missing entries). Configs left untouched." >&2
   fi
+
+  TARGET_CONF="$HOME/.gemini/config/mcp_config.json"
+  inject_placeholders_json "$TARGET_CONF" "$GH_TOKEN" "$TAVILY_KEY"
 
   TARGET_EXT="$HOME/.gemini/config/mcp_config_extended.json"
-  if [ -f "$TARGET_EXT" ]; then
-    if [ -n "$GH_TOKEN" ]; then
-      sed -i "s|\${GITHUB_PERSONAL_ACCESS_TOKEN}|$GH_TOKEN|g" "$TARGET_EXT"
-    fi
-    if [ -n "$TAVILY_KEY" ]; then
-      sed -i "s|\${TAVILY_API_KEY}|$TAVILY_KEY|g" "$TARGET_EXT"
-    fi
-  fi
+  inject_placeholders_json "$TARGET_EXT" "$GH_TOKEN" "$TAVILY_KEY"
 
+  unset KDBX_PASS GH_TOKEN TAVILY_KEY
   if [ -f "$REPO_ROOT/scripts/sync-agents.sh" ]; then
     bash "$REPO_ROOT/scripts/sync-agents.sh"
   fi

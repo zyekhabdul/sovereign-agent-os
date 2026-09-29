@@ -10,7 +10,11 @@ if [[ "${1:-}" == "--no-pkg" ]]; then
 fi
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+REPO_ROOT=""
+for _cand in "$SCRIPT_DIR/.." "$HOME/Projects/sovereign-agent-os"; do
+  if [ -f "$_cand/GLOBAL_RULES.md" ]; then REPO_ROOT=$(cd "$_cand" && pwd); break; fi
+done
+[ -z "$REPO_ROOT" ] && REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
 echo "======================================================"
 echo "    AI & DEVELOPER UNIVERSAL BOOTSTRAP INITIALIZER    "

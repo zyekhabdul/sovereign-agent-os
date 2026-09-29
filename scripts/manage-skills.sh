@@ -7,7 +7,7 @@ set -euo pipefail
 
 SKILLS_DIR="$HOME/.agents/skills"
 ARCHIVE_DIR="$HOME/.agents/skills-archive"
-MANIFEST_DIR="$ARCHIVE_DIR/manifest/skills-manifest"
+MANIFEST_DIR="$HOME/.agents/skills-manifest"
 
 usage() {
   echo "Usage: $0 {status|list-active|list-archive|restore <name>|restore-all|archive <name>}"
@@ -19,7 +19,7 @@ cmd="${1:-status}"
 case "$cmd" in
   status)
     active_count=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
-    archive_count=$(find "$ARCHIVE_DIR" -mindepth 1 -maxdepth 1 -type d ! -name "manifest" 2>/dev/null | wc -l)
+    archive_count=$(find "$ARCHIVE_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
     echo "=================================================="
     echo "            SKILLS INVENTORY STATUS               "
     echo "=================================================="
@@ -35,7 +35,7 @@ case "$cmd" in
     ;;
 
   list-archive)
-    find "$ARCHIVE_DIR" -mindepth 1 -maxdepth 1 -type d ! -name "manifest" -exec basename {} \; | sort
+    find "$ARCHIVE_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort
     ;;
 
   restore)
@@ -54,7 +54,7 @@ case "$cmd" in
 
   restore-all)
     echo "Restoring all archived skills to $SKILLS_DIR..."
-    find "$ARCHIVE_DIR" -mindepth 1 -maxdepth 1 -type d ! -name "manifest" | while read -r d; do
+    find "$ARCHIVE_DIR" -mindepth 1 -maxdepth 1 -type d | while read -r d; do
       mv "$d" "$SKILLS_DIR/"
     done
     echo "[ COMPLETED ] All skills restored."

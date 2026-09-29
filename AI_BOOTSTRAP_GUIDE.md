@@ -32,13 +32,34 @@ Once installed, AI agents must utilize `agy-guard` subcommands during normal wor
 | `agy-guard prep` | Instant pre-flight onboarding (Branch, Dirty files, DoD, Decisions). | `inspect-before-apply.md` |
 | `agy-guard verify` | Auto-detect stack & execute test/linter verification. | `empirical-verification.md` |
 | `agy-guard diff-guard` | Audit diff radius and flag sensitive area modifications. | `sensitive-area-guard.md` |
+| `agy-guard log-warn` | Append warning to `00-AGY-Memory/<ns>/STATE.md` (standard tier). | `sensitive-area-guard.md` |
 | `agy-guard checkpoint` | Atomically log progress to `00-AGY-Memory/<ns>/STATE.md`. | `obsidian-rag.md` |
 | `agy-guard push` | Execute safe human-authorized git push (`ALLOW_GIT_PUSH=1`). | `git-push-restriction.md` |
 | `agy-guard status` | Full system audit of rules, MCPs, and memory limits. | `mcp-discovery.md` |
 
 ---
 
-## 3. MULTI-FORGE REPOSITORY PROTOCOL (TRI-PUSH & PENTA-MIRROR)
+## 3. STRICTNESS TIERS (PER-REPO GOVERNANCE)
+
+Pre-commit harness mematuhi tier per repositori (auto-resolve, override eksplisit menang):
+
+| Tier | Perilaku | Cocok untuk |
+| :--- | :--- | :--- |
+| `strict` (default) | Semua 7 checks HARDBLOCK (placeholder, emoji, test-mutation, secret, required-files, 150-line diff, dep-lock). | Repo sovereign (`zyekhabdul`/`aomiqaza` origin). |
+| `standard` | Test-mutation + 150-line diff turun jadi WARN (tercatat di `STATE.md` via `log-warn`); 5 checks lain tetap HARDBLOCK. | Repo umum/kolaboratif, refactor besar. |
+| `passthrough` | Seluruh harness SKIP (exit 0). Auto-checkpoint juga SKIP kecuali `-n` eksplisit. | Third-party upstream (origin di luar sovereign forges) — otomatis, tanpa konfigurasi. |
+
+```bash
+# Opt-down eksplisit per repo (auto-passthrough third-party tidak perlu ini):
+git config sovereign.strictness standard   # atau strict | passthrough
+git config --unset sovereign.strictness    # kembali ke auto-resolve
+```
+
+Batch installer (`agy-guard install-hooks-all`, `install-rag-hooks.sh`) melewati third-party upstream sepenuhnya.
+
+---
+
+## 4. MULTI-FORGE REPOSITORY PROTOCOL (TRI-PUSH & PENTA-MIRROR)
 
 Every project repository is synchronized to multi-remote endpoints:
 - **GitHub**: `git@github.com:zyekhabdul/<repo-name>.git` (Primary)
@@ -62,9 +83,25 @@ bash scripts/setup-tri-push.sh --penta /path/to/repo <repo-name>
 # (or symlink: bash scripts/setup-penta-push.sh --penta /path/to/repo <repo-name>)
 ```
 
+### Safe Sync (dry-run + auto-backup)
+```bash
+bash scripts/sync-agents.sh --dry-run   # print plan, change nothing
+bash scripts/sync-agents.sh             # snapshots live configs to ~/.config/sovereign-backup/<ts>/ first
+```
+
+### Verification Harness (Sovereign CI)
+Every push runs `.github/workflows/sovereign-ci.yml` (hygiene, tier matrix,
+codex blackbox, windows lint, docker build). Same suite locally:
+```bash
+for f in scripts/*.sh install.sh tests/*.sh; do bash -n "$f"; done
+python3 -m py_compile bin/agy-guard scripts/lib/*.py
+python3 tests/test_hook_parity.py && python3 tests/test_vault_inject.py
+bash tests/test_tier_matrix.sh && bash tests/test_codex_blackbox.sh
+```
+
 ---
 
-## 4. CREDENTIAL & SECRET MANAGEMENT PROTOCOL
+## 5. CREDENTIAL & SECRET MANAGEMENT PROTOCOL
 
 **Golden Law: ZERO Plaintext Secrets in Sovereign Git Tree.**
 

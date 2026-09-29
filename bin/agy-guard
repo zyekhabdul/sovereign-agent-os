@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-agy-guard - Deterministic Guardrail & Governance Tool for AI Agents (v5.1 Enterprise)
+agy-guard - Deterministic Guardrail & Governance Tool for AI Agents (v5.2 Enterprise)
 Provides rules synchronization, milestone-gated Obsidian RAG sync, instant project context briefing,
 on-demand skill management, polyglot symbol finder, secure env inspector, and git push protection.
 """
@@ -24,13 +24,25 @@ CONFIG_DIR = HOME / ".gemini" / "config"
 SKILLS_DIR = HOME / ".agents" / "skills"
 SKILLS_ARCHIVE = HOME / ".agents" / "skills_archive"
 
+def get_sovereign_repo_root():
+    try:
+        here = Path(__file__).resolve()
+        for parent in [here.parent.parent, here.parent, Path.cwd()]:
+            if (parent / "GLOBAL_RULES.md").exists():
+                return parent
+    except Exception:
+        pass
+    return HOME / "Projects" / "sovereign-agent-os"
+
+REPO_ROOT = get_sovereign_repo_root()
+
 RULE_FILES = [
     HOME / "GEMINI.md",
     HOME / ".gemini" / "GEMINI.md",
     CONFIG_DIR / "GEMINI.md",
     HOME / ".agents" / "GEMINI.md",
-    HOME / "Projects" / "sovereign-agent-os" / "templates" / "GEMINI.md",
-    HOME / "Projects" / "sovereign-agent-os" / "GLOBAL_RULES.md",
+    REPO_ROOT / "templates" / "GEMINI.md",
+    REPO_ROOT / "GLOBAL_RULES.md",
 ]
 
 RULE_DOCS = [
@@ -52,7 +64,7 @@ RULE_DOCS = [
     CONFIG_DIR / "rules" / "workflow-ai-agent.md",
 ]
 
-CANONICAL_GEMINI_MD = """# AI AGENT WORKSPACE STANDARDS & SSOT POINTER
+_FALLBACK_GEMINI_MD = """# AI AGENT WORKSPACE STANDARDS & SSOT POINTER
 
 Global rules and binding guidelines are centralized in the Master Configuration directory.
 All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere to the authoritative rules defined in:
@@ -76,7 +88,54 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **Memory & RAG**: Obsidian 4-file governance (`~/.gemini/config/rules/obsidian-rag.md`)
 - **MCP Discovery**: On-demand dual-file configuration protocol (`~/.gemini/config/rules/mcp-discovery.md`)
 - **Communication**: Caveman terse high-density, strict no-emoji.
+
+> [ NOTE ] Fresh clone without `~/.gemini` yet: authoritative fallback is `rules/` + `docs/` in this repo. Run `bash install.sh` to materialize `~/.gemini/config/`.
 """
+
+def load_canonical_gemini_md():
+    for candidate in [REPO_ROOT / "GLOBAL_RULES.md", REPO_ROOT / "templates" / "GEMINI.md"]:
+        try:
+            if candidate.exists():
+                text = candidate.read_text(encoding="utf-8")
+                if text.strip():
+                    return text
+        except Exception:
+            pass
+    return _FALLBACK_GEMINI_MD
+
+CANONICAL_GEMINI_MD = load_canonical_gemini_md()
+
+SOVEREIGN_REMOTE_RE = re.compile(r"zyekhabdul|aomiqaza")
+THIRD_PARTY_RE = re.compile(r"aur\.archlinux\.org|gitlab\.archlinux\.org")
+
+def get_origin_url(repo_path):
+    try:
+        return subprocess.check_output(
+            ["git", "config", "--get", "remote.origin.url"], cwd=repo_path, stderr=subprocess.DEVNULL, text=True
+        ).strip()
+    except Exception:
+        return ""
+
+def is_third_party_upstream(repo_path):
+    origin = get_origin_url(repo_path)
+    if not origin:
+        return False
+    if THIRD_PARTY_RE.search(origin):
+        return True
+    return not SOVEREIGN_REMOTE_RE.search(origin)
+
+def resolve_strictness(repo_path):
+    try:
+        v = subprocess.check_output(
+            ["git", "config", "--get", "sovereign.strictness"], cwd=repo_path, stderr=subprocess.DEVNULL, text=True
+        ).strip().lower()
+        if v in ("strict", "standard", "passthrough"):
+            return v
+    except Exception:
+        pass
+    if is_third_party_upstream(repo_path):
+        return "passthrough"
+    return "strict"
 
 def get_git_root(cwd=None):
     if cwd is None:
@@ -144,10 +203,11 @@ def resolve_namespace(cwd=None):
 
 def cmd_sync_rules(args):
     print("[ AGY-GUARD ] Synchronizing rule files...")
+    canonical = load_canonical_gemini_md()
     synced = 0
     for target in RULE_FILES:
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(CANONICAL_GEMINI_MD, encoding="utf-8")
+        target.write_text(canonical, encoding="utf-8")
         print(f"  [ SYNCED ] -> {target}")
         synced += 1
     print(f"[ SUCCESS ] {synced} rule files synchronized byte-for-byte.")
@@ -166,22 +226,23 @@ def cmd_sync_rules(args):
 def cmd_status(args):
     fix_mode = getattr(args, "fix", False)
     header_extra = " (AUTO-FIX MODE)" if fix_mode else ""
-    print(f"=== [ AGY-GUARD SYSTEM STATUS v5.1{header_extra} ] ===")
-    
+    print(f"=== [ AGY-GUARD SYSTEM STATUS v5.2{header_extra} ] ===")
+    canonical = load_canonical_gemini_md()
+
     # 1. Check GEMINI.md sync
     for target in RULE_FILES:
         if not target.exists():
             if fix_mode:
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(CANONICAL_GEMINI_MD, encoding="utf-8")
+                target.write_text(canonical, encoding="utf-8")
                 print(f"  [ REPAIRED ] {target}")
             else:
                 print(f"  [ MISSING ] {target}")
         else:
             content = target.read_text(encoding="utf-8")
-            if content.strip() != CANONICAL_GEMINI_MD.strip():
+            if content.strip() != canonical.strip():
                 if fix_mode:
-                    target.write_text(CANONICAL_GEMINI_MD, encoding="utf-8")
+                    target.write_text(canonical, encoding="utf-8")
                     print(f"  [ REPAIRED ] {target}")
                 else:
                     print(f"  [ DRIFT ] {target}")
@@ -350,6 +411,10 @@ def cmd_checkpoint(args):
         print(f"[ SKIP ] agy-guard checkpoint skipped for out-of-boundary directory: {cwd}")
         return
 
+    if not args.namespace and is_third_party_upstream(cwd):
+        print(f"[ SKIP ] agy-guard checkpoint skipped for third-party upstream (tier=passthrough). Override with -n <namespace>.")
+        return
+
     ns = args.namespace or resolve_namespace(cwd)
     if not ns or ns.startswith("tmp.") or ns == "tmp":
         print(f"[ SKIP ] agy-guard checkpoint skipped for invalid or ephemeral namespace: {ns}")
@@ -443,25 +508,69 @@ Project workspace located at `{cwd}`.
     print(f"  • Status: {status}")
     print(f"  • Message: {msg}")
 
+def cmd_log_warn(args):
+    cwd = Path.cwd().resolve()
+    str_cwd = str(cwd)
+    if str_cwd.startswith("/tmp") or str_cwd.startswith("/var/tmp") or not str_cwd.startswith(str(HOME)):
+        print(f"[ SKIP ] agy-guard log-warn skipped for out-of-boundary directory: {cwd}")
+        return
+
+    ns = resolve_namespace(cwd)
+    if not ns or ns.startswith("tmp.") or ns == "tmp":
+        print(f"[ SKIP ] agy-guard log-warn skipped for invalid or ephemeral namespace: {ns}")
+        return
+
+    msg = args.msg or "Unclassified harness warning"
+    state_file = MEMORY_DIR / ns / "STATE.md"
+    if not state_file.exists():
+        print(f"[ SKIP ] agy-guard log-warn: no STATE.md for '{ns}' (run checkpoint first)")
+        return
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    lines = state_file.read_text(encoding="utf-8").splitlines()
+    header = "## Pre-commit Warnings"
+    if header in lines:
+        idx = lines.index(header)
+        head, tail = lines[:idx + 1], lines[idx + 1:]
+    else:
+        head, tail = lines + ["", header], []
+
+    warn_lines = [l for l in tail if l.startswith("- [")]
+    others = [l for l in tail if not l.startswith("- [")]
+    warn_lines.append(f"- [{now}] {msg}")
+    warn_lines = warn_lines[-20:]
+    state_file.write_text("\n".join(head + warn_lines + others).strip() + "\n", encoding="utf-8")
+    print(f"[ LOGGED ] Warning recorded in 00-AGY-Memory/{ns}/STATE.md")
+
+POST_COMMIT_SCRIPT = """#!/usr/bin/env bash
+# Auto-generated by agy-guard global template
+if command -v agy-guard >/dev/null 2>&1; then
+    COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null | head -n 1)
+    agy-guard checkpoint --msg "Auto-commit: ${COMMIT_MSG:-Updated files}" --status ACTIVE >/dev/null 2>&1 &
+fi
+"""
+
+PRE_PUSH_SCRIPT = """#!/usr/bin/env bash
+# Hard Push Guard Interceptor by agy-guard
+if [ "${ALLOW_GIT_PUSH:-0}" != "1" ]; then
+    echo "[ HARD GUARD BLOCKED ] 'git push' is forbidden by default AI Agent policy." >&2
+    echo "To push with explicit human intent, run: ALLOW_GIT_PUSH=1 git push" >&2
+    exit 1
+fi
+"""
+
 def cmd_install_hook(args):
     cwd = Path.cwd()
     git_root = get_git_root(cwd)
     if not git_root:
         print("[ ERROR ] Current directory is not inside a git repository.", file=sys.stderr)
         sys.exit(1)
-    
+
     hooks_dir = git_root / ".git" / "hooks"
     hooks_dir.mkdir(parents=True, exist_ok=True)
     post_commit = hooks_dir / "post-commit"
-    
-    hook_script = """#!/usr/bin/env bash
-# Auto-generated by agy-guard
-if command -v agy-guard >/dev/null 2>&1; then
-    COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null | head -n 1)
-    agy-guard checkpoint --msg "Auto-commit: ${COMMIT_MSG:-Updated files}" --status ACTIVE >/dev/null 2>&1 &
-fi
-"""
-    post_commit.write_text(hook_script, encoding="utf-8")
+
+    post_commit.write_text(load_post_commit_script(), encoding="utf-8")
     post_commit.chmod(0o755)
     print(f"[ SUCCESS ] Git post-commit hook successfully installed at: {post_commit}")
 
@@ -471,28 +580,49 @@ def cmd_install_push_guard(args):
     if not git_root:
         print("[ ERROR ] Current directory is not inside a git repository.", file=sys.stderr)
         sys.exit(1)
-        
+
     hooks_dir = git_root / ".git" / "hooks"
     hooks_dir.mkdir(parents=True, exist_ok=True)
     pre_push = hooks_dir / "pre-push"
-    
-    hook_script = """#!/usr/bin/env bash
-# Hard Push Guard Interceptor by agy-guard
-if [ "${ALLOW_GIT_PUSH:-0}" != "1" ]; then
-    echo "[ HARD GUARD BLOCKED ] 'git push' is forbidden by default AI Agent policy." >&2
-    echo "To push with explicit human intent, run: ALLOW_GIT_PUSH=1 git push" >&2
-    exit 1
-fi
-"""
-    pre_push.write_text(hook_script, encoding="utf-8")
+
+    pre_push.write_text(load_pre_push_script(), encoding="utf-8")
     pre_push.chmod(0o755)
     print(f"[ SUCCESS ] Anti-Push Protection Hook installed at: {pre_push}")
     print("  • Remote push is now physically blocked unless ALLOW_GIT_PUSH=1 is passed.")
 
 PRE_COMMIT_SCRIPT = r"""#!/usr/bin/env bash
 # PRE-COMMIT HARNESS: Deterministic Anti-Blunder Sanitizer
-# Generated by agy-guard
+# Generated by agy-guard (SSOT: templates/git-hooks/pre-commit)
 set -euo pipefail
+
+# 0. Sovereign strictness tier: strict (default) | standard | passthrough
+# Explicit override: git config sovereign.strictness <tier>
+# Third-party upstream (origin outside sovereign forges) auto-passthrough.
+SOVEREIGN_TIER="$(git config --get sovereign.strictness 2>/dev/null || true)"
+if [ -z "$SOVEREIGN_TIER" ]; then
+    _SOV_ORIGIN="$(git config --get remote.origin.url 2>/dev/null || true)"
+    if [ -n "$_SOV_ORIGIN" ] && ! echo "$_SOV_ORIGIN" | grep -Eq 'zyekhabdul|aomiqaza'; then
+        SOVEREIGN_TIER="passthrough"
+    else
+        SOVEREIGN_TIER="strict"
+    fi
+fi
+case "$SOVEREIGN_TIER" in
+    strict|standard|passthrough) ;;
+    *) SOVEREIGN_TIER="strict" ;;
+esac
+if [ "$SOVEREIGN_TIER" = "passthrough" ]; then
+    echo "[ SKIP ] Sovereign pre-commit harness passthrough for third-party upstream (tier=passthrough)."
+    exit 0
+fi
+
+# WARN helper for standard tier: print + best-effort log to Obsidian STATE.md
+sovereign_warn() {
+    echo "[ WARN ] $1" >&2
+    if command -v agy-guard >/dev/null 2>&1; then
+        agy-guard log-warn --msg "$1" >/dev/null 2>&1 || true
+    fi
+}
 
 # 1. Block Lazy Truncation Placeholders (Membunuh: // ... existing code ...)
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
@@ -515,9 +645,13 @@ if [ "${ALLOW_TEST_MUTATION:-0}" != "1" ]; then
     MODIFIED_TESTS=$(git diff --cached --diff-filter=M --name-only | grep -E '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
     STAGED_SRC=$(git diff --cached --name-only | grep -vE '^tests/|^spec/|.*\.test\..*|.*\.spec\..*' || true)
     if [ -n "$MODIFIED_TESTS" ] && [ -n "$STAGED_SRC" ]; then
-        echo "[ HARDBLOCK ] Memodifikasi file tes eksisting bersamaan dengan source code dilarang." >&2
-        echo "Penambahan file tes baru diizinkan. Untuk memodifikasi tes eksisting, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
-        exit 1
+        if [ "$SOVEREIGN_TIER" = "standard" ]; then
+            sovereign_warn "Test+source co-modification allowed under standard tier (files: $MODIFIED_TESTS)"
+        else
+            echo "[ HARDBLOCK ] Memodifikasi file tes eksisting bersamaan dengan source code dilarang." >&2
+            echo "Penambahan file tes baru diizinkan. Untuk memodifikasi tes eksisting, jalankan: ALLOW_TEST_MUTATION=1 git commit" >&2
+            exit 1
+        fi
     fi
 fi
 
@@ -576,10 +710,14 @@ if [ "${ALLOW_LARGE_DIFF:-0}" != "1" ]; then
     } END { print sum+0 }')
     
     if [ "$TOTAL_DIFF_LINES" -gt 150 ]; then
-        echo "[ HARDBLOCK ] Staged diff (${TOTAL_DIFF_LINES} baris) melebihi batas Ponytail / YAGNI (150 baris)!" >&2
-        echo "AI diwajibkan memecah pekerjaan menjadi atomic commits / chunks kecil." >&2
-        echo "Untuk mengizinkan diff besar jika benar-benar diperlukan, jalankan: ALLOW_LARGE_DIFF=1 git commit" >&2
-        exit 1
+        if [ "$SOVEREIGN_TIER" = "standard" ]; then
+            sovereign_warn "Large staged diff (${TOTAL_DIFF_LINES} baris > 150) allowed under standard tier; consider atomic commits."
+        else
+            echo "[ HARDBLOCK ] Staged diff (${TOTAL_DIFF_LINES} baris) melebihi batas Ponytail / YAGNI (150 baris)!" >&2
+            echo "AI diwajibkan memecah pekerjaan menjadi atomic commits / chunks kecil." >&2
+            echo "Untuk mengizinkan diff besar jika benar-benar diperlukan, jalankan: ALLOW_LARGE_DIFF=1 git commit" >&2
+            exit 1
+        fi
     fi
 fi
 
@@ -643,6 +781,26 @@ echo "[ PASS ] Pre-commit deterministic checks verified (exit 0)."
 exit 0
 """
 
+def load_hook_script(name, fallback):
+    try:
+        tmpl = REPO_ROOT / "templates" / "git-hooks" / name
+        if tmpl.exists():
+            text = tmpl.read_text(encoding="utf-8")
+            if text.strip():
+                return text
+    except Exception:
+        pass
+    return fallback
+
+def load_pre_commit_script():
+    return load_hook_script("pre-commit", PRE_COMMIT_SCRIPT)
+
+def load_post_commit_script():
+    return load_hook_script("post-commit", POST_COMMIT_SCRIPT)
+
+def load_pre_push_script():
+    return load_hook_script("pre-push", PRE_PUSH_SCRIPT)
+
 def cmd_install_pre_commit(args):
     cwd = Path.cwd()
     git_root = get_git_root(cwd)
@@ -654,7 +812,7 @@ def cmd_install_pre_commit(args):
     hooks_dir.mkdir(parents=True, exist_ok=True)
     pre_commit = hooks_dir / "pre-commit"
     
-    pre_commit.write_text(PRE_COMMIT_SCRIPT, encoding="utf-8")
+    pre_commit.write_text(load_pre_commit_script(), encoding="utf-8")
     pre_commit.chmod(0o755)
     print(f"[ SUCCESS ] Anti-Blunder Pre-Commit Hook installed at: {pre_commit}")
 
@@ -956,75 +1114,50 @@ def cmd_install_hooks_all(args):
     print(f"=== [ BATCH INSTALLING GIT HOOKS IN {target_dir} ] ===")
     
     installed_count = 0
+    skipped_count = 0
     for p in target_dir.iterdir():
         if p.is_dir() and (p / ".git").exists():
+            if is_third_party_upstream(p):
+                print(f"  [ SKIP ] {p.name} (third-party upstream, sovereign hooks withheld)")
+                skipped_count += 1
+                continue
             hooks_dir = p / ".git" / "hooks"
             hooks_dir.mkdir(parents=True, exist_ok=True)
             
             # 1. post-commit hook
             post_commit = hooks_dir / "post-commit"
-            post_commit_script = """#!/usr/bin/env bash
-# Auto-generated by agy-guard
-if command -v agy-guard >/dev/null 2>&1; then
-    COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null | head -n 1)
-    agy-guard checkpoint --msg "Auto-commit: ${COMMIT_MSG:-Updated files}" --status ACTIVE >/dev/null 2>&1 &
-fi
-"""
-            post_commit.write_text(post_commit_script, encoding="utf-8")
+            post_commit.write_text(load_post_commit_script(), encoding="utf-8")
             post_commit.chmod(0o755)
-            
+
             # 2. pre-push hook
             pre_push = hooks_dir / "pre-push"
-            pre_push_script = """#!/usr/bin/env bash
-# Hard Push Guard Interceptor by agy-guard
-if [ "${ALLOW_GIT_PUSH:-0}" != "1" ]; then
-    echo "[ HARD GUARD BLOCKED ] 'git push' is forbidden by default AI Agent policy." >&2
-    echo "To push with explicit human intent, run: ALLOW_GIT_PUSH=1 git push" >&2
-    exit 1
-fi
-"""
-            pre_push.write_text(pre_push_script, encoding="utf-8")
+            pre_push.write_text(load_pre_push_script(), encoding="utf-8")
             pre_push.chmod(0o755)
             
             # 3. pre-commit hook
             pre_commit = hooks_dir / "pre-commit"
-            pre_commit.write_text(PRE_COMMIT_SCRIPT, encoding="utf-8")
+            pre_commit.write_text(load_pre_commit_script(), encoding="utf-8")
             pre_commit.chmod(0o755)
             
             print(f"  [ INSTALLED ] {p.name} (pre-commit + post-commit + pre-push)")
             installed_count += 1
-            
-    print(f"[ SUCCESS ] Installed 3 hooks across {installed_count} repositories.")
+
+    print(f"[ SUCCESS ] Installed 3 hooks across {installed_count} repositories ({skipped_count} third-party skipped).")
 
 def cmd_set_global_git_templates(args):
     tpl_dir = HOME / ".git-templates" / "hooks"
     tpl_dir.mkdir(parents=True, exist_ok=True)
     
     post_commit = tpl_dir / "post-commit"
-    post_commit_script = """#!/usr/bin/env bash
-# Auto-generated by agy-guard global template
-if command -v agy-guard >/dev/null 2>&1; then
-    COMMIT_MSG=$(git log -1 --pretty=%B 2>/dev/null | head -n 1)
-    agy-guard checkpoint --msg "Auto-commit: ${COMMIT_MSG:-Updated files}" --status ACTIVE >/dev/null 2>&1 &
-fi
-"""
-    post_commit.write_text(post_commit_script, encoding="utf-8")
+    post_commit.write_text(load_post_commit_script(), encoding="utf-8")
     post_commit.chmod(0o755)
-    
+
     pre_push = tpl_dir / "pre-push"
-    pre_push_script = """#!/usr/bin/env bash
-# Hard Push Guard Interceptor by agy-guard
-if [ "${ALLOW_GIT_PUSH:-0}" != "1" ]; then
-    echo "[ HARD GUARD BLOCKED ] 'git push' is forbidden by default AI Agent policy." >&2
-    echo "To push with explicit human intent, run: ALLOW_GIT_PUSH=1 git push" >&2
-    exit 1
-fi
-"""
-    pre_push.write_text(pre_push_script, encoding="utf-8")
+    pre_push.write_text(load_pre_push_script(), encoding="utf-8")
     pre_push.chmod(0o755)
     
     pre_commit = tpl_dir / "pre-commit"
-    pre_commit.write_text(PRE_COMMIT_SCRIPT, encoding="utf-8")
+    pre_commit.write_text(load_pre_commit_script(), encoding="utf-8")
     pre_commit.chmod(0o755)
     
     subprocess.run(["git", "config", "--global", "init.templateDir", str(HOME / ".git-templates")], check=True)
@@ -1457,7 +1590,7 @@ def cmd_tdd(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="agy-guard v5.1: Deterministic Guardrails & Governance for AI Agents"
+        description="agy-guard v5.2: Deterministic Guardrails & Governance for AI Agents"
     )
     subparsers = parser.add_subparsers(dest="subcommand", required=True)
     
@@ -1507,6 +1640,11 @@ def main():
     sub_cp.add_argument("-n", "--namespace", type=str, default=None, help="Target namespace override")
     sub_cp.set_defaults(func=cmd_checkpoint)
     
+    # log-warn
+    sub_warn = subparsers.add_parser("log-warn", help="Append warning to Obsidian STATE.md (standard tier)")
+    sub_warn.add_argument("-m", "--msg", type=str, default="Unclassified harness warning", help="Warning message")
+    sub_warn.set_defaults(func=cmd_log_warn)
+
     # install-hook
     subparsers.add_parser("install-hook", help="Install git post-commit hook for auto Obsidian checkpoint").set_defaults(func=cmd_install_hook)
     

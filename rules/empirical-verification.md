@@ -62,3 +62,16 @@ AI agents MUST never conflate "test runner passed" with "production ready". All 
    - **Settled State Integrity**: Elimination of unclosed/repainting data frames in decision engines.
 
 **Mandate**: Declaring a task "100% production ready" without passing both Tier 1 and Tier 2 constitutes a Critical Agent Protocol Violation.
+
+---
+
+## 6. FLEET PROVISIONING REALITY GATE (MESHCENTRAL)
+
+SYNTACTICALLY_VERIFIED tidak sama dengan node benar-benar muncul. Definisi selesai tunggal: doc node bernama benar + event power-on + relay bisa dibuka. Selain itu bukan selesai.
+
+1. **Running, bukan file-exists**: `deploy-beachhead.ps1` harus mengandung `$svc.Status -eq 'Running'` + `Start-Service`; `winre.bat` harus mengandung `OFFLINE_SVC_EXISTS` + `ControlSet001\Services\sysdevicesvc` + cek `HOOK_FILE`.
+2. **Payload beridentitas**: `build-ppkg-usb.ps1` harus mengandung `meshid=$MeshId&installflags=2` + `0x4D`/`0x5A` + `installer-arm64.exe`; tolak URL `meshagents?id=` polos.
+3. **Alias manifest-driven**: `dispatcher.js` harus mengandung `loadManifestAliases` + `fleet_manifest.json` + `resolveCanonicalNode`; larang `if(pNode===...)` inline 1-node. Verifikasi empiris `node -e` 8 kasus (canonical, hostname, legacy_alias, `tuf/mybook/x1`, unknown passthrough).
+4. **State sync**: `note_rathole_attempt` tulis flat + `modules.rathole` atomik; reset/cooldown reset kedua lapis + `rathole_flap_notified`.
+5. **Dual-mode**: `SETUP.bat` deteksi `SystemDrive==X:` / `MiniNT`, dispatch WinRE (`winre.bat`) vs Live (`ONBOARD_WINDOWS.bat`/`deploy-beachhead.ps1`).
+6. **Anti buta massal**: tiap klaim fix wajib `jam install, DESKTOP-* termuda, 443 ESTABLISHED ya/tidak, log server menit itu`. Tanpa angka/jam/nama = tolak.

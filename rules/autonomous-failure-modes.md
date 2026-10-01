@@ -87,3 +87,23 @@ description: Mandatory Defense Invariants Against 10 Autonomous AI Blunders and 
   3. **Dimension C (Temporal Deadlocks & Capital Prison)**: Verify that single-resource or single-position algorithms include timeout watchdogs / time-stops (`max_hold_minutes`) to prevent capital/state from locking forever during sideways/inactivity periods.
   4. **Dimension D (Intra-Lifecycle State Integrity)**: Verify that decision logic evaluates settled/closed states (e.g. `df.iloc[-2]` closed candle) rather than dirty/unclosed states (`df.iloc[-1]`) that suffer from repainting or volume distortion.
   5. **Claim Discipline**: AI must distinguish between `[ SYNTACTICALLY_VERIFIED ]` (code passes local harness) and `[ PRODUCTION_EXECUTION_AUDITED ]` (verified against real-world friction). Strict prohibition on unconditional "100% ready" claims without executing the 4-dimension audit.
+
+---
+
+## 4. FLEET PROVISIONING FAILURE MODES (EMPIRIS MESHCENTRAL 2026-10-01)
+
+### Failure Mode 17: False-Idempotent Success (Sukses Palsu)
+- **Mechanism**: `Test-Path stateFile -or Test-Path exe` / `if exist SVC_BIN` langsung `exit 0 SUDAH TERINJEKSI` padahal service mati / binary stale. Retry dianggap sukses, node tetap tak terdetect di MeshCentral.
+- **Defense Invariant**: Klaim injected hanya jika service `Status -eq 'Running'` (coba `Start-Service` dulu). Di WinRE/offline: cek registry hive `ControlSet001\Services\sysdevicesvc` (`OFFLINE_SVC_EXISTS`) + `HOOK_FILE`, bukan file saja.
+
+### Failure Mode 18: Identity-Less Payload + Monkey-Patch Stacking
+- **Mechanism**: URL `$ServerUrl/meshagents?id=$agentId` tanpa `&meshid=$MeshId&installflags=2`, tanpa cek `MZ` (`0x4D 0x5A`) + size, tanpa ARM64; alias `if(pNode==='burst-016')` inline; 4 trigger konkuren aktif bersamaan agar gejala hilang tanpa tahu rantai mana jalan.
+- **Defense Invariant**: Builder WAJIB `meshid+installflags` + cek MZ/size + SSoT meshid tunggal. Trigger SATU (service pre-logon) + mutex file beachhead, sisanya cadangan nonaktif. Alias via manifest (`fleet_manifest.json` → `loadManifestAliases()`), bukan hardcode nama pribadi.
+
+### Failure Mode 19: Flat vs Nested State Desync
+- **Mechanism**: Update `state["rathole_attempts"]` tapi tidak `modules.rathole.attempts`; reset cooldown lupa `rathole_flap_notified` / `cooldown_notified`. 3 copy `deploy-beachhead.ps1` drift terpisah.
+- **Defense Invariant**: Setiap tulis flat WAJIB sync nested dan sebaliknya dalam satu patch atomik; setiap reset WAJIB reset kedua lapis. Duplikat file deploy WAJIB `md5sum` sama atau diganti 1 SSoT symlink.
+
+### Failure Mode 20: Single-Environment Assumption
+- **Mechanism**: `SETUP.bat` selalu `call winre.bat` walau di Live Windows; tidak deteksi `SystemDrive==X:` / `HKLM\...\MiniNT`. Flashdisk tak mempan, user bingung colok saat WinRE cmd vs lock screen.
+- **Defense Invariant**: WAJIB deteksi dual-mode WinRE vs Live Windows dan dispatch ke `winre.bat` vs `ONBOARD_WINDOWS.bat`/`deploy-beachhead.ps1`.

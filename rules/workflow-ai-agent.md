@@ -61,3 +61,13 @@ Pause execution and solicit human confirmation ONLY at:
 ## 4. RFC/ADR THRESHOLD GATE
 - RFC is strictly bypassed for routine work and Track A tasks.
 - RFC is triggered ONLY when touching new dependencies, DB schemas, breaking public API contracts, or >3 modules blast radius.
+
+---
+
+## 5. FLEET ANTI-BLUNDER PROTOCOL (MESHCENTRAL FASE 0-3)
+
+1. **Fase 0 bekukan baseline (tanpa ubah apa pun)**: backup `meshcentral.db`, compact NeDB, catat jumlah `_id` unik + nama.
+2. **Fase 1 satu mesin kurban, jalur online** (tanpa USB/patch): catat jam install, tunggu 5 menit, cari `DESKTOP-*` termuda di grup → rename. Muncul = pipeline sehat (obatnya SOP + detektor); tak muncul = ambil bukti sisi agen baru boleh sentuh kode.
+3. **Fase 2 perbaiki hanya yang terbukti patah** (meshid di URL, alias di manifest, mutex di installer).
+4. **Fase 3 massal**: `plug → 1 perintah → reboot → cabut` (~2 mnt/device, paralel), lalu verifikasi borongan `watch DESKTOP-* baru + auto-rename`.
+5. **Invariant**: 1 perubahan → 1 observasi; `branch dulu, main belakangan`; rahasia tak pernah di repo/chat; tolak `retry/push` buta tanpa bukti.

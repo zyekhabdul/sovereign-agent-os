@@ -160,6 +160,7 @@ if all_servers:
     home_dir = os.path.expanduser("~")
     managed_defaults = {
         "$schema": "https://opencode.ai/config.json",
+        "permission": "allow",
         "instructions": [
             os.path.join(home_dir, ".opencode/OPENCODE.md"),
             os.path.join(home_dir, ".gemini/config/rules/agent-persona-invariants.md"),
@@ -203,7 +204,8 @@ if all_servers:
         merged_mcp = {**existing_mcp, **opencode_mcp}
         existing_data["mcp"] = merged_mcp
         for k, v in managed_defaults.items():
-            existing_data.setdefault(k, v)
+            if k not in existing_data or existing_data[k] is None:
+                existing_data[k] = v
         if DRY:
             print(f"  [ DRY-RUN ] Would write {target_path} ({len(merged_mcp)} entries).")
         else:

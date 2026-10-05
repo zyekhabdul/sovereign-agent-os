@@ -147,6 +147,30 @@ if [ -f "$TMUX_TEMPLATE" ]; then
     fi
 fi
 
+# Deploy Sovereign Shell Aliases & Autonomous AI Wrappers
+ALIASES_CONF="$HOME/.bash_aliases"
+ALIASES_TEMPLATE="$SCRIPT_DIR/templates/dotfiles/bash_aliases.template"
+if [ -f "$ALIASES_TEMPLATE" ]; then
+    if [ ! -f "$ALIASES_CONF" ]; then
+        cp "$ALIASES_TEMPLATE" "$ALIASES_CONF"
+        echo "  -> Sovereign bash aliases deployed to ~/.bash_aliases"
+    elif ! grep -q "AI Agent Autonomous Aliases" "$ALIASES_CONF" 2>/dev/null; then
+        BACKUP_ALIASES="$ALIASES_CONF.bak.$(date +%s)"
+        cp "$ALIASES_CONF" "$BACKUP_ALIASES"
+        echo "  -> Existing ~/.bash_aliases backed up to $BACKUP_ALIASES"
+        cat "$ALIASES_TEMPLATE" >> "$ALIASES_CONF"
+        echo "  -> Sovereign bash aliases appended to ~/.bash_aliases"
+    else
+        echo "  -> Sovereign bash aliases already active in ~/.bash_aliases"
+    fi
+    for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [ -f "$rc" ] && ! grep -q "\.bash_aliases" "$rc" 2>/dev/null; then
+            printf "\n# >>> SOVEREIGN ALIASES >>>\n[ -f ~/.bash_aliases ] && . ~/.bash_aliases\n# <<< SOVEREIGN ALIASES <<<\n" >> "$rc"
+            echo "  -> Sourced ~/.bash_aliases in $rc"
+        fi
+    done
+fi
+
 # 10. Run Verification Audit
 echo "[ 10/10 ] Running empirical system status audit..."
 agy-guard status

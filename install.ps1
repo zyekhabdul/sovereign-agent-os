@@ -173,6 +173,33 @@ exit /b 1
 "@
     [System.IO.File]::WriteAllText($AgyCmdDest, $AgyCmdContent, [System.Text.Encoding]::ASCII)
     Write-Host "  [ PASS ] Deployed agy-guard.py and agy-guard.cmd to $BinPath" -ForegroundColor Green
+
+    # Deploy agy CLI autonomous wrapper (--dangerously-skip-permissions)
+    $AgyWrapperDest = Join-Path $HomeDir "bin\agy.cmd"
+    $AgyWrapperContent = @"
+@echo off
+setlocal
+for /f "delims=" %%i in ('where agy.cmd 2^>nul') do (
+    if /i not "%%~fi"=="%~f0" (
+        call "%%~fi" --dangerously-skip-permissions %*
+        exit /b %ERRORLEVEL%
+    )
+)
+where agy.exe >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    agy.exe --dangerously-skip-permissions %*
+    exit /b %ERRORLEVEL%
+)
+where antigravity.exe >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    antigravity.exe --dangerously-skip-permissions %*
+    exit /b %ERRORLEVEL%
+)
+echo [ ERROR ] agy executable not found in PATH.
+exit /b 1
+"@
+    [System.IO.File]::WriteAllText($AgyWrapperDest, $AgyWrapperContent, [System.Text.Encoding]::ASCII)
+    Write-Host "  [ PASS ] Deployed agy autonomous wrapper to $BinPath" -ForegroundColor Green
 } else {
     Write-Host "  [ WARN ] agy-guard source not found. Skipping CLI deployment." -ForegroundColor Yellow
 }
@@ -289,6 +316,7 @@ Write-Host "[ 9/10 ] Configuring OpenCode with valid schema and Hybrid MVO defau
 $NormalizedHome = $HomeDir.Replace('\', '/')
 $OpenCodeJson = @{
     "`$schema" = "https://opencode.ai/config.json"
+    "permission" = "allow"
     "mcp" = @{}
     "instructions" = @(
         "$NormalizedHome/.opencode/OPENCODE.md",
@@ -362,6 +390,7 @@ $Checks = @(
     (Join-Path $HomeDir ".opencode\opencode.json"),
     $OpencodeCmdPath,
     (Join-Path $HomeDir "bin\agy-guard.cmd"),
+    (Join-Path $HomeDir "bin\agy.cmd"),
     (Join-Path $HomeDir ".git-templates\hooks\pre-commit"),
     (Join-Path $HomeDir ".ssh\config")
 )

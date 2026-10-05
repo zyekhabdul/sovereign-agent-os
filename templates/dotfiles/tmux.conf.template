@@ -1,0 +1,112 @@
+# ==============================================================================
+# SOVEREIGN AI AGENT OS — TMUX CONFIGURATION TEMPLATE
+# Standard: Sovereign Hardware Cluster & VPS Host Discipline
+# ==============================================================================
+
+# Default Shell (Dynamic: evaluated from user login shell / zsh)
+set -g default-shell __DEFAULT_SHELL__
+set -g default-command __DEFAULT_SHELL__
+
+# ==============================================================================
+# 1. PENGATURAN UMUM & KEYBINDINGS (SOVEREIGN VPS/LOCAL EDITION)
+# ==============================================================================
+
+# Ubah prefix bawaan dari Ctrl+b ke Ctrl+a
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# Anti-conflict: Tambahkan secondary prefix Ctrl+b agar bisa dikontrol langsung tanpa dobel Ctrl+a saat nested
+set -g prefix2 C-b
+bind C-b send-prefix -2
+
+# Kirim prefix ke inner session jika tekan a setelah Ctrl+a
+bind a send-prefix
+
+# Aktifkan fitur Mouse (bisa klik panel, scroll, dan drag seleksi teks)
+set -g mouse on
+
+# Mulai penomoran window dan pane dari angka 1
+set -g base-index 1
+set -g pane-base-index 1
+set-window-option -g pane-base-index 1
+set-option -g renumber-windows on
+
+# Shortcut reload konfigurasi (Prefix + r)
+bind r source-file ~/.tmux.conf \; display-message "Sovereign Tmux Berhasil Dimuat Ulang!"
+
+# Navigasi window Tmux via Ctrl + Scroll Mouse di mana saja
+bind-key -n C-WheelUpPane previous-window
+bind-key -n C-WheelDownPane next-window
+bind-key -n C-WheelUpStatus previous-window
+bind-key -n C-WheelDownStatus next-window
+bind-key -n C-WheelUpBorder previous-window
+bind-key -n C-WheelDownBorder next-window
+bind-key -T copy-mode-vi C-WheelUpPane previous-window
+bind-key -T copy-mode-vi C-WheelDownPane next-window
+bind-key -T copy-mode C-WheelUpPane previous-window
+bind-key -T copy-mode C-WheelDownPane next-window
+
+# ==============================================================================
+# 2. CLIPBOARD OVER SSH (OSC 52 - NATIVE TANPA DEPENDENCY X11/WAYLAND)
+# ==============================================================================
+
+# Aktifkan OSC 52 clipboard native (langsung tembus lewat SSH stream)
+set -s set-clipboard on
+set -g allow-passthrough on
+set -ga terminal-overrides ",xterm-256color:Tc:Ms=\\E]52;c;%p2%s\\7"
+
+# Mode copy Vi & integrasi seleksi mouse
+set-window-option -g mode-keys vi
+bind -T copy-mode-vi v send-keys -X begin-selection
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel
+bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel
+bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
+bind -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
+
+# ==============================================================================
+# 3. DAFTAR PLUGIN ESENSIAL (MANAGED VIA TPM)
+# ==============================================================================
+
+set -g @plugin "tmux-plugins/tpm"
+set -g @plugin "tmux-plugins/tmux-sensible"
+set -g @plugin "christoomey/vim-tmux-navigator"
+set -g @plugin "tmux-plugins/tmux-resurrect"
+set -g @plugin "tmux-plugins/tmux-continuum"
+set -g @automating-tmux-continuum "on"
+set -g @continuum-restore "on"
+
+# ==============================================================================
+# 4. TAMPILAN STATUS BAR MONOCHROME (POSISI ATAS - DUAL HUD)
+# ==============================================================================
+
+set -g default-terminal "xterm-256color"
+
+# Posisi Status Bar di ATAS
+set -g status-position top
+set -g status-interval 2
+set -g status-style bg=default,fg=#b2b2b2
+
+# Format Bagian Kiri (Identitas Host & Sesi)
+set -g status-left "#[fg=#ffffff,bg=#262626,bold] #H:#S #[bg=default,fg=default] "
+set -g status-left-length 40
+
+# Format Bagian Kanan (Realtime High-Density Metrics: CPU, RAM, SWAP, DISK, LOAD, DOC, UP & Jam)
+set -g status-right-length 240
+set -g status-right "#(~/.config/tmux/scripts/sysinfo.sh)#[fg=#666666]│ #[fg=#8a8a8a]%H:%M "
+
+# Tab styling
+set -g window-status-style fg=#666666,bg=default
+set -g window-status-format " #I:#W "
+set -g window-status-current-style fg=#ffffff,bg=default,bold
+set -g window-status-current-format " #[fg=#ffffff]• #I:#W "
+
+# Pane borders
+set -g pane-border-style fg=#262626
+set -g pane-active-border-style fg=#8a8a8a
+
+# ==============================================================================
+# 5. INISIALISASI TPM
+# ==============================================================================
+set-environment -g TMUX_PLUGIN_MANAGER_PATH "~/.config/tmux/plugins/"
+run "~/.config/tmux/plugins/tpm/tpm"

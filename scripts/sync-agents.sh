@@ -165,7 +165,8 @@ if all_servers:
             os.path.join(home_dir, ".opencode/OPENCODE.md"),
             os.path.join(home_dir, ".gemini/config/rules/agent-persona-invariants.md"),
             os.path.join(home_dir, ".gemini/config/rules/ponytail-yagni.md"),
-            os.path.join(home_dir, ".gemini/config/rules/deterministic-machine-harness.md")
+            os.path.join(home_dir, ".gemini/config/rules/deterministic-machine-harness.md"),
+            os.path.join(home_dir, ".gemini/config/rules/obsidian-rag.md")
         ],
         "skills": {
             "paths": [

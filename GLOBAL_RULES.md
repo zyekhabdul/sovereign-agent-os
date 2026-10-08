@@ -23,4 +23,12 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **MCP Discovery**: On-demand dual-file configuration protocol (`~/.gemini/config/rules/mcp-discovery.md`)
 - **Communication**: Caveman terse high-density, strict no-emoji.
 
+### Mandatory Cold-Start Protocol (Tier 1 RAG Bootstrap)
+Before analyzing codebase or modifying code in any repository, ALL agents (AGY, Claude Code, OpenCode, Codex) MUST:
+1. **Auto-Bind Namespace**: Resolve target namespace from CWD (e.g. `~/Projects/<repo>` -> `00-AGY-Memory/<repo>/`).
+2. **Read Project Context & Traps**: Read `~/Documents/Obsidian Vault/00-AGY-Memory/<repo>/CONTEXT.md` to load architecture constraints and `## Known Gotchas & Environment Traps`.
+3. **Pre-Flight ADR Scan**: Scan the last 10 ADRs in `~/Documents/Obsidian Vault/00-AGY-Memory/<repo>/DECISIONS.md` before planning or proposing architectural changes.
+4. **Inspect Active State**: Check `~/Documents/Obsidian Vault/00-AGY-Memory/<repo>/STATE.md` for current milestone, commit checkpoint, and active invariants.
+
 > [ NOTE ] Fresh clone without `~/.gemini` yet: authoritative fallback is `rules/` + `docs/` in this repo. Run `bash install.sh` to materialize `~/.gemini/config/`.
+

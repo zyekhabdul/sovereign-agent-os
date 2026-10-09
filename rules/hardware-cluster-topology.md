@@ -1,56 +1,52 @@
-# SOVEREIGN HARDWARE CLUSTER TOPOLOGY & BURST WORKER SPECIFICATION
+# SOVEREIGN HARDWARE CLUSTER TOPOLOGY & FLEET BURST POOL SPECIFICATION
 
-- **Document ID**: SPEC-CLUSTER-TOPO-2026-09-06
-- **Target Nodes**: `servv` (VPS), `thinkpad-arch` (Workstation), `tuf-gaming-arch` (Burst Worker)
+- **Document ID**: SPEC-CLUSTER-TOPO-2026-10-09 (MODERNIZED)
+- **Target Nodes**: `serv-001` (VPS Ingress), `thinkpad-arch` (Workstation), **MeshCentral Multi-Burst Pool (`burst-001` .. `burst-043`+)**
 - **Status**: RATIFIED & ACTIVE
-- **Principle**: Decoupled Tri-Node Architecture (24/7 Cloud Ingress + Interactive Client + Burst Compute)
+- **Principle**: Sovereign Multi-Tier Cluster (24/7 Cloud Ingress + Interactive Client + Decentralized Multi-Burst Compute Pool)
+- **Transport Standard**: **Channel 1 (MeshCentral Outbound WSS / port 443) is the SOLE active transport for workers**. Channels 2 (Tailscale) and 3 (Rathole) are OFFICIALLY DEPRECATED.
 
 ---
 
-## 1. TRI-NODE FLEET TOPOLOGY & HARDWARE PROFILE
+## 1. SOVEREIGN CLUSTER TOPOLOGY & FLEET HARDWARE PROFILE
 
 ```text
 +-----------------------------------------------------------------------------------+
-|                            TAILSCALE ENCRYPTED MESH                               |
+|               MESHCENTRAL OUTBOUND WSS TRANSPORT (CHANNEL 1 ACTIVE)               |
 +-----------------------------------------------------------------------------------+
         ▲                                     ▲                               ▲
-        │ (24/7 Always-On)                    │ (Interactive Client)          │ (On-Demand Burst)
+        │ (24/7 Always-On)                    │ (Interactive Client)          │ (On-Demand WSS Dispatch)
         ▼                                     ▼                               ▼
 +-----------------------+           +-----------------------+       +-----------------------+
-|         servv         |           |     thinkpad-arch     |       |    tuf-gaming-arch    |
-|   (100.67.53.119)     |           |    (100.68.194.103)   |       |     (100.69.47.16)    |
+|       serv-001        |           |     thinkpad-arch     |       |   MULTI-BURST POOL    |
+|    (Cloud Host VPS)   |           |    (Developer UI)     |       |  (burst-001 .. -043+) |
 |-----------------------|           |-----------------------|       |-----------------------|
-| Role: Cloud & Ingress |           | Role: Console / UI    |       | Role: Burst Worker    |
-| OS: Debian 12 x86_64  |           | OS: Arch Linux LTS    |       | OS: Arch Linux LTS    |
-| CPU: 2 vCPU           |           | CPU: i5-4300M (2C/4T) |       | CPU: Ryzen 7 (8C/16T) |
-| RAM: 4GB              |           | RAM: 11GB DDR3        |       | RAM: 16GB DDR5        |
-| Disk: 80GB SSD        |           | Disk: 1TB SATA        |       | Disk: 512GB NVMe SSD  |
-| GPU: None             |           | GPU: Intel HD 4600    |       | GPU: NVIDIA RTX 2050  |
-| Display: Headless     |           | Display: Healthy LCD  |       | Display: BROKEN / DEAD|
-| Power: 24/7 Cloud PSU |           | Power: Healthy AC/BAT |       | Power: UNSTABLE/LIMIT |
+| Role: Ingress & Bot   |           | Role: Console / UI    |       | Role: Burst Compute   |
+| OS: Debian 12 x86_64  |           | OS: Arch Linux LTS    |       | OS: Linux / Win11     |
+| CPU: 2 vCPU           |           | CPU: i5-4300M (2C/4T) |       | CPU: High-Core / GPUs |
+| RAM: 12GB             |           | RAM: 11GB DDR3        |       | RAM: 16GB+ Pool       |
+| Ingress: 24/7 Daemons |           | Display: Healthy LCD  |       | Mode: Boot-to-Poweroff|
 +-----------------------+           +-----------------------+       +-----------------------+
 ```
 
-### Detailed Node Specifications
+### Detailed Fleet Archetypes
 
-| Metric / Attribute | Node 1: `servv` | Node 2: `thinkpad-arch` | Node 3: `tuf-gaming-arch` |
-| :--- | :--- | :--- | :--- |
-| **Hostname** | `VM-2-105-debian` (`servv`) | `thinkpad-arch` | `tuf-gaming-arch` |
-| **Tailscale IP** | `100.67.53.119` | `100.68.194.103` | `100.69.47.16` |
-| **Local LAN IP** | Cloud Public (`43.157.229.233`) | `192.168.0.127` | `192.168.0.110` |
-| **Primary User** | `fuckadmin` | `fuckadmin` | `aomiqaza` |
-| **Hardware Model** | Cloud KVM VPS | Lenovo ThinkPad T440p | ASUS TUF Gaming A15 (FA506NFR) |
-| **Processor** | 2 vCPU Intel Xeon | Intel Core i5-4300M (2C/4T @ 2.60GHz) | **AMD Ryzen 7 7435HS (8C/16T)** |
-| **Graphics** | None | Intel HD Graphics 4600 | **NVIDIA GeForce RTX 2050 (4GB)** |
-| **Memory** | 4 GiB | 11 GiB DDR3 | **16 GiB DDR5** |
-| **Storage** | 80 GiB SSD | 1 TB SATA | **512 GiB High-IOPS NVMe SSD** |
-| **Physical Display**| Headless (Cloud) | Working Built-in Display | **BROKEN / DEAD (Blackout)** |
-| **Power State** | 24/7 Always-On Grid | Stable Plugged-in Adapter | **FAULTY CHARGER / DRAINING** |
-| **Network State** | Constant 24/7 Internet | Standard Home Internet | **Intermittent / Offline-Frequent** |
+| Archetype / Node | Identitas Host / Pool | Profil & Akses Transport | Peran & Beban Komputasi | Siklus Operasional |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cloud Ingress (`serv-001`)** | `serv-001` (VPS Debian 12) | 24/7 Cloud Grid, Dokploy, Traefik | Live Trading Bot, Webhooks, Master Telemetry | 24/7 Always-On |
+| **Interactive Cockpit (`thi`)** | `thinkpad-arch` | Arch Linux, Healthy Display | Manual terminal, code review, git management | Human interactive |
+| **Multi-Burst Pool (`burst-*`)**| `burst-001` s/d `burst-043`+ | **MeshCentral WSS (Channel 1)** | Tabular ML Retraining, 365d Backtesting, Harvester | On-Demand (Boot -> Work -> Off) |
+| **Pool Node: TUF (`burst-016`)**| `tuf-gaming-arch` (Ryzen 7 16T + RTX 2050) | MeshCentral WSS (Channel 1) | Heavy ML batch compute (`crypto-burst-trainer`) | On-Demand (Nightly Window) |
+
+> [!IMPORTANT]
+> **CHANNELS 2 & 3 DEPRECATION INVARIANT**:
+> - Tailscale IP routing (`100.x.x.x`) [Channel 2] dan Rathole proxy tunnels (`:4040`) [Channel 3] **RESMI DIDEPRIEKASI**.
+> - Seluruh AI Agent DILARANG KERAS berasumsi bahwa burst worker dapat diakses via Tailscale SSH atau IP langsung. Seluruh interaksi wajib melewati **Channel 1 (MeshCentral WSS via RPC `meshctrl` / `scripts/meshcentral_fleet_dispatcher.py`)**.
+> - TUF / `burst-001` **BUKAN LAGI SATU-SATUNYA BURST WORKER**. Seluruh armada burst worker di MeshCentral adalah satu kesatuan compute pool.
 
 ---
 
-## 2. HARD CONSTRAINTS ON `tuf-gaming-arch` (NODE 3)
+## 2. HARD CONSTRAINTS ON BURST COMPUTE POOL (INCL. TUF / `burst-016`)
 
 AI Agents operating across this cluster (specifically on VPS `servv`) MUST strictly respect these 4 immutable physical constraints:
 
@@ -111,23 +107,30 @@ Cold Backup Storage Vault      -> thinkpad-arch      1TB SATA drive + Rclone mul
 
 ---
 
-## 5. OPERATIONAL PROTOCOL FOR AI AGENTS ON VPS (`servv`)
+## 5. OPERATIONAL PROTOCOL FOR AI AGENTS ON VPS (`serv-001`)
 
-When an autonomous agent running on `servv` identifies a task requiring heavy computational capacity (e.g. LLM fine-tuning/inference, heavy compilation, media transcoding):
+When an autonomous agent running on `serv-001` identifies a task requiring heavy computational capacity (e.g. ML retraining, grid search backtesting, data harvesting):
 
-1. **Pre-Flight Reachability Gate**:
-   ```bash
-   if nc -zv -w 2 100.69.47.16 22 2>/dev/null; then
-       echo "[CLUSTER] tuf-gaming-arch is ONLINE. Ready for burst offload."
-   else
-       echo "[CLUSTER] tuf-gaming-arch is OFFLINE. Deferring heavy job to local queue or awaiting manual boot."
-   fi
-   ```
-2. **Work Packet Dispatch**:
-   - Transfer input data/job scripts to `tuf-gaming-arch:~/jobs/<job-id>/`.
-   - Trigger the execution remotely via SSH:
+1. **Fleet Discovery via Channel 1**:
+   - Query currently online burst workers via MeshCentral RPC:
      ```bash
-     ssh tuf-gaming-arch "cd ~/jobs/<job-id> && ./run.sh && rsync -avz output/ fuckadmin@100.67.53.119:~/output/ && sudo poweroff"
+     .venv/bin/python scripts/meshcentral_fleet_dispatcher.py list
      ```
-3. **No-Polling Invariant**:
-   - VPS agent must not poll `tuf-gaming-arch` in an infinite loop while waiting for boot. If offline, notify the developer to power on the machine.
+   - If no burst nodes are online, defer heavy jobs to local queue or alert via Telegram. Never poll in an infinite loop.
+
+2. **Headless Execution via Channel 1 (Outbound WSS)**:
+   - Dispatch job without SSH or Tailscale:
+     ```bash
+     .venv/bin/python scripts/meshcentral_fleet_dispatcher.py run --node burst-016 --cmd "..." --os linux
+     ```
+
+3. **Artifact Retrieval (Pull-Mode Pattern)**:
+   - When remote job completes, it writes `reports/job_completed.json`.
+   - VPS pulls artifacts into local directory using MeshCentral `Download` RPC:
+     ```bash
+     .venv/bin/python scripts/meshcentral_fleet_dispatcher.py download --node burst-016 --remote "models/regime_model.onnx" --local "models/"
+     ```
+   - For candlestick harvesting, run:
+     ```bash
+     .venv/bin/python scripts/meshcentral_fleet_dispatcher.py sync-harvester
+     ```

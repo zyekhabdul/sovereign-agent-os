@@ -1991,12 +1991,34 @@ def cmd_prune_brain(args):
         except Exception:
             pass
 
-    total_reclaimed_mb = (reclaimed_logs_bytes + reclaimed_transcripts_bytes + reclaimed_scratch_bytes + reclaimed_steps_bytes) / (1024 * 1024)
+    # 6. Clean redundant chunk slices in inactive sessions
+    cleaned_chunks_count = 0
+    reclaimed_chunks_bytes = 0
+    for s in sessions:
+        if s.name in protected_sessions:
+            continue
+        try:
+            s_age_sec = now - s.stat().st_mtime
+            if s_age_sec > max_age_sec:
+                chunks_dir = s / ".system_generated" / "logs" / "chunks"
+                if chunks_dir.exists() and chunks_dir.is_dir():
+                    c_files = [f for f in chunks_dir.rglob("*") if f.is_file()]
+                    if c_files:
+                        c_sz = sum(f.stat().st_size for f in c_files)
+                        cleaned_chunks_count += len(c_files)
+                        reclaimed_chunks_bytes += c_sz
+                        if not dry_run:
+                            shutil.rmtree(chunks_dir, ignore_errors=True)
+        except Exception:
+            pass
+
+    total_reclaimed_mb = (reclaimed_logs_bytes + reclaimed_transcripts_bytes + reclaimed_scratch_bytes + reclaimed_steps_bytes + reclaimed_chunks_bytes) / (1024 * 1024)
     print(f"  • Sessions Scanned     : {len(sessions)} ({len(protected_sessions)} active/protected)")
     print(f"  • Task Logs Vacuumed   : {pruned_logs_count} files ({reclaimed_logs_bytes / (1024*1024):.2f} MB)")
     print(f"  • Transcripts Gzipped  : {compressed_transcripts_count} files ({reclaimed_transcripts_bytes / (1024*1024):.2f} MB)")
     print(f"  • Dead Scratch Cleaned : {cleaned_scratch_dirs} dirs ({reclaimed_scratch_bytes / (1024*1024):.2f} MB)")
     print(f"  • Step Traces Pruned   : {cleaned_steps_count} files ({reclaimed_steps_bytes / (1024*1024):.2f} MB)")
+    print(f"  • Stream Chunks Purged : {cleaned_chunks_count} files ({reclaimed_chunks_bytes / (1024*1024):.2f} MB)")
     print("------------------------------------------------")
     print(f"[ TOTAL SPACE RECLAIMED ] : {total_reclaimed_mb:.2f} MB")
     

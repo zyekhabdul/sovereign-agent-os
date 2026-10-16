@@ -33,3 +33,27 @@ def test_groundedness_execution_on_self():
     assert "SELF-RAG GROUNDEDNESS AUDIT" in res.stdout
     assert "Boundary Confinement" in res.stdout
     assert "Persona Integrity" in res.stdout
+
+
+def test_prep_execution():
+    res = subprocess.run([sys.executable, str(AGY_GUARD), "prep"], cwd=str(ROOT), capture_output=True, text=True)
+    assert res.returncode == 0
+    assert "PRE-FLIGHT AGENT ONBOARDING BRIEFING" in res.stdout
+    assert "STACK FINGERPRINT" in res.stdout
+    assert "KNOWN GOTCHAS" in res.stdout
+    assert "ACTIVE STATE" in res.stdout
+
+
+def test_prune_brain_cli_help():
+    res = subprocess.run([sys.executable, str(AGY_GUARD), "prune-brain", "--help"], capture_output=True, text=True)
+    assert res.returncode == 0
+    assert "--max-size-mb" in res.stdout
+    assert "--dry-run" in res.stdout
+
+
+def test_prune_brain_dry_run_execution():
+    res = subprocess.run([sys.executable, str(AGY_GUARD), "prune-brain", "--dry-run"], cwd=str(ROOT), capture_output=True, text=True)
+    assert res.returncode == 0
+    assert "AGY BRAIN GARBAGE COLLECTION" in res.stdout
+    assert "TOTAL SPACE RECLAIMED" in res.stdout
+

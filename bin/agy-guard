@@ -13,6 +13,7 @@ import shutil
 import argparse
 import subprocess
 import time
+import gzip
 from pathlib import Path
 from datetime import datetime
 
@@ -21,6 +22,8 @@ _vault_env = os.environ.get("OBSIDIAN_VAULT_PATH") or os.environ.get("VAULT_DIR"
 VAULT_PATH = Path(_vault_env).resolve() if _vault_env else (HOME / "Documents" / "Obsidian Vault")
 MEMORY_DIR = VAULT_PATH / "00-AGY-Memory"
 CONFIG_DIR = HOME / ".gemini" / "config"
+BRAIN_DIR = HOME / ".gemini" / "antigravity-cli" / "brain"
+PRESENCE_DIR = HOME / ".gemini" / "antigravity-cli" / "presence"
 SKILLS_DIR = HOME / ".agents" / "skills"
 SKILLS_ARCHIVE = (HOME / ".agents" / "skills-archive") if (HOME / ".agents" / "skills-archive").exists() else (HOME / ".agents" / "skills_archive")
 
@@ -1658,42 +1661,350 @@ def cmd_verify(args):
         sys.exit(1)
     print("==============================================")
 
+def detect_stack_fingerprint(root_path):
+    """Generates a high-density technical stack fingerprint."""
+    info = []
+    engine = "Generic Codebase"
+    gates = []
+
+    pkg_file = root_path / "package.json"
+    if pkg_file.exists():
+        try:
+            data = json.loads(pkg_file.read_text(encoding="utf-8"))
+            name = data.get("name", root_path.name)
+            scripts = list(data.get("scripts", {}).keys())
+            deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
+            key_frameworks = [f for f in ["next", "react", "vue", "express", "fastify", "typescript", "vitest", "jest", "tailwindcss"] if f in deps]
+            engine = f"Node.js ({data.get('type', 'commonjs')})"
+            if key_frameworks:
+                engine += f" [Frameworks: {', '.join(key_frameworks)}]"
+            info.append(f"• Manifest       : package.json (Name: {name}, Dependencies: {len(deps)})")
+            if scripts:
+                gates.append(f"npm run [{', '.join(scripts[:6])}]")
+        except Exception:
+            engine = "Node.js (Malformed package.json)"
+
+    cargo_file = root_path / "Cargo.toml"
+    if cargo_file.exists():
+        engine = "Rust (Cargo)"
+        gates.append("cargo check / cargo test")
+        info.append("• Manifest       : Cargo.toml")
+
+    go_file = root_path / "go.mod"
+    if go_file.exists():
+        engine = "Golang"
+        gates.append("go vet / go test ./...")
+        try:
+            first_line = go_file.read_text(encoding="utf-8").splitlines()[0]
+            info.append(f"• Manifest       : go.mod ({first_line.strip()})")
+        except Exception:
+            info.append("• Manifest       : go.mod")
+
+    py_indicators = [root_path / "pyproject.toml", root_path / "requirements.txt", root_path / "setup.py", root_path / "pytest.ini"]
+    py_files = [p.name for p in py_indicators if p.exists()]
+    if py_files or (root_path / "tests").exists() or list(root_path.glob("*.py")):
+        engine = "Python"
+        gates.append("pytest / python3 -m py_compile")
+        if py_files:
+            info.append(f"• Manifest       : {', '.join(py_files)}")
+        elif (root_path / "tests").exists():
+            info.append("• Test Suite     : tests/ (pytest)")
+
+    if list(root_path.glob("scripts/*.sh")) or list(root_path.glob("*.sh")):
+        gates.append("bash -n scripts/*.sh")
+
+    composer_file = root_path / "composer.json"
+    if composer_file.exists():
+        engine = "PHP / Composer"
+        gates.append("composer test / php -l")
+        info.append("• Manifest       : composer.json")
+
+    docker_files = [root_path / "docker-compose.yml", root_path / "compose.yaml", root_path / "Dockerfile"]
+    found_docker = [d.name for d in docker_files if d.exists()]
+    if found_docker:
+        info.append(f"• Container      : {', '.join(found_docker)}")
+
+    return engine, info, gates
+
 def cmd_prep(args):
-    """Pre-flight one-shot agent onboarding briefing."""
+    """Pre-flight one-shot agent onboarding briefing (Track A/B Cold-Start)."""
     cwd = Path.cwd()
     ns = resolve_namespace(cwd)
     git_root = get_git_root(cwd)
+    root_path = git_root or cwd
     commit, branch, dirty = get_git_info(cwd)
     
     print("=== [ PRE-FLIGHT AGENT ONBOARDING BRIEFING ] ===")
     print(f"  • Active Namespace    : {ns}")
-    print(f"  • Git Root Path       : {git_root or cwd}")
+    print(f"  • Git Root Path       : {root_path}")
     print(f"  • Git Branch / Commit : {branch} ({commit[:8]})")
     print(f"  • Modified / Untracked: {dirty} file(s)")
     
-    # 1. Check PRD / PLAN status
-    plan_file = cwd / "PLAN.md"
-    prd_file = cwd / "PRD.md"
+    # 1. Recent commits & working tree
+    try:
+        commits = subprocess.check_output(
+            ["git", "log", "-n", "3", "--oneline"],
+            cwd=cwd, stderr=subprocess.DEVNULL, text=True
+        ).strip().splitlines()
+        if commits:
+            print("\n--- [ RECENT COMMITS (LAST 3) ] ---")
+            for c in commits:
+                print(f"  {c}")
+    except Exception:
+        pass
+
+    if dirty > 0:
+        try:
+            status_lines = subprocess.check_output(
+                ["git", "status", "--short"],
+                cwd=cwd, stderr=subprocess.DEVNULL, text=True
+            ).strip().splitlines()
+            if status_lines:
+                print("\n--- [ WORKING TREE DIFF SUMMARY ] ---")
+                for s in status_lines[:6]:
+                    print(f"  {s}")
+                if len(status_lines) > 6:
+                    print(f"  ... (+{len(status_lines) - 6} more files)")
+        except Exception:
+            pass
+
+    # 2. Stack Fingerprint
+    engine, manifest_info, gates = detect_stack_fingerprint(root_path)
+    print("\n--- [ STACK FINGERPRINT ] ---")
+    print(f"  • Primary Engine      : {engine}")
+    for item in manifest_info:
+        print(f"  {item}")
+    if gates:
+        print(f"  • Verification Gates  : {' | '.join(gates)}")
+
+    # 3. Known Gotchas & Environment Traps from CONTEXT.md
+    ctx_file = MEMORY_DIR / ns / "CONTEXT.md"
+    gotchas_lines = []
+    if ctx_file.exists():
+        try:
+            text = ctx_file.read_text(encoding="utf-8")
+            if "## Known Gotchas & Environment Traps" in text:
+                part = text.split("## Known Gotchas & Environment Traps", 1)[1]
+                if "\n## " in part:
+                    part = part.split("\n## ", 1)[0]
+                gotchas_lines = [l.strip() for l in part.splitlines() if l.strip()]
+        except Exception:
+            pass
+
+    print("\n--- [ KNOWN GOTCHAS & ENVIRONMENT TRAPS ] ---")
+    if gotchas_lines:
+        for g in gotchas_lines[:8]:
+            print(f"  {g}")
+    else:
+        fallback_gotchas = build_contextual_gotchas(engine, root_path).splitlines()
+        for g in fallback_gotchas[:6]:
+            print(f"  {g}")
+
+    # 4. Active Checklist from STATE.md
+    state_file = MEMORY_DIR / ns / "STATE.md"
+    active_tasks = []
+    if state_file.exists():
+        try:
+            stext = state_file.read_text(encoding="utf-8")
+            for line in stext.splitlines():
+                stripped = line.strip()
+                if any(stripped.startswith(prefix) for prefix in ["- [ ]", "- [-]", "- [x]", "* [ ]", "* [-]", "* [x]"]):
+                    active_tasks.append(stripped)
+                elif "Active Tasks" in line or "Status State" in line or "Task Message" in line:
+                    active_tasks.append(f"• {stripped.lstrip('#').strip()}")
+        except Exception:
+            pass
+
+    print("\n--- [ ACTIVE STATE & CHECKLIST (STATE.md) ] ---")
+    if active_tasks:
+        for t in active_tasks[:8]:
+            print(f"  {t}")
+    else:
+        print("  • [ NOTE ] No pending checklist tasks found in STATE.md. Clean slate.")
+
+    # 5. Local PLAN.md or PRD.md
+    plan_file = root_path / "PLAN.md"
+    prd_file = root_path / "PRD.md"
     if plan_file.exists():
-        print("\n--- [ ACTIVE PLAN.md SUMMARY ] ---")
+        print("\n--- [ LOCAL PLAN.md DETECTED ] ---")
         lines = plan_file.read_text(encoding="utf-8", errors="replace").splitlines()
-        for l in lines[:10]:
+        for l in lines[:6]:
             print(f"  {l}")
     elif prd_file.exists():
-        print("\n--- [ PRD.md DETECTED ] ---")
+        print("\n--- [ LOCAL PRD.md DETECTED ] ---")
         lines = prd_file.read_text(encoding="utf-8", errors="replace").splitlines()
-        for l in lines[:8]:
+        for l in lines[:6]:
             print(f"  {l}")
-            
-    # 2. Check Obsidian Decisions & Laws
-    dec_file = MEMORY_DIR / ns / "DECISIONS.md"
-    if dec_file.exists():
-        print("\n--- [ TOP ARCHITECTURAL LAWS (DECISIONS.md) ] ---")
-        lines = dec_file.read_text(encoding="utf-8", errors="replace").splitlines()
-        for l in lines[:8]:
-            print(f"  {l}")
-            
+
     print("\n================================================")
+
+def cmd_prune_brain(args):
+    """Vacuum and garbage collect stale task logs and inactive session traces in ~/.gemini/antigravity-cli/brain."""
+    brain_dir = BRAIN_DIR
+    presence_dir = PRESENCE_DIR
+    
+    if not brain_dir.exists():
+        print(f"[ NOTICE ] Brain directory does not exist: {brain_dir}")
+        return
+
+    max_size_bytes = int(args.max_size_mb * 1024 * 1024)
+    max_age_sec = int(args.max_age_days * 86400)
+    now = time.time()
+    dry_run = args.dry_run
+
+    print("=== [ AGY BRAIN GARBAGE COLLECTION & VACUUM ] ===")
+    print(f"  • Brain Path        : {brain_dir}")
+    print(f"  • Mode              : {'DRY-RUN (Simulation)' if dry_run else 'ACTIVE (Purging & Compressing)'}")
+    print(f"  • Task Log Threshold: > {args.max_size_mb:.1f} MB or > {args.max_age_days} days old")
+    print(f"  • Inactive Threshold: > {args.max_age_days} days without modification")
+    print("------------------------------------------------")
+
+    # 1. Identify Protected Active Sessions
+    protected_sessions = set()
+    if presence_dir.exists():
+        for p in presence_dir.glob("*.lock"):
+            protected_sessions.add(p.stem)
+            
+    # Protect any session modified within last 12 hours
+    sessions = [d for d in brain_dir.iterdir() if d.is_dir() and not d.name.startswith(".")]
+    for d in sessions:
+        try:
+            mtime = d.stat().st_mtime
+            if (now - mtime) < 43200:  # 12 hours
+                protected_sessions.add(d.name)
+        except Exception:
+            pass
+
+    # Current conversation ID from env
+    for env_k in ["CONVERSATION_ID", "GEMINI_CONVERSATION_ID", "AGY_CONVERSATION_ID"]:
+        if os.environ.get(env_k):
+            protected_sessions.add(os.environ[env_k])
+
+    # 2. Prune / Truncate task-*.log files
+    task_logs = list(brain_dir.glob("*/.system_generated/tasks/task-*.log"))
+    pruned_logs_count = 0
+    reclaimed_logs_bytes = 0
+
+    for tf in task_logs:
+        try:
+            st = tf.stat()
+            sz = st.st_size
+            age_sec = now - st.st_mtime
+            
+            session_id = tf.parent.parent.parent.name
+            is_protected = session_id in protected_sessions
+
+            if age_sec > max_age_sec and not is_protected:
+                pruned_logs_count += 1
+                reclaimed_logs_bytes += sz
+                if not dry_run:
+                    tf.unlink(missing_ok=True)
+            elif sz > max_size_bytes:
+                keep_bytes = min(20480, sz)
+                pruned_logs_count += 1
+                reclaimed_logs_bytes += (sz - keep_bytes)
+                if not dry_run:
+                    try:
+                        with open(tf, "rb") as f:
+                            f.seek(max(0, sz - keep_bytes))
+                            tail_bytes = f.read()
+                        with open(tf, "wb") as f:
+                            f.write(f"[ TRUNCATED BY agy-guard prune-brain: Original size {sz/(1024*1024):.2f} MB ]\n\n".encode("utf-8"))
+                            f.write(tail_bytes)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+    # 3. Compress inactive session transcripts
+    compressed_transcripts_count = 0
+    reclaimed_transcripts_bytes = 0
+    
+    if not args.no_compress:
+        for s in sessions:
+            if s.name in protected_sessions:
+                continue
+            try:
+                s_age_sec = now - s.stat().st_mtime
+                if s_age_sec > max_age_sec:
+                    logs_dir = s / ".system_generated" / "logs"
+                    if logs_dir.exists():
+                        for jf in logs_dir.glob("transcript*.jsonl"):
+                            if jf.is_file() and not jf.name.endswith(".gz"):
+                                sz = jf.stat().st_size
+                                if sz > 10240:
+                                    compressed_transcripts_count += 1
+                                    if dry_run:
+                                        est_savings = int(sz * 0.8)
+                                        reclaimed_transcripts_bytes += est_savings
+                                    else:
+                                        gz_path = jf.with_name(jf.name + ".gz")
+                                        with open(jf, "rb") as f_in, gzip.open(gz_path, "wb", compresslevel=6) as f_out:
+                                            shutil.copyfileobj(f_in, f_out)
+                                        gz_sz = gz_path.stat().st_size
+                                        jf.unlink()
+                                        reclaimed_transcripts_bytes += (sz - gz_sz)
+            except Exception:
+                pass
+
+    # 4. Clean dead scratch directories in inactive sessions
+    cleaned_scratch_dirs = 0
+    reclaimed_scratch_bytes = 0
+    for s in sessions:
+        if s.name in protected_sessions:
+            continue
+        try:
+            s_age_sec = now - s.stat().st_mtime
+            if s_age_sec > max_age_sec:
+                scratch_dir = s / "scratch"
+                if scratch_dir.exists() and scratch_dir.is_dir():
+                    s_files = [f for f in scratch_dir.rglob("*") if f.is_file()]
+                    if s_files:
+                        scratch_sz = sum(f.stat().st_size for f in s_files)
+                        cleaned_scratch_dirs += 1
+                        reclaimed_scratch_bytes += scratch_sz
+                        if not dry_run:
+                            shutil.rmtree(scratch_dir, ignore_errors=True)
+                            scratch_dir.mkdir(exist_ok=True)
+        except Exception:
+            pass
+
+    # 5. Clean dead step traces in inactive sessions
+    cleaned_steps_count = 0
+    reclaimed_steps_bytes = 0
+    for s in sessions:
+        if s.name in protected_sessions:
+            continue
+        try:
+            s_age_sec = now - s.stat().st_mtime
+            if s_age_sec > max_age_sec:
+                steps_dir = s / ".system_generated" / "steps"
+                if steps_dir.exists() and steps_dir.is_dir():
+                    s_files = [f for f in steps_dir.rglob("*") if f.is_file()]
+                    if s_files:
+                        step_sz = sum(f.stat().st_size for f in s_files)
+                        cleaned_steps_count += len(s_files)
+                        reclaimed_steps_bytes += step_sz
+                        if not dry_run:
+                            shutil.rmtree(steps_dir, ignore_errors=True)
+                            steps_dir.mkdir(exist_ok=True)
+        except Exception:
+            pass
+
+    total_reclaimed_mb = (reclaimed_logs_bytes + reclaimed_transcripts_bytes + reclaimed_scratch_bytes + reclaimed_steps_bytes) / (1024 * 1024)
+    print(f"  • Sessions Scanned     : {len(sessions)} ({len(protected_sessions)} active/protected)")
+    print(f"  • Task Logs Vacuumed   : {pruned_logs_count} files ({reclaimed_logs_bytes / (1024*1024):.2f} MB)")
+    print(f"  • Transcripts Gzipped  : {compressed_transcripts_count} files ({reclaimed_transcripts_bytes / (1024*1024):.2f} MB)")
+    print(f"  • Dead Scratch Cleaned : {cleaned_scratch_dirs} dirs ({reclaimed_scratch_bytes / (1024*1024):.2f} MB)")
+    print(f"  • Step Traces Pruned   : {cleaned_steps_count} files ({reclaimed_steps_bytes / (1024*1024):.2f} MB)")
+    print("------------------------------------------------")
+    print(f"[ TOTAL SPACE RECLAIMED ] : {total_reclaimed_mb:.2f} MB")
+    
+    if dry_run:
+        print("\n[ NOTE ] Dry-run mode completed. Zero files modified. Run without --dry-run to purge.")
+    else:
+        print("\n[ SUCCESS ] Vacuum completed. Brain storage optimized.")
+    print("================================================")
 
 def cmd_diff_guard(args):
     """Audits diff radius (Ponytail YAGNI) and flags sensitive area violations."""
@@ -1833,6 +2144,14 @@ def main():
     
     # prep
     subparsers.add_parser("prep", help="One-shot agent pre-flight onboarding briefing").set_defaults(func=cmd_prep)
+    
+    # prune-brain
+    sub_prune = subparsers.add_parser("prune-brain", help="Vacuum and garbage collect stale task logs and inactive session traces in brain", description="Vacuum and garbage collect stale task logs and inactive session traces in ~/.gemini/antigravity-cli/brain")
+    sub_prune.add_argument("--max-size-mb", type=float, default=2.0, help="Size threshold in MB to truncate task-*.log (default: 2.0)")
+    sub_prune.add_argument("--max-age-days", type=int, default=7, help="Age threshold in days for task logs and scratch (default: 7)")
+    sub_prune.add_argument("--dry-run", action="store_true", help="Simulate vacuum and calculate reclaimable space without modifying files")
+    sub_prune.add_argument("--no-compress", action="store_true", help="Skip gzipping inactive transcripts")
+    sub_prune.set_defaults(func=cmd_prune_brain)
     
     # verify
     subparsers.add_parser("verify", help="Auto-detect and run empirical test/linter verification").set_defaults(func=cmd_verify)

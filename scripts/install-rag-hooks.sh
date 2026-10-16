@@ -26,8 +26,9 @@ for repo in "${PROJECTS_DIR}"/*; do
     [ -L "$repo" ] && continue
     if [ -d "${repo}/.git" ]; then
         _RAG_ORIGIN="$(git -C "$repo" config --get remote.origin.url 2>/dev/null || true)"
-        if [ -n "$_RAG_ORIGIN" ] && ! echo "$_RAG_ORIGIN" | grep -Eq 'zyekhabdul|aomiqaza'; then
-            echo "[ SKIP ] $(basename "$repo") (third-party upstream, RAG hook withheld)"
+        REPO_NAME="$(basename "$repo")"
+        if [ -n "$_RAG_ORIGIN" ] && ! echo "$_RAG_ORIGIN" | grep -Eq 'zyekhabdul|aomiqaza' && [ ! -d "$HOME/Documents/Obsidian Vault/00-AGY-Memory/$REPO_NAME" ]; then
+            echo "[ SKIP ] $REPO_NAME (third-party upstream without memory, RAG hook withheld)"
             SKIPPED=$((SKIPPED + 1))
             continue
         fi

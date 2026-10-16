@@ -24,13 +24,6 @@
         "__HOME__/.npm-global/lib/node_modules/@modelcontextprotocol/server-memory/dist/index.js"
       ]
     },
-    "obsidian": {
-      "command": "node",
-      "args": [
-        "__HOME__/.npm-global/lib/node_modules/mcp-obsidian/dist/index.js",
-        "__HOME__/Documents/Obsidian Vault"
-      ]
-    },
     "postgres": {
       "command": "node",
       "args": [

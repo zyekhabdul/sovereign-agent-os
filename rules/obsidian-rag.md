@@ -6,7 +6,8 @@ description: Enterprise Standard Obsidian Vault RAG Governance & Zero-Maintenanc
 # MANDATORY GLOBAL RULE: OBSIDIAN RAG ENTERPRISE GOVERNANCE
 
 - **Global Obsidian Vault Path**: `~/Documents/Obsidian Vault`
-- **MCP Server Name**: `obsidian`
+- **POSIX Direct Path Standard**: Authoritative sole retrieval method (`00-AGY-Memory/<project-namespace>/`)
+- **MCP Server Status**: `obsidian` MCP DEPRECATED & PRUNED (Zero-Overhead POSIX Native Standard)
 - **Applicability**: ALL AI coding agents (Antigravity CLI `agy`, Claude Code, Cursor, Codex, OpenCode).
 
 ---
@@ -94,8 +95,8 @@ In case of conflicting directives, AI agents MUST resolve truth using this stric
 
 ---
 
-## 8. GRACEFUL DEGRADED MODE (MCP FALLBACK)
-- If the `obsidian` MCP server fails or is unavailable, the AI agent MUST NOT halt or error out.
-- The agent MUST gracefully fall back to local workspace documentation (`DEVELOPMENT.md`, `CHANGELOG.md`) and notify the user:
-  `[SYSTEM] Obsidian RAG unavailable. Operating in Local Repository Fallback Mode.`
+## 8. POSIX DIRECT STANDARD & MCP DEPRECATION (RFC-RAG-005)
+- The legacy `obsidian` MCP server is formally DEPRECATED and purged from active MCP configurations to eliminate context prompt bloat.
+- Direct POSIX filesystem access (`view_file`, `replace_file_content`, `grep`, `cat` directly on `~/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`) is the sole, authoritative, zero-overhead SSOT for RAG retrieval and mutations.
+- If the vault filesystem path is inaccessible or unmounted, the agent MUST gracefully fall back to local workspace documentation (`DEVELOPMENT.md`, `CHANGELOG.md`).
 

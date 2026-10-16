@@ -6,7 +6,8 @@ description: Enterprise Standard Obsidian Vault RAG Governance & Zero-Maintenanc
 # MANDATORY GLOBAL RULE: OBSIDIAN RAG ENTERPRISE GOVERNANCE
 
 - **Global Obsidian Vault Path**: `~/Documents/Obsidian Vault`
-- **MCP Server Name**: `obsidian`
+- **POSIX Direct Path Standard**: Authoritative sole retrieval method (`00-AGY-Memory/<project-namespace>/`)
+- **MCP Server Status**: `obsidian` MCP DEPRECATED & PRUNED (Zero-Overhead POSIX Native Standard)
 - **Applicability**: ALL AI coding agents (Antigravity CLI `agy`, Claude Code, Cursor, Codex, OpenCode).
 
 ---
@@ -72,13 +73,30 @@ In case of conflicting directives, AI agents MUST resolve truth using this stric
 
 ---
 
-## 5. HIGH-DENSITY & TOKEN CAPACITY CAP
+## 6. SOTA RAG PATTERNS & DETERMINISTIC AUDIT (RFC-RAG-004)
+1. **Contextual Enrichment Protocol (Anthropic Pattern)**:
+   - When generating or scaffolding `CONTEXT.md` and `STATE.md`, headers MUST be enriched with:
+     - Global namespace identity (`00-AGY-Memory/<namespace>/`)
+     - Absolute repository boundary confinement
+     - High-density `## Known Gotchas & Environment Traps` (stack-specific memory limits, runtime traps, path traps)
+   - Prevents subagent chunk amnesia during multi-agent delegation or long-context reasoning.
+2. **Automated Groundedness Check (Self-RAG)**:
+   - Before executing `agy-guard checkpoint`, agents and tooling MUST run deterministic groundedness verification:
+     - **Boundary**: Zero file mutations leaking outside active repository.
+     - **Persona**: Strict No-Emoji compliant (0 raw emojis in diff).
+     - **Sensitive Surface**: Hard-stop warning on auth, payment, schema mutations.
+     - **ADR Grounding**: Code diff must align 1:1 with active ADRs in `DECISIONS.md`.
+
+---
+
+## 7. HIGH-DENSITY & TOKEN CAPACITY CAP
 - RAG files MUST be terse, high-density markdown (bullet points, tables, zero fluff/conversational filler).
 - Total lines per RAG file MUST NOT exceed **200 lines**.
 
 ---
 
-## 6. GRACEFUL DEGRADED MODE (MCP FALLBACK)
-- If the `obsidian` MCP server fails or is unavailable, the AI agent MUST NOT halt or error out.
-- The agent MUST gracefully fall back to local workspace documentation (`DEVELOPMENT.md`, `CHANGELOG.md`) and notify the user:
-  `[SYSTEM] Obsidian RAG unavailable. Operating in Local Repository Fallback Mode.`
+## 8. POSIX DIRECT STANDARD & MCP DEPRECATION (RFC-RAG-005)
+- The legacy `obsidian` MCP server is formally DEPRECATED and purged from active MCP configurations to eliminate context prompt bloat.
+- Direct POSIX filesystem access (`view_file`, `replace_file_content`, `grep`, `cat` directly on `~/Documents/Obsidian Vault/00-AGY-Memory/<namespace>/`) is the sole, authoritative, zero-overhead SSOT for RAG retrieval and mutations.
+- If the vault filesystem path is inaccessible or unmounted, the agent MUST gracefully fall back to local workspace documentation (`DEVELOPMENT.md`, `CHANGELOG.md`).
+

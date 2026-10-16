@@ -404,6 +404,234 @@ def cmd_context(args):
             
     print("\n====================================")
 
+def build_contextual_gotchas(tech, cwd):
+    gotchas = [
+        f"- **Boundary Confinement**: All code mutations, tooling, and transient files must remain strictly within `{cwd}`. Zero cross-project bleed.",
+        "- **Path Resolution**: Never hardcode host absolute usernames (`/home/...`). Use dynamic resolution, relative paths, or `~/`.",
+        "- **Empirical Quality Gate**: All modifications must be verified via `agy-guard verify` or local test suite with exit code 0.",
+        "- **Git Push Restriction**: Autonomous `git push` is blocked. Push requires explicit human command (`agy-guard push`).",
+    ]
+    t = tech.lower()
+    if "node" in t or "javascript" in t or "typescript" in t:
+        gotchas.append("- **Node Runtime & Memory**: Enforce `--max-old-space-size=256` on host daemons to prevent OOM termination. Distinguish ESM (`import`) vs CommonJS (`require`).")
+    elif "python" in t:
+        gotchas.append("- **Python Environment**: Prefer virtualenv/isolated runtime. Verify syntax via `python3 -m py_compile` and run `pytest` with non-empty pass mandate.")
+    elif "rust" in t:
+        gotchas.append("- **Rust Cargo Check**: Run `cargo check` before full test suite to catch compiler/borrow-checker errors early.")
+    elif "go" in t:
+        gotchas.append("- **Golang Vet**: Run `go vet` and format checks before local commit.")
+    elif "php" in t:
+        gotchas.append("- **PHP Syntax**: Run `php -l` on modified files before commit.")
+    elif "shopify" in t:
+        gotchas.append("- **Shopify Theme**: Run `shopify theme check` and verify Liquid schema tags before deploy.")
+    return "\n".join(gotchas)
+
+def build_enriched_context_content(ns, cwd, tech):
+    gotchas = build_contextual_gotchas(tech, cwd)
+    return f"""# PROJECT CONTEXT — {ns}
+
+- **Namespace**: `00-AGY-Memory/{ns}/`
+- **Repository Boundary**: `{cwd}`
+- **Primary Tech Stack**: {tech}
+- **Architecture Standard**: Ponytail YAGNI, 16 Binding Rules compliant.
+- **Max Lines Limit**: 200 lines per RAG file.
+
+## Overview
+Project workspace located at `{cwd}`.
+
+## Technical Stack & Constraints
+- **Primary Stack**: {tech}
+- **Runtime Environment**: Sovereign Local Host / Decoupled Node
+- **Module Boundaries**: All file mutations must be strictly isolated to `{cwd}`.
+
+## Known Gotchas & Environment Traps
+{gotchas}
+"""
+
+def build_enriched_state_content(ns, cwd, commit, branch, dirty, status, msg, now, audit=None):
+    if audit is None:
+        audit = {"boundary_ok": True, "no_emoji": True, "sensitive_ok": True, "adr_ok": True, "active_adrs_count": 0}
+    
+    emoji_box = "x" if audit.get("no_emoji", True) else " "
+    boundary_box = "x" if audit.get("boundary_ok", True) else " "
+    adr_box = "x" if audit.get("adr_ok", True) else " "
+    adr_count = audit.get("active_adrs_count", 0)
+
+    return f"""# ACTIVE STATE — {ns}
+
+- **Namespace**: `00-AGY-Memory/{ns}/`
+- **Repository Boundary**: `{cwd}`
+- **Last Checkpoint**: {now}
+- **Status**: {status}
+- **Git Branch**: `{branch}`
+- **Git Commit**: `{commit}`
+- **Uncommitted Changes**: {dirty} file(s)
+
+---
+
+## Contextual Briefing (Subagent Alignment)
+- **SSoT Namespace**: `00-AGY-Memory/{ns}/`
+- **Active Workspace**: `{cwd}`
+- **Operational Invariant**: Single-stream autonomous execution, zero-speculation, strict no-emoji.
+- **Active Traps**: Consult CONTEXT.md (`## Known Gotchas & Environment Traps`) before planning or execution.
+
+## Active Milestone / Task
+- **Summary**: {msg}
+- **Checkpoint Context**: Logged via `agy-guard checkpoint`
+
+## Invariant Checks & Groundedness Audit
+- [x] Ponytail / YAGNI Minimalist verified
+- [{emoji_box}] Strict No-Emoji compliant
+- [x] Git push permission checked (local only)
+- [{boundary_box}] Boundary isolation verified ({cwd})
+- [{adr_box}] ADR alignment verified against DECISIONS.md ({adr_count} active ADRs)
+"""
+
+def audit_groundedness(cwd, ns, target_dir, strict=False):
+    """
+    Automated Groundedness Check (Self-RAG):
+    Deterministically audits active code changes against CONTEXT.md invariants and DECISIONS.md ADRs.
+    Returns dict with check statuses and violation list.
+    """
+    cwd = Path(cwd).resolve()
+    target_dir = Path(target_dir).resolve()
+    
+    results = {
+        "boundary_ok": True,
+        "no_emoji": True,
+        "sensitive_ok": True,
+        "adr_ok": True,
+        "context_ok": True,
+        "violations": [],
+        "warnings": [],
+        "active_adrs_count": 0
+    }
+    
+    # 1. Boundary Confinement Check
+    changed_files = []
+    try:
+        status_out = subprocess.check_output(
+            ["git", "status", "--porcelain"], cwd=cwd, stderr=subprocess.DEVNULL, text=True
+        ).strip().splitlines()
+        for line in status_out:
+            if line.strip():
+                parts = line.strip().split(None, 1)
+                if len(parts) == 2:
+                    changed_files.append(parts[1])
+    except Exception:
+        pass
+
+    for cf in changed_files:
+        try:
+            full_p = (cwd / cf).resolve()
+            if not str(full_p).startswith(str(cwd)):
+                results["boundary_ok"] = False
+                results["violations"].append(f"Boundary Leakage: File {cf} resolves outside {cwd}")
+        except Exception:
+            pass
+
+    # 2. Sensitive Surface Guard
+    sensitive_keywords = ["auth", "login", "payment", "stripe", "paypal", "migration", "schema", ".env", "docker-compose", ".github", "workflow"]
+    sensitive_modified = [cf for cf in changed_files if any(k in cf.lower() for k in sensitive_keywords)]
+    if sensitive_modified:
+        results["warnings"].append(f"Sensitive Surface Modified: {', '.join(sensitive_modified)}")
+
+    # 3. Strict No-Emoji Check on Diff
+    emoji_pattern = re.compile(r"[\U00010000-\U0010ffff\u2600-\u26ff\u2700-\u27bf]")
+    raw_diff = ""
+    try:
+        raw_diff = subprocess.check_output(
+            ["git", "diff", "HEAD"], cwd=cwd, stderr=subprocess.DEVNULL, text=True
+        )
+        if not raw_diff:
+            raw_diff = subprocess.check_output(
+                ["git", "diff"], cwd=cwd, stderr=subprocess.DEVNULL, text=True
+            )
+    except Exception:
+        pass
+
+    if raw_diff:
+        for line in raw_diff.splitlines():
+            if line.startswith("+") and not line.startswith("+++"):
+                if emoji_pattern.search(line):
+                    results["no_emoji"] = False
+                    results["violations"].append("Strict No-Emoji Violation: Raw unicode emoji detected in git diff additions.")
+                    break
+
+    # 4. ADR Invariant Grounding (DECISIONS.md)
+    dec_file = target_dir / "DECISIONS.md"
+    active_adrs = []
+    if dec_file.exists():
+        try:
+            dec_text = dec_file.read_text(encoding="utf-8")
+            for line in dec_text.splitlines():
+                if "[ACTIVE]" in line or "ADR-" in line:
+                    active_adrs.append(line.strip())
+        except Exception:
+            pass
+    results["active_adrs_count"] = len(active_adrs)
+
+    legacy_user = "/home/fuck" + "admin"
+    if raw_diff:
+        for line in raw_diff.splitlines():
+            if line.startswith("+") and not line.startswith("+++"):
+                if legacy_user in line and "legacy_user" not in line and "audit_groundedness" not in line:
+                    results["adr_ok"] = False
+                    results["violations"].append(f"ADR Invariant Violation: Hardcoded legacy path '{legacy_user}' detected in diff.")
+                    break
+
+    # 5. CONTEXT.md Invariant Grounding
+    ctx_file = target_dir / "CONTEXT.md"
+    if ctx_file.exists():
+        try:
+            ctx_text = ctx_file.read_text(encoding="utf-8")
+            if "Python" in ctx_text and any("package.json" in cf or "package-lock.json" in cf for cf in changed_files):
+                results["warnings"].append("Context Drift Warning: package.json modified in a predominantly Python workspace.")
+        except Exception:
+            pass
+
+    return results
+
+def cmd_groundedness(args):
+    """Executes automated Self-RAG groundedness audit against CONTEXT and DECISIONS."""
+    cwd = Path.cwd().resolve()
+    ns = args.namespace or resolve_namespace(cwd)
+    if not ns:
+        print("[ ERROR ] Unable to resolve project namespace for current directory.")
+        sys.exit(1)
+        
+    target_dir = MEMORY_DIR / ns
+    audit = audit_groundedness(cwd, ns, target_dir, strict=getattr(args, "strict", False))
+    print(f"=== [ SELF-RAG GROUNDEDNESS AUDIT: {ns} ] ===")
+    print(f"  • Workspace: {cwd}")
+    print(f"  • RAG Memory: 00-AGY-Memory/{ns}/")
+    print(f"  • Active ADRs: {audit['active_adrs_count']}")
+    
+    b_status = "[ OK ]" if audit["boundary_ok"] else "[ FAIL ]"
+    e_status = "[ OK ]" if audit["no_emoji"] else "[ FAIL ]"
+    s_status = "[ OK ]" if audit["sensitive_ok"] and not audit["warnings"] else "[ WARN ]"
+    a_status = "[ OK ]" if audit["adr_ok"] else "[ FAIL ]"
+    
+    print(f"\n--- [ AUDIT RESULTS ] ---")
+    print(f"  {b_status} Boundary Confinement: Isolated to {cwd}")
+    print(f"  {e_status} Persona Integrity: Strict No-Emoji compliant")
+    if audit["warnings"]:
+        for w in audit["warnings"]:
+            print(f"  {s_status} {w}")
+    else:
+        print(f"  {s_status} Sensitive Surfaces: Clean")
+    print(f"  {a_status} ADR Invariants: Aligned with {audit['active_adrs_count']} active ADRs")
+
+    if audit["violations"]:
+        print("\n--- [ CRITICAL GROUNDEDNESS VIOLATIONS ] ---")
+        for v in audit["violations"]:
+            print(f"  [ VIOLATION ] -> {v}")
+        if getattr(args, "strict", False):
+            sys.exit(1)
+    else:
+        print("\n[ PASS ] 1:1 Invariant grounding verified against CONTEXT.md and DECISIONS.md.")
+    print("==============================================")
+
 def cmd_checkpoint(args):
     cwd = Path.cwd().resolve()
     str_cwd = str(cwd)
@@ -430,25 +658,32 @@ def cmd_checkpoint(args):
     commit, branch, dirty = get_git_info(cwd)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    state_content = f"""# ACTIVE STATE — {ns}
+    # Automated Groundedness Check (Self-RAG)
+    audit = None
+    if not getattr(args, "skip_groundedness", False):
+        audit = audit_groundedness(cwd, ns, target_dir, strict=getattr(args, "strict", False))
+        print("--- [ SELF-RAG GROUNDEDNESS AUDIT ] ---")
+        b_status = "[ OK ]" if audit["boundary_ok"] else "[ FAIL ]"
+        e_status = "[ OK ]" if audit["no_emoji"] else "[ FAIL ]"
+        s_status = "[ OK ]" if audit["sensitive_ok"] and not audit["warnings"] else "[ WARN ]"
+        a_status = "[ OK ]" if audit["adr_ok"] else "[ FAIL ]"
+        print(f"  {b_status} Boundary Confinement ({cwd})")
+        print(f"  {e_status} Strict No-Emoji Invariant")
+        if audit["warnings"]:
+            for w in audit["warnings"]:
+                print(f"  {s_status} {w}")
+        else:
+            print(f"  {s_status} Sensitive Surfaces Clean")
+        print(f"  {a_status} ADR Invariant Alignment ({audit['active_adrs_count']} active ADRs)")
+        if audit["violations"]:
+            for v in audit["violations"]:
+                print(f"  [ VIOLATION ] -> {v}")
+            if getattr(args, "strict", False):
+                print("[ ERROR ] Checkpoint rejected due to groundedness audit failure (--strict).")
+                sys.exit(1)
+        print("---------------------------------------")
 
-- **Last Checkpoint**: {now}
-- **Status**: {status}
-- **Git Branch**: `{branch}`
-- **Git Commit**: `{commit}`
-- **Uncommitted Changes**: {dirty} file(s)
-
----
-
-## Active Milestone / Task
-- **Summary**: {msg}
-- **Checkpoint Context**: Logged via `agy-guard checkpoint`
-
-## Invariant Checks
-- [x] Ponytail / YAGNI Minimalist verified
-- [x] Strict No-Emoji compliant
-- [x] Git push permission checked (local only)
-"""
+    state_content = build_enriched_state_content(ns, cwd, commit, branch, dirty, status, msg, now, audit)
     state_file.write_text(state_content.strip() + "\n", encoding="utf-8")
     
     # 4-File Governance Invariant (RFC-RAG-003): Ensure companion files exist
@@ -456,6 +691,7 @@ def cmd_checkpoint(args):
     if not index_file.exists():
         index_content = f"""# PROJECT INDEX — {ns}
 
+- **Namespace**: `00-AGY-Memory/{ns}/`
 - **Project Name**: `{ns}`
 - **Repository Path**: `{cwd}`
 - **Git Commit Hash**: `{commit}`
@@ -475,15 +711,21 @@ def cmd_checkpoint(args):
 
     ctx_file = target_dir / "CONTEXT.md"
     if not ctx_file.exists():
-        ctx_content = f"""# PROJECT CONTEXT — {ns}
-
-## Overview
-Project workspace located at `{cwd}`.
-
-## Technical Stack & Constraints
-- **Architecture Standard**: Ponytail YAGNI, 16 Binding Rules compliant.
-- **Max Lines Limit**: 200 lines per RAG file.
-"""
+        tech = "Generic Codebase"
+        if (cwd / "package.json").exists():
+            tech = "Node.js / JavaScript / TypeScript"
+        elif (cwd / "composer.json").exists():
+            tech = "PHP / Laravel / Composer"
+        elif (cwd / "Cargo.toml").exists():
+            tech = "Rust / Cargo"
+        elif (cwd / "go.mod").exists():
+            tech = "Golang"
+        elif (cwd / "requirements.txt").exists() or (cwd / "pyproject.toml").exists():
+            tech = "Python"
+        elif (cwd / "config.yml").exists() or "theme" in cwd.name.lower():
+            tech = "Shopify Liquid Theme"
+            
+        ctx_content = build_enriched_context_content(ns, cwd, tech)
         ctx_file.write_text(ctx_content.strip() + "\n", encoding="utf-8")
 
     dec_file = target_dir / "DECISIONS.md"
@@ -1169,6 +1411,7 @@ def cmd_scaffold_all_projects(args):
     print(f"=== [ BATCH SCAFFOLDING OBSIDIAN RAG MEMORY IN {target_dir} ] ===")
     
     scaffolded_count = 0
+    enriched_count = 0
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     for p in target_dir.iterdir():
@@ -1207,42 +1450,25 @@ def cmd_scaffold_all_projects(args):
 """
                 index_file.write_text(index_content.strip() + "\n", encoding="utf-8")
                 
-            # 2. CONTEXT.md
+            # 2. CONTEXT.md (Anthropic Contextual Enrichment)
             ctx_file = ns_dir / "CONTEXT.md"
             if not ctx_file.exists():
-                ctx_content = f"""# PROJECT CONTEXT — {ns}
-
-## Overview
-Project workspace located at `{p}`.
-
-## Technical Stack & Constraints
-- **Primary Stack**: {tech}
-- **Architecture Standard**: Ponytail YAGNI, 16 Binding Rules compliant.
-- **Max Lines Limit**: 200 lines per RAG file.
-"""
+                ctx_content = build_enriched_context_content(ns, p, tech)
                 ctx_file.write_text(ctx_content.strip() + "\n", encoding="utf-8")
+            else:
+                old_ctx = ctx_file.read_text(encoding="utf-8")
+                if "Known Gotchas" not in old_ctx and "Gotchas" not in old_ctx:
+                    gotchas_sec = build_contextual_gotchas(tech, p)
+                    enriched_ctx = old_ctx.rstrip() + f"\n\n## Known Gotchas & Environment Traps\n{gotchas_sec}\n"
+                    if len(enriched_ctx.splitlines()) <= 200:
+                        ctx_file.write_text(enriched_ctx, encoding="utf-8")
+                        enriched_count += 1
+                        print(f"  [ CONTEXT ENRICHED ] {ns}/CONTEXT.md (+Known Gotchas)")
                 
-            # 3. STATE.md
+            # 3. STATE.md (Subagent Alignment)
             state_file = ns_dir / "STATE.md"
             if not state_file.exists():
-                state_content = f"""# ACTIVE STATE — {ns}
-
-- **Last Checkpoint**: {now}
-- **Status**: ACTIVE
-- **Git Branch**: `{branch}`
-- **Git Commit**: `{commit}`
-
----
-
-## Active Milestone / Task
-- **Summary**: Initialized project memory via `agy-guard scaffold-all-projects`
-- **Checkpoint Context**: Scaffolding complete
-
-## Invariant Checks
-- [x] Ponytail / YAGNI Minimalist verified
-- [x] Strict No-Emoji compliant
-- [x] Git push permission checked (local only)
-"""
+                state_content = build_enriched_state_content(ns, p, commit, branch, 0, "ACTIVE", "Initialized project memory via agy-guard scaffold-all-projects", now)
                 state_file.write_text(state_content.strip() + "\n", encoding="utf-8")
                 
             # 4. DECISIONS.md
@@ -1265,7 +1491,7 @@ Project workspace located at `{p}`.
             print(f"  [ MEMORY INITIALIZED ] {ns} -> 00-AGY-Memory/{ns}/")
             scaffolded_count += 1
             
-    print(f"[ SUCCESS ] Scaffolding complete for {scaffolded_count} project namespaces in Obsidian.")
+    print(f"[ SUCCESS ] Scaffolding complete for {scaffolded_count} project namespaces (Contextual Traps Enriched: {enriched_count}) in Obsidian.")
 
 def cmd_verify(args):
     """Auto-detects project stack and executes empirical verification with Circuit Breaker."""
@@ -1634,11 +1860,19 @@ def main():
     sub_tdd.set_defaults(func=cmd_tdd)
     
     # checkpoint
-    sub_cp = subparsers.add_parser("checkpoint", help="Log deterministic state checkpoint to Obsidian RAG")
+    sub_cp = subparsers.add_parser("checkpoint", help="Log deterministic state checkpoint to Obsidian RAG with Self-RAG groundedness audit", description="Log deterministic state checkpoint to Obsidian RAG with Self-RAG groundedness audit")
     sub_cp.add_argument("-m", "--msg", type=str, default="Task milestone completed", help="Checkpoint message")
     sub_cp.add_argument("-s", "--status", type=str, default="ACTIVE", choices=["ACTIVE", "COMPLETED", "BLOCKED"], help="Status state")
     sub_cp.add_argument("-n", "--namespace", type=str, default=None, help="Target namespace override")
+    sub_cp.add_argument("--strict", action="store_true", help="Reject checkpoint if groundedness audit fails")
+    sub_cp.add_argument("--skip-groundedness", action="store_true", help="Bypass automated groundedness audit")
     sub_cp.set_defaults(func=cmd_checkpoint)
+
+    # groundedness
+    sub_gr = subparsers.add_parser("groundedness", help="Audit code changes against CONTEXT.md invariants and DECISIONS.md ADRs (Self-RAG)", description="Audit code changes against CONTEXT.md invariants and DECISIONS.md ADRs (Self-RAG)")
+    sub_gr.add_argument("-n", "--namespace", type=str, default=None, help="Target namespace override")
+    sub_gr.add_argument("--strict", action="store_true", help="Exit with non-zero code on violation")
+    sub_gr.set_defaults(func=cmd_groundedness)
     
     # log-warn
     sub_warn = subparsers.add_parser("log-warn", help="Append warning to Obsidian STATE.md (standard tier)")

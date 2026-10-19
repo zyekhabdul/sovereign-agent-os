@@ -5,7 +5,7 @@ set -euo pipefail
 # DISPATCH SOVEREIGN AGENT BUNDLE TO THIWIN (CORE-002)
 # ==============================================================================
 
-SOURCE_DIR="/home/fuckadmin/setup-sovereign-thiwin"
+SOURCE_DIR="${SOURCE_DIR:-$HOME/setup-sovereign-thiwin}"
 TARGET_NODE="thinkpad-win"
 TARGET_TAILSCALE_IP="100.78.84.3"
 

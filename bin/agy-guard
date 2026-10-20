@@ -53,6 +53,8 @@ RULE_DOCS = [
     CONFIG_DIR / "rules" / "agy-runtime-troubleshooting.md",
     CONFIG_DIR / "rules" / "ai-proposal-protocol.md",
     CONFIG_DIR / "rules" / "autonomous-failure-modes.md",
+    CONFIG_DIR / "rules" / "cloud-storage-policy.md",
+    CONFIG_DIR / "rules" / "compile-time-zero-bloat.md",
     CONFIG_DIR / "rules" / "deterministic-machine-harness.md",
     CONFIG_DIR / "rules" / "empirical-verification.md",
     CONFIG_DIR / "rules" / "environment-topology.md",

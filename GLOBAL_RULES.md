@@ -5,7 +5,7 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - Master Rules Index: `~/.gemini/config/GEMINI.md`
 - Modular Rule Definitions: `~/.gemini/config/rules/`
 
-### Core Directives Summary (17 Modular Binding Rules)
+### Core Directives Summary (18 Modular Binding Rules)
 - **Deterministic Machine Harness**: Autonomous execution governed by compiler, typecheck, and test gates (`~/.gemini/config/rules/deterministic-machine-harness.md`)
 - **Autonomous Failure Modes Defense**: 10 anti-blunder invariants and circuit breaker (`~/.gemini/config/rules/autonomous-failure-modes.md`)
 - **Agent Persona & Execution Invariants**: Objective technical mentor, autonomous single-stream execution, strict no-emoji (`~/.gemini/config/rules/agent-persona-invariants.md`)
@@ -18,6 +18,7 @@ All agents (Antigravity CLI, OpenCode, Claude Code, Codex) MUST strictly adhere 
 - **Hardware Topology**: Tri-node sovereign hardware cluster and burst worker constraints (`~/.gemini/config/rules/hardware-cluster-topology.md`)
 - **System Diagnostics**: Periodic VPS & endpoint verification (`~/.gemini/config/rules/system-diagnostics.md`)
 - **Code Style**: Ponytail / YAGNI minimalism & native-first (`~/.gemini/config/rules/ponytail-yagni.md`)
+- **Zero-Bloat Engineering**: Compile-time heavy, runtime featherlight, Web-Standards native & strict TypeScript (`~/.gemini/config/rules/compile-time-zero-bloat.md`)
 - **Architectural Proposal Protocol**: Autonomous local coding, RFC for major breaking changes only (`~/.gemini/config/rules/ai-proposal-protocol.md`)
 - **Workflow Standard**: Modern Dual-Track Agentic Engineering & Machine Verification Harness (`~/.gemini/config/rules/workflow-ai-agent.md`)
 - **Memory & RAG**: Obsidian 4-file governance (`~/.gemini/config/rules/obsidian-rag.md`)

@@ -12,9 +12,10 @@ Semua referensi path antar file WAJIB menggunakan nama file **persis sama** deng
 
 | Nama File Baku | Lokasi |
 |---|---|
-| `PRD-MASTER-TEMPLATE.md` | `09-Panduan-Projek/` |
-| `WORKFLOW-AI-AGENT-STANDARD.md` | `09-Panduan-Projek/` |
-| `GLOBAL-PROJECT-STANDARD.md` | `09-Panduan-Projek/` (file ini) |
+| `PRD-MASTER-TEMPLATE.md` | `01-Panduan-Projek/` |
+| `WORKFLOW-AI-AGENT-STANDARD.md` | `01-Panduan-Projek/` |
+| `GLOBAL-PROJECT-STANDARD.md` | `01-Panduan-Projek/` (file ini) |
+| `MODERN-WEB-STANDARDS.md` | `01-Panduan-Projek/` |
 
 Sebelum menulis referensi path di `PLAN.md`, `AGENTS.md`, atau `GEMINI.md` manapun, **cocokkan dulu ke tabel ini** — jangan menulis dari ingatan/asumsi nama file.
 
@@ -40,6 +41,7 @@ Sebelum menulis referensi path di `PLAN.md`, `AGENTS.md`, atau `GEMINI.md` manap
 | `SPEC.md` / `PRD.md` | Spesifikasi "what & why", skema tipe, dan Non-Goals | **Kondisional**: Hanya untuk Track B (Arsitektur/Modul Baru/SaaS) |
 | `PLAN.md` | Checklist batch kerja terisolasi (maksimal 10 chunk aktif) | **Kondisional**: Hanya untuk Track B multi-step |
 | `DESIGN_SYSTEM.md` | Token warna, tipografi, komponen UI, rules styling | **Kondisional**: Wajib untuk Frontend/UI/Theme |
+| `MODERN-WEB-STANDARDS.md` | Standar AI discovery (`/llms.txt`), crawler (`robots.txt`, `sitemap.xml`), `security.txt`, `webmanifest`, JSON-LD | **Kondisional**: Wajib diacu untuk seluruh proyek web/frontend/e-commerce |
 | `DEPLOYMENT.md` | Cara deploy, staging/production, rollback procedure | **Kondisional**: Wajib untuk proyek production |
 | `CHANGELOG.md` | Riwayat rilis perubahan user-facing | **Kondisional**: Proyek dengan milestone rilis |
 | `DEVELOPMENT.md` | Catatan naratif kerja manusia & handoff manual | **Opsional**: Dev log manual developer |
